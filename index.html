@@ -552,8 +552,11 @@
 
         .chart-container {
             position: relative;
+            height: 280px;
             min-height: 280px;
+            max-height: 280px;
             width: 100%;
+            overflow: hidden;
         }
 
         /* Projeção Preditiva */
@@ -1666,15 +1669,14 @@
         }
 
         .vehicle-mini-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary, #1e3a8a);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
         .vehicle-mini-card.active {
-            border-color: var(--primary) !important;
-            background: rgba(30, 58, 138, 0.08) !important;
-            box-shadow: 0 0 0 2px var(--primary);
+            border-color: #2563eb !important;
+            background: #eff6ff !important;
+            box-shadow: 0 0 0 2px #2563eb !important;
         }
 
         .vehicle-mini-card .card-prefix {
@@ -1733,7 +1735,7 @@
                     <span id="cloudStatusText">Conectando Online...</span>
                 </button>
 <!-- Botão de Conexão com Google / Gmail para Drive -->
-                <button type="button" id="googleDriveConnectBtn" class="theme-toggle-btn" style="border-color: #ea4335; color: #c5221f; background: #fef2f2; font-weight: 700; gap: 6px; display: inline-flex; align-items: center;" onclick="handleHeaderGoogleSyncClick()" title="Conectar Conta Google / Gmail para sincronizar e salvar no Google Drive">
+                <button type="button" id="googleDriveConnectBtn" class="theme-toggle-btn" style="display: none !important; border-color: #ea4335; color: #c5221f; background: #fef2f2; font-weight: 700; gap: 6px; align-items: center;" onclick="handleHeaderGoogleSyncClick()" title="Conectar Conta Google / Gmail para sincronizar e salvar no Google Drive">
                     <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.8 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
                     <span id="googleDriveBtnText">Entrar com Google</span>
                 </button>
@@ -2855,9 +2857,27 @@
 
     function updateAdminBadgeUI() {
         const badge = document.getElementById('adminSessionBadge');
+        const googleBtn = document.getElementById('googleDriveConnectBtn');
+        const tabDrive = document.getElementById('tabBtnDrive');
+
         if (badge) {
             badge.style.display = isAdminAuthenticated ? 'inline-flex' : 'none';
         }
+
+        // A opção de sincronizar com o Google só aparece para o Administrador!
+        if (googleBtn) {
+            if (isAdminAuthenticated) {
+                googleBtn.style.setProperty('display', 'inline-flex', 'important');
+                updateGoogleDriveUI();
+            } else {
+                googleBtn.style.setProperty('display', 'none', 'important');
+            }
+        }
+
+        if (tabDrive) {
+            tabDrive.style.display = isAdminAuthenticated ? 'inline-block' : 'none';
+        }
+
         const targetLock = document.getElementById('targetKmLockTag');
         if (targetLock) {
             targetLock.textContent = isAdminAuthenticated ? '🔓' : '🔒';
@@ -3285,7 +3305,14 @@
     }
 
     function generateDataHash(obj) {
-        return JSON.stringify(obj);
+        if (!obj) return '';
+        const clean = {
+            records: obj.records || [],
+            vehicles: obj.vehicles || [],
+            targetMap: obj.targetMap || {},
+            mileageHistory: obj.mileageHistory || []
+        };
+        return JSON.stringify(clean);
     }
 
     function setCloudStatusBadge(status, text) {
@@ -3402,19 +3429,15 @@
 
     function startAutoSync() {
         if (autoSyncInterval) clearInterval(autoSyncInterval);
+        // Sincronização periódica suave a cada 20 segundos
         autoSyncInterval = setInterval(() => {
-            loadDataFromOnline(true);
-        }, 4000);
-
-        window.addEventListener('focus', () => {
-            loadDataFromOnline(true);
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
+            // Evita atualizar a tela se o usuário estiver digitando em qualquer campo
+            const active = document.activeElement;
+            const isUserTyping = active && (active.tagName === 'INPUT' || active.tagName === 'SELECT' || active.tagName === 'TEXTAREA');
+            if (!isUserTyping) {
                 loadDataFromOnline(true);
             }
-        });
+        }, 20000);
     }
 
     function openServerConfigModal() {
@@ -5700,62 +5723,80 @@
         });
         const bgColors = dataKM.map(km => km > 500 ? '#10b981' : (km >= 0 ? '#f59e0b' : '#ef4444'));
 
-        const ctxBar = document.getElementById('barChart').getContext('2d');
-        if (barChartInstance) barChartInstance.destroy();
-        barChartInstance = new Chart(ctxBar, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'KM Restantes para Troca',
-                    data: dataKM,
-                    backgroundColor: bgColors,
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: { label: (ctx) => ` ${ctx.raw.toLocaleString('pt-BR')} km restantes` } }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: tickColor, font: { weight: '600' } },
-                        grid: { color: gridColor }
+        const barCanvas = document.getElementById('barChart');
+        if (barCanvas) {
+            const ctxBar = barCanvas.getContext('2d');
+            if (barChartInstance) {
+                barChartInstance.data.labels = labels;
+                barChartInstance.data.datasets[0].data = dataKM;
+                barChartInstance.data.datasets[0].backgroundColor = bgColors;
+                barChartInstance.update('none');
+            } else {
+                barChartInstance = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'KM Restantes para Troca',
+                            data: dataKM,
+                            backgroundColor: bgColors,
+                            borderRadius: 6
+                        }]
                     },
-                    y: {
-                        beginAtZero: true,
-                        ticks: { color: tickColor },
-                        grid: { color: gridColor }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (ctx) => ` ${ctx.raw.toLocaleString('pt-BR')} km restantes` } }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: tickColor, font: { weight: '600' } },
+                                grid: { color: gridColor }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: tickColor },
+                                grid: { color: gridColor }
+                            }
+                        }
                     }
-                }
+                });
             }
-        });
+        }
 
-        const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
-        if (doughnutChartInstance) doughnutChartInstance.destroy();
-        doughnutChartInstance = new Chart(ctxDoughnut, {
-            type: 'doughnut',
-            data: {
-                labels: ['Em dia (> 500 km)', 'Atenção (≤ 500 km)', 'Vencido'],
-                datasets: [{
-                    data: [okCount, warnCount, dangerCount],
-                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: labelColor, font: { weight: '600' } }
+        const doughnutCanvas = document.getElementById('doughnutChart');
+        if (doughnutCanvas) {
+            const ctxDoughnut = doughnutCanvas.getContext('2d');
+            if (doughnutChartInstance) {
+                doughnutChartInstance.data.datasets[0].data = [okCount, warnCount, dangerCount];
+                doughnutChartInstance.update('none');
+            } else {
+                doughnutChartInstance = new Chart(ctxDoughnut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Em dia (> 500 km)', 'Atenção (≤ 500 km)', 'Vencido'],
+                        datasets: [{
+                            data: [okCount, warnCount, dangerCount],
+                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: labelColor, font: { weight: '600' } }
+                            }
+                        }
                     }
-                }
+                });
             }
-        });
+        }
     }
 
     let currentTheme = localStorage.getItem('oleo_vtr_theme') || 'light';
@@ -6060,6 +6101,11 @@
         const btnText = document.getElementById('googleDriveBtnText');
         const connectBtn = document.getElementById('googleDriveConnectBtn');
 
+        if (!isAdminAuthenticated) {
+            if (connectBtn) connectBtn.style.setProperty('display', 'none', 'important');
+            return;
+        }
+
         if (googleAccessToken && googleUserEmail) {
             if (statusLbl) {
                 statusLbl.textContent = '🟢 Google Conectado: ' + googleUserEmail;
@@ -6070,6 +6116,7 @@
                 btnText.textContent = googleUserEmail;
             }
             if (connectBtn) {
+                connectBtn.style.setProperty('display', 'inline-flex', 'important');
                 connectBtn.style.borderColor = '#16a34a';
                 connectBtn.style.color = '#15803d';
                 connectBtn.style.background = '#f0fdf4';
@@ -6085,6 +6132,7 @@
                 btnText.textContent = 'Entrar com Google';
             }
             if (connectBtn) {
+                connectBtn.style.setProperty('display', 'inline-flex', 'important');
                 connectBtn.style.borderColor = '#ea4335';
                 connectBtn.style.color = '#c5221f';
                 connectBtn.style.background = '#fef2f2';
@@ -6534,24 +6582,14 @@
         }
         onVehicleSelectChange();
 
-        // Destaca visualmente o card clicado
+        // Destaca visualmente o card clicado sem pular a tela
         document.querySelectorAll('.vehicle-mini-card').forEach(card => {
             if (card.getAttribute('data-prefix') === prefix) {
                 card.classList.add('active');
-                card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
             } else {
                 card.classList.remove('active');
             }
         });
-
-        // Foco no campo de KM Atual para digitação imediata no celular
-        const kmInput = document.getElementById('currentKm');
-        if (kmInput) {
-            setTimeout(() => {
-                kmInput.focus();
-                kmInput.select();
-            }, 100);
-        }
     }
 
 
