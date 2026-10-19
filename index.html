@@ -1588,7 +1588,130 @@
         [data-theme="dark"] .custom-context-item { color: #f8fafc !important; }
         [data-theme="dark"] .custom-context-item:hover { background-color: #334155 !important; color: #60a5fa !important; }
 
+
+        /* 📱 SELETOR DE MODO: MINI CARDS vs SELETOR DROPDOWN */
+        .vehicle-select-mode-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .view-mode-tab-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-mode-tab-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .view-mode-tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.25);
+        }
+
+        /* Grid de Mini Cards (Ideal para Celular) */
+        .vehicle-mini-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 6px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 600px) {
+            .vehicle-mini-cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+                max-height: 240px;
+                gap: 6px;
+                padding: 4px;
+            }
+        }
+
+        .vehicle-mini-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 6px;
+            border-radius: 8px;
+            background: var(--card-bg, #ffffff);
+            border: 1.5px solid var(--border);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+            position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .vehicle-mini-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .vehicle-mini-card.active {
+            border-color: var(--primary) !important;
+            background: rgba(30, 58, 138, 0.08) !important;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .vehicle-mini-card .card-prefix {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+
+        .vehicle-mini-card .card-km {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .vehicle-mini-card .card-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        [data-theme="dark"] .vehicle-mini-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        [data-theme="dark"] .vehicle-mini-card.active {
+            background: rgba(59, 130, 246, 0.2) !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+
 </style>
+    <!-- Google Identity Services (OAuth 2.0 e Google Drive) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div class="dashboard-container">
@@ -1604,6 +1727,11 @@
                 <button type="button" id="cloudStatusBtn" class="cloud-badge-btn disconnected" onclick="loadDataFromOnline(false)" title="Status da sincronização no servidor online (Clique para forçar atualização)">
                     <span class="cloud-dot"></span>
                     <span id="cloudStatusText">Conectando Online...</span>
+                </button>
+<!-- Botão de Conexão com Google / Gmail para Drive -->
+                <button type="button" id="googleDriveConnectBtn" class="theme-toggle-btn" style="border-color: #ea4335; color: #c5221f; background: #fef2f2; font-weight: 700; gap: 6px; display: inline-flex; align-items: center;" onclick="handleHeaderGoogleSyncClick()" title="Conectar Conta Google / Gmail para sincronizar e salvar no Google Drive">
+                    <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.8 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
+                    <span id="googleDriveBtnText">Entrar com Google</span>
                 </button>
                 <button type="button" id="adminSessionBadge" class="theme-toggle-btn" style="display: none; background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #d97706;" onclick="logoutAdmin()" title="Administrador autenticado nesta sessão (Clique se desejar encerrar a sessão de ADM)">
                     <span style="font-size: 0.95rem;">🔓</span>
@@ -1657,7 +1785,33 @@
             </div>
 
             <form id="recordForm">
-                <div class="form-grid">
+                <!-- Seletor de Modo de Visualização: Mini Cards (Padrão) vs Seletor Dropdown -->
+                <div class="vehicle-select-mode-tabs">
+                    <button type="button" id="tabModeMiniCards" class="view-mode-tab-btn active" onclick="switchVehicleSelectMode('cards')" title="Modo Mini Cards (Ideal para Celular)">
+                        📱 Mini Cards (Todas as Viaturas)
+                    </button>
+                    <button type="button" id="tabModeDropdown" class="view-mode-tab-btn" onclick="switchVehicleSelectMode('dropdown')" title="Modo Seletor Tradicional">
+                        📋 Modo Seletor
+                    </button>
+                </div>
+
+                <!-- Modo 1: Mini Cards (Padrão / Celular) -->
+                <div id="vehicleMiniCardsContainer" style="display: block; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+                            Toque no prefixo da viatura para registrar:
+                        </span>
+                        <button type="button" class="btn btn-outline btn-sm btn-3d" style="font-size: 0.74rem; padding: 3px 8px;" onclick="handleVehicleEditButtonClick()" title="Gerenciar Viaturas (Requer Senha ADM)">
+                            ✏️ Editar Viatura
+                        </button>
+                    </div>
+                    <div id="vehicleMiniCardsGrid" class="vehicle-mini-cards-grid">
+                        <!-- Gerado dinamicamente via renderVehicleMiniCards() -->
+                    </div>
+                </div>
+
+                <!-- Modo 2: Seletor Tradicional (Dropdown) -->
+                <div id="vehicleDropdownContainer" style="display: none; margin-bottom: 12px;">
                     <div class="form-group full">
                         <label for="vehicleSelect">Escolha a Viatura *</label>
                         <div class="input-btn-group">
@@ -1665,6 +1819,9 @@
                             <button type="button" class="btn btn-edit-sector btn-3d" title="Opções de Gerenciamento da Viatura (Requer Senha ADM)" onclick="handleVehicleEditButtonClick()">✏️ Editar</button>
                         </div>
                     </div>
+                </div>
+
+                <div class="form-grid">
                     <!-- Ordem Solicitada: 1° KM Atual, 2° Data, 3° KM Final (Alvo) -->
                     <div class="form-group">
                         <label for="currentKm">KM Atual da Viatura *</label>
@@ -2017,7 +2174,7 @@
 <!-- ========================================================================= -->
 <!-- 🔐 MODAL DE SOLICITAÇÃO DE SENHA ADM (SEM NAVEGADOR PROMPT/URL BANNER)     -->
 <!-- ========================================================================= -->
-<div id="adminPasswordModal" class="modal-overlay" onclick="onAdminPasswordOverlayClick(event)">
+<div id="adminPasswordModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 440px;" onclick="event.stopPropagation()">
         <div class="modal-header">
             <div class="modal-title"><span>alteração permitida apenas pelo administrador</span></div>
@@ -2030,6 +2187,15 @@
             <input type="password" id="adminPasswordInput" placeholder="Senha do Administrador" style="font-size: 1rem; padding: 10px 12px;" onkeydown="if(event.key==='Enter') submitAdminPassword()">
             <div id="adminPasswordError" style="display: none; color: #ef4444; font-size: 0.85rem; font-weight: 700;">
                 ❌ Senha incorreta! Tente novamente.
+            </div>
+
+            <!-- Opção Entrar com Google Separada (Apenas para Logar) -->
+            <div style="margin-top: 4px; padding-top: 10px; border-top: 1px dashed var(--border); text-align: center;">
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px;">Ou faça login com 1 clique usando seu e-mail:</div>
+                <button type="button" class="btn btn-3d" style="width: 100%; display: flex; align-items: center; justify-content: center; border-color: #ea4335; color: #c5221f; background: #ffffff; gap: 8px; font-weight: 700; padding: 10px;" onclick="loginWithGoogleAuth()" title="Fazer login com Gmail / Google">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.8 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
+                    <span>Entrar com Google</span>
+                </button>
             </div>
         </div>
         <div class="modal-footer">
@@ -2084,7 +2250,7 @@
 </div>
 
 <!-- Modal de Atualização Rápida de KM (2 Cliques no Card/Tabela) -->
-<div id="quickKmModal" class="modal-overlay" onclick="onQuickKmOverlayClick(event)">
+<div id="quickKmModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 420px;" onclick="event.stopPropagation()">
         <div class="modal-header">
             <div class="modal-title"><span>⏱️ Atualizar Odômetro (KM)</span></div>
@@ -2104,14 +2270,14 @@
             </p>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-outline btn-3d" onclick="closeQuickKmModal()">Cancelar</button>
-            <button type="button" class="btn btn-primary btn-3d" onclick="saveQuickKmUpdate()">✅ Atualizar KM</button>
+            <button type="button" class="btn btn-outline btn-3d" onclick="closeQuickKmModal()">Fechar</button>
+            <button type="button" class="btn btn-primary btn-3d" onclick="saveQuickKmUpdate()">💾 Salvar Novo KM</button>
         </div>
     </div>
 </div>
 
 <!-- Modal: Opções de Edição da Viatura -->
-<div id="vehicleAdminOptionsModal" class="modal-overlay" onclick="onVehicleAdminOptionsOverlayClick(event)">
+<div id="vehicleAdminOptionsModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header">
             <div class="modal-title"><span>✏️ Gerenciar Viatura</span></div>
@@ -2138,7 +2304,7 @@
 </div>
 
 <!-- Modal de Edição Completa da Viatura / Óleo -->
-<div id="editModal" class="modal-overlay" onclick="onModalOverlayClick(event)">
+<div id="editModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card">
         <div class="modal-header">
             <div class="modal-title"><span>✏️ Atualizar Viatura:</span> <span id="modalVehiclePrefix" style="color: var(--primary); text-decoration: underline;">--</span></div>
@@ -2179,7 +2345,7 @@
 </div>
 
 <!-- Modal Unificado de Importação / Conexão de Planilha -->
-<div id="mergeModal" class="modal-overlay" onclick="onMergeOverlayClick(event)">
+<div id="mergeModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card">
         <div class="modal-header">
             <div class="modal-title"><span>📥 Importar e Alimentar Banco de Dados de Óleo & Rodagem</span></div>
@@ -2188,6 +2354,7 @@
         <div style="display:flex; flex-direction:column; gap:14px;">
             <div class="import-tabs">
                 <button type="button" class="import-tab-btn active" id="tabBtnOnline" onclick="switchImportTab('online')">🌐 Link Online (Google Sheets)</button>
+                <button type="button" class="import-tab-btn" id="tabBtnDrive" onclick="switchImportTab('drive')">☁️ Do Google Drive</button>
                 <button type="button" class="import-tab-btn" id="tabBtnFile" onclick="switchImportTab('file')">📁 Planilha Pronta (.xlsx, .csv, .json)</button>
                 <button type="button" class="import-tab-btn" id="tabBtnText" onclick="switchImportTab('text')">📋 Colar Células / JSON</button>
             </div>
@@ -2204,6 +2371,56 @@
                         1. No Google Sheets, clique em <strong>Compartilhar</strong>.<br>
                         2. Mude para <strong>Qualquer pessoa com o link (Leitor)</strong>.<br>
                         3. Cole o link aqui.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba: Do Google Drive -->
+            <div id="tabContentDrive" class="tab-content">
+                <div class="modal-section-box" style="display: flex; flex-direction: column; gap: 10px; background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 0.9rem; font-weight: 800; color: #991b1b; display: flex; align-items: center; gap: 6px;">
+                            ☁️ Planilhas e Backups no seu Google Drive
+                        </span>
+                        <button type="button" class="btn btn-outline btn-3d btn-sm" id="btnRefreshDriveFiles" style="border-color: #ea4335; color: #c5221f; font-weight: 700;" onclick="loadGoogleDriveFilesList()">
+                            🔄 Atualizar lista
+                        </button>
+                    </div>
+
+                    <!-- Banner de status da conta conectada -->
+                    <div id="driveAccountStatusBanner" style="display: none; font-size: 0.82rem; font-weight: 600; padding: 8px 12px; border-radius: 6px; background: #ffffff; border: 1px solid #86efac; color: #15803d; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+                        <span id="driveAccountStatusText">🟢 Conectado ao Google Drive</span>
+                        <button type="button" class="btn btn-outline btn-sm" style="font-size: 0.74rem; padding: 3px 8px; border-color: #15803d; color: #15803d;" onclick="handleGoogleDriveAuthClick(() => loadGoogleDriveFilesList())">
+                            🔄 Alternar conta
+                        </button>
+                    </div>
+
+                    <!-- Aviso caso não esteja autenticado -->
+                    <div id="driveAuthNotice" style="display: none; padding: 14px; border-radius: 6px; background: #ffffff; border: 1px dashed #f87171; text-align: center;">
+                        <p style="font-size: 0.86rem; color: #7f1d1d; margin-bottom: 10px; line-height: 1.4;">
+                            Conecte sua conta do Google para visualizar e importar as planilhas ou backups salvos no seu Drive.
+                        </p>
+                        <button type="button" class="btn btn-primary btn-3d btn-sm" style="padding: 8px 16px; font-weight: 700; background: #ea4335; border-color: #dc2626;" onclick="handleGoogleDriveAuthClick(() => loadGoogleDriveFilesList())">
+                            🔑 Conectar conta Google Drive
+                        </button>
+                    </div>
+
+                    <!-- Lista de arquivos do Google Drive -->
+                    <div id="driveFilesListContainer" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 0;">
+                        <!-- Preenchido via loadGoogleDriveFilesList() -->
+                    </div>
+
+                    <!-- Opção de carregar diretamente pelo Link/ID do Google Drive -->
+                    <div style="border-top: 1px dashed #fca5a5; padding-top: 10px; margin-top: 4px;">
+                        <label for="driveDirectFileIdInput" style="display: block; font-size: 0.8rem; font-weight: 700; color: #991b1b; margin-bottom: 5px;">
+                            🔗 Ou cole o link / ID do arquivo no Google Drive:
+                        </label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="driveDirectFileIdInput" placeholder="Cole o link https://drive.google.com/file/d/... ou ID do arquivo" style="flex: 1; font-size: 0.82rem; padding: 8px 12px; border: 1px solid #f87171; border-radius: 6px; box-sizing: border-box;" oninput="onDriveDirectInputChanged()">
+                            <button type="button" class="btn btn-primary btn-3d btn-sm" style="font-weight: 700; padding: 8px 14px; background: #ea4335;" onclick="importFromDriveDirectInput()">
+                                📥 Baixar e importar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2238,7 +2455,7 @@
 </div>
 
 <!-- Modal de Gerenciamento de Viaturas Cadastradas -->
-<div id="manageVehiclesModal" class="modal-overlay" onclick="onManageVehiclesOverlayClick(event)">
+<div id="manageVehiclesModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card">
         <div class="modal-header">
             <div class="modal-title"><span>🚗 Gerenciar e Renomear Viaturas Cadastradas</span></div>
@@ -2258,7 +2475,7 @@
 </div>
 
 <!-- Modal de Configuração da Conexão Online -->
-<div id="serverConfigModal" class="modal-overlay" onclick="onServerConfigOverlayClick(event)">
+<div id="serverConfigModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 580px;">
         <div class="modal-header">
             <div class="modal-title"><span>🌐 Conexão do Banco de Dados Online</span></div>
@@ -2300,13 +2517,30 @@
 </div>
 
 <!-- Modal Unificado de Banco de Dados -->
-<div id="databaseActionsModal" class="modal-overlay" onclick="onDatabaseActionsOverlayClick(event)">
+<div id="databaseActionsModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 520px;">
         <div class="modal-header">
-            <div class="modal-title"><span>💾 Banco de Dados</span></div>
+            <div class="modal-title"><span>💾 Banco de Dados & Google Drive</span></div>
             <button class="modal-close" onclick="closeDatabaseActionsModal()" title="Fechar">✖</button>
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px; padding: 8px 0;">
+            <!-- Configuração do Google Drive / Gmail (OAuth Client ID) -->
+            <div style="padding: 12px; background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px;">
+                <label for="googleClientIdInput" style="display: block; font-size: 0.84rem; font-weight: 700; color: #991b1b; margin-bottom: 4px;">
+                    🔑 ID do Cliente Google (OAuth Client ID):
+                </label>
+                <div style="font-size: 0.76rem; color: #7f1d1d; margin-bottom: 6px; line-height: 1.3;">
+                    Cole aqui o Client ID gerado no Google Cloud Console para permitir login com o Gmail e sincronização automática com o Google Drive.
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <input type="text" id="googleClientIdInput" placeholder="Ex: 123456789-xxxx.apps.googleusercontent.com" style="flex: 1; font-size: 0.78rem; padding: 8px 10px; border: 1px solid #f87171; border-radius: 6px; font-family: monospace; background: #fff; color: #0f172a;">
+                    <button type="button" class="btn btn-primary btn-3d" style="padding: 8px 14px; font-size: 0.82rem; white-space: nowrap;" onclick="saveGoogleClientId()" title="Salvar ID do Cliente">💾 Salvar</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                    <span id="googleAuthStatusLabel" style="font-size: 0.76rem; color: #64748b; font-weight: 600;">⚪ Não conectado</span>
+                    <button type="button" id="googleDisconnectLink" style="display: none; background: none; border: none; color: #dc2626; font-size: 0.74rem; cursor: pointer; text-decoration: underline;" onclick="disconnectGoogleAccount()">Desconectar conta</button>
+                </div>
+            </div>
             <button type="button" class="btn btn-merge btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeDatabaseActionsModal(); openMergeModal();">
                 📥 Importar / Conectar Planilha (Google Sheets / Excel)
             </button>
@@ -2327,7 +2561,7 @@
 </div>
 
 <!-- Modal Unificado de Tabelas (Exportação) -->
-<div id="tablesExportModal" class="modal-overlay" onclick="onTablesExportOverlayClick(event)">
+<div id="tablesExportModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header">
             <div class="modal-title"><span>📊 Tabelas da Frota</span></div>
@@ -2348,7 +2582,7 @@
 </div>
 
 <!-- Modal Unificado de Edição de Tabela -->
-<div id="editTableModal" class="modal-overlay" onclick="onEditTableOverlayClick(event)">
+<div id="editTableModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header">
             <div class="modal-title"><span>✏️ Editar Tabela</span></div>
@@ -2369,7 +2603,7 @@
 </div>
 
 <!-- Modal de Edição da Tabela de Óleo (Dentro do Setor) -->
-<div id="oilTableEditModal" class="modal-overlay" onclick="onOilTableEditOverlayClick(event)">
+<div id="oilTableEditModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header">
             <div class="modal-title"><span>✏️ Opções da Tabela de Óleo</span></div>
@@ -2390,7 +2624,7 @@
 </div>
 
 <!-- Modal de Edição do Controle de Rodagem (Dentro do Setor) -->
-<div id="mileageTableEditModal" class="modal-overlay" onclick="onMileageTableEditOverlayClick(event)">
+<div id="mileageTableEditModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header">
             <div class="modal-title"><span>✏️ Opções do Controle de Rodagem</span></div>
@@ -3608,6 +3842,9 @@
         }
 
         onVehicleSelectChange();
+        if (typeof renderVehicleMiniCards === 'function') {
+            renderVehicleMiniCards();
+        }
     }
 
     function setQuickFilter(filterValue) {
@@ -3622,6 +3859,14 @@
         if (!selected) return;
 
         document.getElementById('selectedVehicleTitle').textContent = selected;
+        // Sincroniza destaque no card ativo
+        document.querySelectorAll('.vehicle-mini-card').forEach(card => {
+            if (card.getAttribute('data-prefix') === selected) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
 
         const vRecord = records.find(r => r.vehicle === selected);
 
@@ -3872,6 +4117,9 @@
     function saveRecords() {
         localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
         localStorage.setItem('oleo_vtr_mileage_history', JSON.stringify(mileageHistory));
+        if (typeof debouncedDriveAutoSync === 'function') {
+            debouncedDriveAutoSync();
+        }
     }
 
     async function setOriginalBaselinePrompt() {
@@ -4539,6 +4787,15 @@
         dlAnchor.remove();
 
         showToast(`📥 Banco de dados exportado como <strong>${finalName}</strong>!`);
+
+        setTimeout(async () => {
+            const targetAccount = googleUserEmail ? ` (${googleUserEmail})` : '';
+            const saveToDrive = confirm('Deseja também salvar uma cópia do backup do Banco de Dados no seu Google Drive' + targetAccount + '?');
+            if (saveToDrive) {
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                await uploadFileToUserGoogleDrive(finalName, 'application/json', blob);
+            }
+        }, 500);
     }
 
     let currentImportTab = 'online';
@@ -4551,6 +4808,14 @@
         if (tabName === 'online') {
             document.getElementById('tabBtnOnline').classList.add('active');
             document.getElementById('tabContentOnline').classList.add('active');
+        } else if (tabName === 'drive') {
+            const btnDrive = document.getElementById('tabBtnDrive');
+            const cntDrive = document.getElementById('tabContentDrive');
+            if (btnDrive) btnDrive.classList.add('active');
+            if (cntDrive) cntDrive.classList.add('active');
+            if (typeof loadGoogleDriveFilesList === 'function') {
+                loadGoogleDriveFilesList();
+            }
         } else if (tabName === 'file') {
             document.getElementById('tabBtnFile').classList.add('active');
             document.getElementById('tabContentFile').classList.add('active');
@@ -5330,6 +5595,7 @@
     // Inicialização Completa
     applyTheme(currentTheme);
     updateAdminBadgeUI();
+    initGoogleDriveAuth();
     initViewDisplayMode();
     updateAppTitleDisplay();
     initStatusTimestamp();
@@ -5338,6 +5604,7 @@
     renderDashboard();
     renderMileageTable();
     updateColumnVisibilityUI();
+    switchVehicleSelectMode(currentVehicleSelectMode || 'cards');
 
     loadDataFromOnline(false);
     startAutoSync();
@@ -5531,6 +5798,838 @@
         closeCustomContextMenu();
     }, { passive: true });
 
+
+    // =========================================================================
+    // 🔑 INTEGRAÇÃO GOOGLE DRIVE & LOGIN COM GMAIL (SINCRONIZAÇÃO AUTOMÁTICA)
+    // =========================================================================
+    let googleTokenClient = null;
+    let googleAccessToken = null;
+    let googleUserEmail = localStorage.getItem('oleo_vtr_google_email') || '';
+    let googleClientId = localStorage.getItem('oleo_vtr_google_client_id') || localStorage.getItem('batalhao_vtr_google_client_id') || '';
+    let googleDriveDbFileId = localStorage.getItem('oleo_vtr_drive_file_id') || null;
+    const GOOGLE_DRIVE_DB_FILENAME = 'CONTROLE_OLEO_FROTA_1CIA_1BPTRAN_DATABASE.json';
+    const MASTER_ADMIN_EMAIL = 'p4.1cia.1bptran.sp@gmail.com';
+    let authorizedGoogleEmails = JSON.parse(localStorage.getItem('oleo_vtr_authorized_google_emails') || '["p4.1cia.1bptran.sp@gmail.com"]');
+
+    function handleHeaderGoogleSyncClick() {
+        if (googleAccessToken && googleUserEmail) {
+            // Se já conectado, oferece sincronizar agora ou desconectar
+            const action = confirm(`🟢 Conectado ao Google: ${googleUserEmail}\n\n- Clique em OK para SINCRONIZAR AGORA com o arquivo no seu Google Drive.\n- Clique em CANCELAR se desejar gerenciar ou desconectar a conta.`);
+            if (action) {
+                autoSyncToGoogleDrive(true);
+            } else {
+                openDatabaseActionsModal();
+            }
+        } else {
+            loginWithGoogleAuth();
+        }
+    }
+
+    let selectedDriveFile = null;
+
+    function onDriveDirectInputChanged() {
+        selectedDriveFile = null;
+        document.querySelectorAll('.drive-file-item').forEach(el => {
+            el.style.borderColor = '#fecaca';
+            el.style.backgroundColor = '#ffffff';
+            const radio = el.querySelector('input[type="radio"]');
+            if (radio) radio.checked = false;
+        });
+    }
+
+    function selectDriveFileFromList(fileId, fileName, mimeType, element) {
+        selectedDriveFile = { id: fileId, name: fileName, mimeType: mimeType };
+        const input = document.getElementById('driveDirectFileIdInput');
+        if (input) input.value = fileId;
+
+        document.querySelectorAll('.drive-file-item').forEach(el => {
+            el.style.borderColor = '#fecaca';
+            el.style.backgroundColor = '#ffffff';
+            const radio = el.querySelector('input[type="radio"]');
+            if (radio) radio.checked = false;
+        });
+
+        if (element) {
+            element.style.borderColor = '#15803d';
+            element.style.backgroundColor = '#f0fdf4';
+            const radio = element.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        }
+
+        showToast('📄 Arquivo selecionado: <strong>' + fileName + '</strong>. Clique em "Baixar e importar" para carregar.');
+    }
+
+    async function loadGoogleDriveFilesList() {
+        const listContainer = document.getElementById('driveFilesListContainer');
+        const notice = document.getElementById('driveAuthNotice');
+        const statusBanner = document.getElementById('driveAccountStatusBanner');
+        const statusText = document.getElementById('driveAccountStatusText');
+        if (!listContainer) return;
+
+        const email = googleUserEmail || localStorage.getItem('oleo_vtr_google_email') || '';
+
+        if (!googleAccessToken) {
+            if (statusBanner) statusBanner.style.display = 'none';
+            if (notice) {
+                notice.style.display = 'block';
+                if (email) {
+                    const p = notice.querySelector('p');
+                    if (p) p.innerHTML = `Sua conta Google <strong>${email}</strong> está identificada.<br>Clique no botão abaixo para autorizar o acesso e carregar seus arquivos do Google Drive:`;
+                }
+            }
+            listContainer.innerHTML = '';
+            return;
+        }
+
+        if (notice) notice.style.display = 'none';
+        if (statusBanner) {
+            statusBanner.style.display = 'flex';
+            if (statusText) {
+                statusText.innerHTML = `🟢 Conectado ao Google Drive: <strong>${email || 'Conta Google'}</strong>`;
+            }
+        }
+
+        listContainer.innerHTML = '<div style="text-align:center; padding:18px; color:#64748b; font-size:0.86rem;"><span class="spinner"></span> ⏳ Buscando planilhas e backups no seu Google Drive...</div>';
+
+        try {
+            const q = "trashed = false and (name contains '.json' or name contains '.xlsx' or name contains '.xls' or name contains '.csv' or mimeType = 'application/vnd.google-apps.spreadsheet' or mimeType = 'application/json' or mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' or mimeType = 'application/vnd.ms-excel' or mimeType = 'text/csv')";
+            const url = 'https://www.googleapis.com/drive/v3/files?pageSize=40&orderBy=modifiedTime desc&fields=files(id,name,mimeType,size,modifiedTime)&q=' + encodeURIComponent(q);
+
+            const res = await fetch(url, {
+                headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    googleAccessToken = null;
+                    if (notice) notice.style.display = 'block';
+                    if (statusBanner) statusBanner.style.display = 'none';
+                    listContainer.innerHTML = '';
+                    return;
+                }
+                throw new Error('HTTP ' + res.status);
+            }
+
+            const data = await res.json();
+            let files = data.files || [];
+
+            if (files.length === 0) {
+                const fallbackUrl = "https://www.googleapis.com/drive/v3/files?pageSize=40&orderBy=modifiedTime desc&fields=files(id,name,mimeType,size,modifiedTime)&q=" + encodeURIComponent("trashed = false and mimeType != 'application/vnd.google-apps.folder'");
+                const resFallback = await fetch(fallbackUrl, {
+                    headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+                });
+                if (resFallback.ok) {
+                    const fbData = await resFallback.json();
+                    files = fbData.files || [];
+                }
+            }
+
+            if (files.length === 0) {
+                listContainer.innerHTML = '<div style="text-align:center; padding:16px; color:#64748b; font-size:0.84rem;">📭 Nenhum arquivo recente encontrado no seu Google Drive.<br><span style="font-size:0.75rem;">Você também pode colar o link do arquivo no campo abaixo.</span></div>';
+                return;
+            }
+
+            let listHtml = '';
+            files.forEach((f) => {
+                const isJson = f.name.toLowerCase().endsWith('.json') || f.mimeType === 'application/json';
+                const icon = isJson ? '📄' : '📊';
+                const modified = f.modifiedTime ? new Date(f.modifiedTime).toLocaleDateString('pt-BR') : '-';
+                const safeName = f.name.replace(/'/g, "\\'");
+                const isSelected = selectedDriveFile && selectedDriveFile.id === f.id;
+
+                listHtml += `
+                    <div class="drive-file-item" style="display:flex; justify-content:space-between; align-items:center; background:${isSelected ? '#f0fdf4' : '#ffffff'}; padding:8px 12px; border-radius:6px; border:1px solid ${isSelected ? '#15803d' : '#fecaca'}; gap:10px; cursor:pointer; transition:all 0.15s;" onclick="selectDriveFileFromList('${f.id}', '${safeName}', '${f.mimeType}', this)">
+                        <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+                            <input type="radio" name="driveFileSelectRadio" ${isSelected ? 'checked' : ''} style="cursor:pointer; width:16px; height:16px; accent-color:var(--primary);" onclick="event.stopPropagation(); selectDriveFileFromList('${f.id}', '${safeName}', '${f.mimeType}', this.closest('.drive-file-item'))">
+                            <span style="font-size:1.25rem;">${icon}</span>
+                            <div style="display:flex; flex-direction:column; min-width:0;">
+                                <span style="font-size:0.86rem; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${f.name}">${f.name}</span>
+                                <span style="font-size:0.72rem; color:#64748b;">Modificado em: ${modified}</span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-merge btn-3d btn-sm" style="padding:4px 10px; font-size:0.76rem;" onclick="event.stopPropagation(); downloadAndImportDriveFile('${f.id}', '${safeName}', '${f.mimeType}')" title="Importar este arquivo imediatamente">
+                            📥 Importar
+                        </button>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = listHtml;
+        } catch (err) {
+            listContainer.innerHTML = '<div style="color:#ef4444; padding:12px; font-size:0.84rem; text-align:center;">Erro ao listar arquivos do Google Drive: ' + err.message + '<br><button type="button" class="btn btn-outline btn-sm" style="margin-top:6px;" onclick="loadGoogleDriveFilesList()">Tentar novamente</button></div>';
+        }
+    }
+
+    async function downloadAndImportDriveFile(fileId, fileName, mimeType) {
+        if (!googleAccessToken) {
+            handleGoogleDriveAuthClick(() => downloadAndImportDriveFile(fileId, fileName, mimeType));
+            return;
+        }
+
+        showToast('☁️ <strong>Baixando ' + fileName + ' do seu Google Drive...</strong>');
+
+        try {
+            let fetchUrl = '';
+            if (mimeType === 'application/vnd.google-apps.spreadsheet') {
+                fetchUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            } else {
+                fetchUrl = 'https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media';
+            }
+
+            const res = await fetch(fetchUrl, {
+                headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+            });
+
+            if (!res.ok) {
+                throw new Error('HTTP ' + res.status);
+            }
+
+            const isJson = fileName.toLowerCase().endsWith('.json') || mimeType === 'application/json';
+
+            if (isJson) {
+                const jsonText = await res.text();
+                const parsed = JSON.parse(jsonText);
+                processJsonData(parsed, true);
+            } else {
+                const arrayBuffer = await res.arrayBuffer();
+                const data = new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                processWorkbookData(workbook, true);
+            }
+            closeMergeModal();
+            saveRecords();
+            renderDashboard();
+            renderMileageTable();
+            populateVehicleSelects();
+            syncAllDataToOnline();
+            showToast('✅ <strong>Dados importados e sincronizados com sucesso do Google Drive!</strong>');
+        } catch (err) {
+            alert('Erro ao carregar arquivo do Google Drive: ' + err.message);
+        }
+    }
+
+    function importFromDriveDirectInput() {
+        const input = document.getElementById('driveDirectFileIdInput');
+        if (!input || !input.value.trim()) {
+            alert('Por favor, informe o Link de compartilhamento ou ID do arquivo no Google Drive.');
+            return;
+        }
+        const val = input.value.trim();
+        let fileId = val;
+        const match = val.match(/\/d\/([a-zA-Z0-9_-]+)/) || val.match(/id=([a-zA-Z0-9_-]+)/);
+        if (match) {
+            fileId = match[1];
+        }
+        downloadAndImportDriveFile(fileId, 'Arquivo_Google_Drive', '');
+    }
+
+    function initGoogleDriveAuth() {
+        const input = document.getElementById('googleClientIdInput');
+        if (input && googleClientId) {
+            input.value = googleClientId;
+        }
+        updateGoogleDriveUI();
+
+        if (window.google && googleClientId) {
+            try {
+                googleTokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: googleClientId,
+                    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email',
+                    callback: handleGoogleTokenResponse
+                });
+            } catch (err) {
+                console.warn('Erro ao inicializar token client do Google:', err);
+            }
+        }
+    }
+
+    function saveGoogleClientId() {
+        const input = document.getElementById('googleClientIdInput');
+        if (!input) return;
+        const val = input.value.trim();
+        if (val) {
+            googleClientId = val;
+            localStorage.setItem('oleo_vtr_google_client_id', val);
+            initGoogleDriveAuth();
+            showToast('💾 <strong>ID do Cliente Google salvo com sucesso!</strong>');
+        } else {
+            googleClientId = '';
+            localStorage.removeItem('oleo_vtr_google_client_id');
+            googleAccessToken = null;
+            googleUserEmail = '';
+            localStorage.removeItem('oleo_vtr_google_email');
+            updateGoogleDriveUI();
+            showToast('ℹ️ Configuração do Google removida.');
+        }
+    }
+
+    function updateGoogleDriveUI() {
+        const statusLbl = document.getElementById('googleAuthStatusLabel');
+        const discLink = document.getElementById('googleDisconnectLink');
+        const btnText = document.getElementById('googleDriveBtnText');
+        const connectBtn = document.getElementById('googleDriveConnectBtn');
+
+        if (googleAccessToken && googleUserEmail) {
+            if (statusLbl) {
+                statusLbl.textContent = '🟢 Google Conectado: ' + googleUserEmail;
+                statusLbl.style.color = '#16a34a';
+            }
+            if (discLink) discLink.style.display = 'inline';
+            if (btnText) {
+                btnText.textContent = googleUserEmail;
+            }
+            if (connectBtn) {
+                connectBtn.style.borderColor = '#16a34a';
+                connectBtn.style.color = '#15803d';
+                connectBtn.style.background = '#f0fdf4';
+                connectBtn.title = 'Conectado como ' + googleUserEmail + ' (Clique para sincronizar ou gerenciar)';
+            }
+        } else {
+            if (statusLbl) {
+                statusLbl.textContent = '⚪ Não conectado ao Google';
+                statusLbl.style.color = '#64748b';
+            }
+            if (discLink) discLink.style.display = 'none';
+            if (btnText) {
+                btnText.textContent = 'Entrar com Google';
+            }
+            if (connectBtn) {
+                connectBtn.style.borderColor = '#ea4335';
+                connectBtn.style.color = '#c5221f';
+                connectBtn.style.background = '#fef2f2';
+                connectBtn.title = 'Conectar Conta Google / Gmail para sincronizar e salvar no Google Drive';
+            }
+        }
+    }
+
+    let pendingDriveUploadCallback = null;
+
+    function handleGoogleDriveAuthClick(onSuccess = null) {
+        if (!googleClientId) {
+            const promptId = prompt('Atenção: Nenhum "ID do Cliente Google (OAuth Client ID)" configurado.\n\nCole aqui o seu Client ID do Google Cloud Console para ativar o login com Gmail e a sincronização com o Google Drive:');
+            if (promptId && promptId.trim()) {
+                googleClientId = promptId.trim();
+                localStorage.setItem('oleo_vtr_google_client_id', googleClientId);
+                const input = document.getElementById('googleClientIdInput');
+                if (input) input.value = googleClientId;
+                initGoogleDriveAuth();
+            } else {
+                return;
+            }
+        }
+
+        if (onSuccess) pendingDriveUploadCallback = onSuccess;
+
+        if (!window.google || !google.accounts || !google.accounts.oauth2) {
+            alert('A biblioteca do Google está carregando. Por favor, aguarde alguns segundos e tente novamente.');
+            return;
+        }
+
+        if (!googleTokenClient) {
+            googleTokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: googleClientId,
+                scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email',
+                callback: handleGoogleTokenResponse
+            });
+        }
+
+        googleTokenClient.requestAccessToken({ prompt: googleAccessToken ? '' : 'select_account' });
+    }
+
+    async function handleGoogleTokenResponse(tokenResponse) {
+        if (tokenResponse && tokenResponse.access_token) {
+            googleAccessToken = tokenResponse.access_token;
+
+            try {
+                const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+                    headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+                });
+                if (userRes.ok) {
+                    const userData = await userRes.json();
+                    googleUserEmail = userData.email || 'Conta Google';
+                    localStorage.setItem('oleo_vtr_google_email', googleUserEmail);
+                }
+            } catch (e) {
+                googleUserEmail = 'Conectado';
+            }
+
+            updateGoogleDriveUI();
+
+            if (pendingDriveUploadCallback) {
+                const cb = pendingDriveUploadCallback;
+                pendingDriveUploadCallback = null;
+                cb();
+            } else {
+                onGoogleUserLoggedIn(googleUserEmail);
+            }
+        } else if (tokenResponse && tokenResponse.error) {
+            showToast('⚠️ Autenticação do Google cancelada.');
+            pendingDriveUploadCallback = null;
+        }
+    }
+
+    function disconnectGoogleAccount() {
+        if (googleAccessToken && window.google && google.accounts && google.accounts.oauth2) {
+            try {
+                google.accounts.oauth2.revoke(googleAccessToken, () => {});
+            } catch (e) {}
+        }
+        googleAccessToken = null;
+        googleUserEmail = '';
+        localStorage.removeItem('oleo_vtr_google_email');
+        localStorage.removeItem('oleo_vtr_drive_file_id');
+        googleDriveDbFileId = null;
+        updateGoogleDriveUI();
+        showToast('🚪 Conta Google desconectada.');
+    }
+
+    // Login com Google
+    function loginWithGoogleAuth() {
+        handleGoogleDriveAuthClick(async () => {
+            closeAdminPasswordModal(true);
+            onGoogleUserLoggedIn(googleUserEmail);
+        });
+    }
+
+    let pendingGoogleLinkEmail = '';
+
+    function openGoogleUserLinkModal(email) {
+        pendingGoogleLinkEmail = email;
+        const emailEl = document.getElementById('googleLinkModalEmail');
+        if (emailEl) emailEl.textContent = email;
+
+        const passInput = document.getElementById('googleLinkUserPass');
+        if (passInput) passInput.value = '';
+
+        const errDiv = document.getElementById('googleLinkError');
+        if (errDiv) errDiv.style.display = 'none';
+
+        const modal = document.getElementById('googleUserLinkModal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeGoogleUserLinkModal() {
+        const modal = document.getElementById('googleUserLinkModal');
+        if (modal) modal.style.display = 'none';
+        pendingGoogleLinkEmail = '';
+    }
+
+    function confirmGoogleLinkAdmin() {
+        const passInput = document.getElementById('googleLinkUserPass');
+        const errDiv = document.getElementById('googleLinkError');
+        const typedPass = (passInput ? passInput.value : '').trim();
+
+        if (typedPass !== ADMIN_PASSWORD) {
+            if (errDiv) { errDiv.textContent = '❌ Senha incorreta! Tente novamente.'; errDiv.style.display = 'block'; }
+            return;
+        }
+
+        const cleanEmail = pendingGoogleLinkEmail.toLowerCase().trim();
+        if (!authorizedGoogleEmails.includes(cleanEmail)) {
+            authorizedGoogleEmails.push(cleanEmail);
+            localStorage.setItem('oleo_vtr_authorized_google_emails', JSON.stringify(authorizedGoogleEmails));
+        }
+
+        isAdminAuthenticated = true;
+        sessionStorage.setItem('oleo_vtr_admin_auth', 'true');
+        updateAdminBadgeUI();
+        closeGoogleUserLinkModal();
+        closeAdminPasswordModal(true);
+        showToast('🔓 Conta Google autorizada com sucesso: <strong>' + cleanEmail + '</strong>!');
+        checkPromptDriveImportOnLogin();
+    }
+
+    function onGoogleUserLoggedIn(email) {
+        if (!email) return;
+        const cleanEmail = email.toLowerCase().trim();
+
+        // Se for o e-mail mestre padrão ou se já foi autorizado:
+        if (cleanEmail === MASTER_ADMIN_EMAIL || authorizedGoogleEmails.includes(cleanEmail)) {
+            isAdminAuthenticated = true;
+            sessionStorage.setItem('oleo_vtr_admin_auth', 'true');
+            updateAdminBadgeUI();
+            closeAdminPasswordModal(true);
+            showToast('🔓 Bem-vindo(a), <strong>Administrador</strong>! (Conectado com ' + cleanEmail + ')');
+            checkPromptDriveImportOnLogin();
+        } else {
+            // Abre modal para confirmar autorização com senha uma única vez
+            openGoogleUserLinkModal(cleanEmail);
+        }
+    }
+
+    function checkPromptDriveImportOnLogin() {
+        setTimeout(() => {
+            const modal = document.getElementById('promptDriveImportModal');
+            if (modal) modal.style.display = 'flex';
+        }, 500);
+    }
+
+    function declineDriveImportOnLogin() {
+        const modal = document.getElementById('promptDriveImportModal');
+        if (modal) modal.style.display = 'none';
+        showToast('ℹ️ Mantendo os dados atuais carregados no sistema.');
+        // Sincroniza o estado atual no Drive para manter a cópia atualizada
+        debouncedDriveAutoSync();
+    }
+
+    async function acceptDriveImportOnLogin() {
+        const modal = document.getElementById('promptDriveImportModal');
+        if (modal) modal.style.display = 'none';
+
+        if (googleAccessToken) {
+            try {
+                showToast('⏳ <strong>Buscando arquivo salvo no Google Drive...</strong>');
+                const searchQ = "trashed = false and name = '" + GOOGLE_DRIVE_DB_FILENAME + "'";
+                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?pageSize=1&fields=files(id,name,mimeType)&q=' + encodeURIComponent(searchQ), {
+                    headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+                });
+                if (searchRes.ok) {
+                    const searchData = await searchRes.json();
+                    if (searchData.files && searchData.files.length > 0) {
+                        const file = searchData.files[0];
+                        googleDriveDbFileId = file.id;
+                        localStorage.setItem('oleo_vtr_drive_file_id', file.id);
+                        await downloadAndImportDriveFile(file.id, file.name, file.mimeType);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('Busca direta falhou, abrindo seletor do Drive:', err);
+            }
+        }
+
+        openMergeModal();
+        switchImportTab('drive');
+        if (typeof loadGoogleDriveFilesList === 'function') {
+            loadGoogleDriveFilesList();
+        }
+    }
+
+    let autoSyncDriveTimer = null;
+
+    function debouncedDriveAutoSync() {
+        if (!googleAccessToken) return;
+        if (autoSyncDriveTimer) clearTimeout(autoSyncDriveTimer);
+        autoSyncDriveTimer = setTimeout(() => {
+            autoSyncToGoogleDrive();
+        }, 1500);
+    }
+
+    async function autoSyncToGoogleDrive(showManualToast = false) {
+        if (!googleAccessToken) {
+            if (showManualToast) {
+                handleGoogleDriveAuthClick(() => autoSyncToGoogleDrive(true));
+            }
+            return;
+        }
+
+        if (showManualToast) {
+            showToast('☁️ <strong>Sincronizando com o Google Drive...</strong>');
+        }
+
+        try {
+            const payload = {
+                appTitle: appTitle,
+                lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
+                vehicles: customVehicles,
+                targetMap: vehicleTargetMap,
+                records: records,
+                mileageHistory: mileageHistory,
+                updatedAt: new Date().toISOString()
+            };
+
+            const jsonStr = JSON.stringify(payload, null, 2);
+            const fileBlob = new Blob([jsonStr], { type: 'application/json' });
+
+            if (!googleDriveDbFileId) {
+                const searchQ = "trashed = false and name = '" + GOOGLE_DRIVE_DB_FILENAME + "'";
+                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?pageSize=1&fields=files(id,name)&q=' + encodeURIComponent(searchQ), {
+                    headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+                });
+                if (searchRes.ok) {
+                    const searchData = await searchRes.json();
+                    if (searchData.files && searchData.files.length > 0) {
+                        googleDriveDbFileId = searchData.files[0].id;
+                        localStorage.setItem('oleo_vtr_drive_file_id', googleDriveDbFileId);
+                    }
+                }
+            }
+
+            if (googleDriveDbFileId) {
+                const metadata = {
+                    name: GOOGLE_DRIVE_DB_FILENAME,
+                    mimeType: 'application/json',
+                    description: 'Sincronização automática do Controle de Óleo - 1ª Cia 1º BPTran'
+                };
+                const form = new FormData();
+                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                form.append('file', fileBlob);
+
+                const patchRes = await fetch('https://www.googleapis.com/upload/drive/v3/files/' + googleDriveDbFileId + '?uploadType=multipart', {
+                    method: 'PATCH',
+                    headers: { 'Authorization': 'Bearer ' + googleAccessToken },
+                    body: form
+                });
+
+                if (patchRes.ok) {
+                    showToast('☁️ <strong>Arquivo salvo automaticamente no Google Drive!</strong>');
+                } else if (patchRes.status === 404) {
+                    googleDriveDbFileId = null;
+                    localStorage.removeItem('oleo_vtr_drive_file_id');
+                    autoSyncToGoogleDrive(showManualToast);
+                }
+            } else {
+                const metadata = {
+                    name: GOOGLE_DRIVE_DB_FILENAME,
+                    mimeType: 'application/json',
+                    description: 'Sincronização automática do Controle de Óleo - 1ª Cia 1º BPTran'
+                };
+                const form = new FormData();
+                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                form.append('file', fileBlob);
+
+                const postRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + googleAccessToken },
+                    body: form
+                });
+
+                if (postRes.ok) {
+                    const postData = await postRes.json();
+                    if (postData.id) {
+                        googleDriveDbFileId = postData.id;
+                        localStorage.setItem('oleo_vtr_drive_file_id', googleDriveDbFileId);
+                        showToast('☁️ <strong>Backup inicial criado no seu Google Drive!</strong>');
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Erro ao sincronizar com Google Drive:', e);
+        }
+    }
+
+    async function uploadFileToUserGoogleDrive(fileName, mimeType, fileBlob) {
+        if (!googleAccessToken) {
+            handleGoogleDriveAuthClick(() => uploadFileToUserGoogleDrive(fileName, mimeType, fileBlob));
+            return;
+        }
+
+        showToast('☁️ <strong>Enviando ' + fileName + ' para o seu Google Drive...</strong>');
+
+        try {
+            const metadata = {
+                name: fileName,
+                mimeType: mimeType,
+                description: 'Exportado pelo Painel de Controle de Óleo - 1ª Cia 1º BPTran'
+            };
+
+            const form = new FormData();
+            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            form.append('file', fileBlob);
+
+            const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + googleAccessToken
+                },
+                body: form
+            });
+
+            if (uploadRes.ok) {
+                const fileData = await uploadRes.json();
+                showToast('✅ <strong>' + fileName + ' salvo no seu Google Drive!</strong>');
+            } else if (uploadRes.status === 401) {
+                googleAccessToken = null;
+                handleGoogleDriveAuthClick(() => uploadFileToUserGoogleDrive(fileName, mimeType, fileBlob));
+            } else {
+                const errJson = await uploadRes.json().catch(() => ({}));
+                const msg = (errJson.error && errJson.error.message) ? errJson.error.message : ('HTTP ' + uploadRes.status);
+                alert('Erro ao enviar para o Google Drive: ' + msg);
+            }
+        } catch (err) {
+            alert('Falha na comunicação com o Google Drive: ' + err.message);
+        }
+    }
+
+
+    // =========================================================================
+    // 📱 MINI CARDS DE VIATURAS (PADRÃO PARA CELULAR) E MODO SELETOR
+    // =========================================================================
+    let currentVehicleSelectMode = localStorage.getItem('oleo_vtr_select_mode') || 'cards';
+
+    function switchVehicleSelectMode(mode) {
+        currentVehicleSelectMode = mode;
+        localStorage.setItem('oleo_vtr_select_mode', mode);
+
+        const tabCards = document.getElementById('tabModeMiniCards');
+        const tabDropdown = document.getElementById('tabModeDropdown');
+        const containerCards = document.getElementById('vehicleMiniCardsContainer');
+        const containerDropdown = document.getElementById('vehicleDropdownContainer');
+
+        if (mode === 'dropdown') {
+            if (tabCards) tabCards.classList.remove('active');
+            if (tabDropdown) tabDropdown.classList.add('active');
+            if (containerCards) containerCards.style.display = 'none';
+            if (containerDropdown) containerDropdown.style.display = 'block';
+        } else {
+            if (tabCards) tabCards.classList.add('active');
+            if (tabDropdown) tabDropdown.classList.remove('active');
+            if (containerCards) containerCards.style.display = 'block';
+            if (containerDropdown) containerDropdown.style.display = 'none';
+            renderVehicleMiniCards();
+        }
+    }
+
+    function renderVehicleMiniCards() {
+        const grid = document.getElementById('vehicleMiniCardsGrid');
+        if (!grid) return;
+
+        const currentSelected = document.getElementById('vehicleSelect') ? document.getElementById('vehicleSelect').value : '';
+
+        let cardsHtml = '';
+        customVehicles.forEach(v => {
+            const vRecord = records.find(r => r.vehicle === v);
+            const fixedTarget = vehicleTargetMap[v] || (vRecord ? vRecord.targetKm : null);
+            const currentKm = vRecord ? vRecord.currentKm : null;
+            
+            let statusColor = '#94a3b8'; // Cinza: Sem dados
+            let statusText = 'Sem dados';
+            let remainingText = '';
+
+            if (currentKm !== null && !isNaN(currentKm)) {
+                const activeTarget = fixedTarget || vRecord.targetKm;
+                if (activeTarget) {
+                    const diff = activeTarget - currentKm;
+                    if (diff > 500) {
+                        statusColor = '#16a34a'; // Verde: Em dia
+                        statusText = 'Em Dia';
+                        remainingText = `+${diff.toLocaleString('pt-BR')} km`;
+                    } else if (diff >= 0) {
+                        statusColor = '#d97706'; // Amarelo: Atenção
+                        statusText = 'Atenção';
+                        remainingText = `+${diff.toLocaleString('pt-BR')} km`;
+                    } else {
+                        statusColor = '#dc2626'; // Vermelho: Vencido
+                        statusText = 'Vencido';
+                        remainingText = `-${Math.abs(diff).toLocaleString('pt-BR')} km`;
+                    }
+                } else {
+                    statusColor = '#2563eb';
+                    statusText = 'Sem Alvo';
+                    remainingText = `${currentKm.toLocaleString('pt-BR')} km`;
+                }
+            }
+
+            const isSelected = (v === currentSelected);
+
+            cardsHtml += `
+                <div class="vehicle-mini-card ${isSelected ? 'active' : ''}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${statusText}">
+                    <div class="card-prefix">${v}</div>
+                    <div class="card-km" style="display: flex; align-items: center; justify-content: center; gap: 4px; font-weight: 600;">
+                        <span class="card-status-dot" style="background-color: ${statusColor};"></span>
+                        <span style="color: ${statusColor}; font-size: 0.72rem;">${remainingText || statusText}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        grid.innerHTML = cardsHtml;
+    }
+
+    function selectVehicleFromMiniCard(prefix) {
+        const select = document.getElementById('vehicleSelect');
+        if (select) {
+            select.value = prefix;
+        }
+        onVehicleSelectChange();
+
+        // Destaca visualmente o card clicado
+        document.querySelectorAll('.vehicle-mini-card').forEach(card => {
+            if (card.getAttribute('data-prefix') === prefix) {
+                card.classList.add('active');
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            } else {
+                card.classList.remove('active');
+            }
+        });
+
+        // Foco no campo de KM Atual para digitação imediata no celular
+        const kmInput = document.getElementById('currentKm');
+        if (kmInput) {
+            setTimeout(() => {
+                kmInput.focus();
+                kmInput.select();
+            }, 100);
+        }
+    }
+
 </script>
+
+<!-- Modal de Pergunta: Importar Banco do Google Drive / Gmail no Login -->
+<div id="promptDriveImportModal" class="modal-overlay" onclick="if(event.target===this) event.stopPropagation();" style="display: none; z-index: 10080;">
+    <div class="modal-card" style="max-width: 440px;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title"><span>☁️ Sincronização com Google Drive</span></div>
+            <button type="button" class="modal-close" onclick="declineDriveImportOnLogin()" title="Fechar">✖</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px; padding: 12px 0;">
+            <div style="display: flex; align-items: center; gap: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px;">
+                <span style="font-size: 1.8rem;">📥</span>
+                <div>
+                    <div style="font-size: 0.95rem; font-weight: 800; color: #1e3a8a;">Deseja sincronizar / carregar os dados salvos no Google Drive?</div>
+                    <div style="font-size: 0.8rem; color: #475569; margin-top: 2px;">Você pode carregar a versão salva no Drive ou continuar com o banco atual.</div>
+                </div>
+            </div>
+
+            <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.4; margin: 0;">
+                Se escolher <strong>"Não"</strong>, os dados atuais do sistema permanecerão exatamente como estão, sem qualquer alteração.
+            </p>
+
+            <div class="modal-footer" style="padding-top: 6px; display: flex; gap: 10px;">
+                <button type="button" class="btn btn-outline btn-3d" style="flex: 1; justify-content: center; height: 42px;" onclick="declineDriveImportOnLogin()">
+                    ❌ Não, manter atual
+                </button>
+                <button type="button" class="btn btn-primary btn-3d" style="flex: 1; justify-content: center; height: 42px; background: #ea4335; border-color: #dc2626;" onclick="acceptDriveImportOnLogin()">
+                    ☁️ Sim, sincronizar do Drive
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Vinculação / Confirmação de Conta Google para Administrador -->
+<div id="googleUserLinkModal" class="modal-overlay" onclick="if(event.target===this) event.stopPropagation();" style="display: none; z-index: 10050;">
+    <div class="modal-card" style="max-width: 480px;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title"><span>🔐 Autorizar Conta Google</span></div>
+            <button type="button" class="modal-close" onclick="closeGoogleUserLinkModal()" title="Fechar">✖</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px; padding: 10px 0;">
+            <div style="background: rgba(66, 133, 244, 0.08); border: 1px solid rgba(66, 133, 244, 0.3); border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.8 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
+                <div style="overflow: hidden;">
+                    <div style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Google Autenticado:</div>
+                    <div id="googleLinkModalEmail" style="font-size: 0.95rem; font-weight: 800; color: var(--primary); word-break: break-all;">--</div>
+                </div>
+            </div>
+
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.4; margin: 0;">
+                Para autorizar este e-mail do Gmail como Administrador do sistema, confirme com a senha mestre padrão:
+            </p>
+
+            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: var(--bg); display: flex; flex-direction: column; gap: 8px;">
+                <div>
+                    <label for="googleLinkUserPass" style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Senha de Administrador:</label>
+                    <input type="password" id="googleLinkUserPass" placeholder="Digite PATRULHEIRO1" style="width: 100%; font-size: 0.92rem; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main);" onkeydown="if(event.key==='Enter') confirmGoogleLinkAdmin()">
+                </div>
+                <div id="googleLinkError" style="display: none; color: #ef4444; font-size: 0.8rem; font-weight: 700;"></div>
+                <button type="button" class="btn btn-primary btn-3d" style="width: 100%; justify-content: center; padding: 10px; font-weight: 700; margin-top: 4px;" onclick="confirmGoogleLinkAdmin()">
+                    🔗 Confirmar e Autorizar Acesso
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
