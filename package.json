@@ -1,11 +1,10 @@
 {
   "name": "controle-frota-oleo-bptran",
   "version": "1.0.0",
-  "description": "Sistema de Controle de Óleo e Rodagem de Viaturas - Frota 1ª Cia do 1º BPTran - Otimizado para Vercel e Render",
+  "description": "Sistema de Controle de Óleo e Rodagem de Viaturas - Servidor Online",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -13,15 +12,5 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "keywords": [
-    "frota",
-    "oleo",
-    "viaturas",
-    "policia-militar",
-    "render",
-    "nodejs",
-    "vercel"
-  ],
-  "author": "Sd Vagner - Telemática"
+  }
 }

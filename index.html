@@ -18,25 +18,25 @@
     </script>
     <style>
         :root {
-            --bg: #f8fafc;
+            --bg: #eaedf2;
             --card-bg: #ffffff;
             --text-main: #0f172a;
-            --text-muted: #64748b;
+            --text-muted: #475569;
             --primary: #1e3a8a;
             --primary-hover: #1e40af;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --purple: #8b5cf6;
-            --indigo: #4f46e5;
-            --border: #e2e8f0;
+            --success: #15803d;
+            --warning: #b45309;
+            --danger: #b91c1c;
+            --purple: #7e22ce;
+            --indigo: #4338ca;
+            --border: #cbd5e1;
             --radius: 12px;
-            --row-even-bg: #f1f5f9;
-            --row-hover-bg: #e0f2fe;
-            --sticky-shadow: 4px 0 8px rgba(0, 0, 0, 0.08);
+            --row-even-bg: #e2e8f0;
+            --row-hover-bg: #dbeafe;
+            --sticky-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
 
-            --status-ok-bg: #d1fae5;
-            --status-ok-text: #065f46;
+            --status-ok-bg: #dcfce7;
+            --status-ok-text: #166534;
             --status-warn-bg: #fef3c7;
             --status-warn-text: #92400e;
             --status-danger-bg: #fee2e2;
@@ -145,8 +145,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background-color: #f1f5f9;
-            border: 1px solid var(--border);
+            background-color: #e2e8f0;
+            border: 1px solid #cbd5e1;
             padding: 8px 14px;
             border-radius: 8px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.03);
@@ -425,8 +425,8 @@
 
         /* Info do Veículo Selecionado */
         .vehicle-info-panel {
-            background-color: #f1f5f9;
-            border: 1px dashed #cbd5e1;
+            background-color: #e8edf4;
+            border: 1px dashed #94a3b8;
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -1753,8 +1753,14 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
+        .vehicle-mini-card {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
         .vehicle-mini-card:nth-child(even) {
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
         }
 
         [data-theme="dark"] .vehicle-mini-card:nth-child(even) {
@@ -4177,9 +4183,13 @@
     const ADMIN_PASSWORD = "PATRULHEIRO1";
     let adminPasswordResolveCallback = null;
     let isAdminAuthenticated = sessionStorage.getItem('oleo_vtr_admin_auth') === 'true';
-    // vehiclePhotos e vehicleAvarias declarados no topo do script para evitar TDZ
-    vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
-    vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
+    // State variables declared at the top of the script (avoiding TDZ ReferenceError)
+    let vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
+    let vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
+    // currentInspectVehicle and currentUploadSlotId declared at top of script
+    let currentAvariaVehicle = null;
+    let currentAvariaDescription = '';
+    let selectedAvariaSlots = [];
 
     function updateAdminBadgeUI() {
         const badge = document.getElementById('adminSessionBadge');
@@ -5759,8 +5769,12 @@
         const selected = vehicleSelect.value;
         if (!selected) return;
 
-        document.getElementById('selectedVehicleTitle').textContent = selected;
+        const vRecord = records.find(r => r.vehicle === selected);
         const vInfoSelected = VEHICLE_FLEET_INFO[selected] || { model: (vRecord && vRecord.model) || '', placa: (vRecord && vRecord.placa) || '' };
+
+        const titleEl = document.getElementById('selectedVehicleTitle');
+        if (titleEl) titleEl.textContent = selected;
+
         const metaEl = document.getElementById('selectedVehicleMeta');
         if (metaEl) {
             metaEl.textContent = (vInfoSelected.model ? vInfoSelected.model : '') + (vInfoSelected.placa ? ' • Placa: ' + vInfoSelected.placa : '');
@@ -5773,8 +5787,6 @@
                 card.classList.remove('active');
             }
         });
-
-        const vRecord = records.find(r => r.vehicle === selected);
 
         const lastKmVal = document.getElementById('lastKmVal');
         const lastTargetVal = document.getElementById('lastTargetVal');
@@ -7336,8 +7348,10 @@
     }
 
     function renderDashboard() {
-        const filterVal = document.getElementById('filterVehicle').value;
-        const filterMonth = document.getElementById('filterMonth').value;
+        const filterValEl = document.getElementById('filterVehicle');
+        const filterVal = filterValEl ? filterValEl.value : 'ALL';
+        const filterMonthEl = document.getElementById('filterMonth');
+        const filterMonth = filterMonthEl ? filterMonthEl.value : 'ALL';
 
         let baseRecords = records;
         if (filterMonth !== 'ALL') {
@@ -7374,7 +7388,7 @@
         const projectionMessage = document.getElementById('projectionMessage');
 
         let monthLabelText = "";
-        if (filterMonth !== 'ALL') {
+        if (filterMonth && filterMonth !== 'ALL' && typeof filterMonth === 'string' && filterMonth.includes('-')) {
             const [y, m] = filterMonth.split('-');
             monthLabelText = " em " + (monthNamesPT[parseInt(m,10)-1] || m) + "/" + y;
         }
@@ -8495,33 +8509,34 @@
         customVehicles.forEach(v => {
             const vRecord = records.find(r => r.vehicle === v);
             const fixedTarget = vehicleTargetMap[v] || (vRecord ? vRecord.targetKm : null);
-            const currentKm = vRecord ? vRecord.currentKm : null;
+            const currentKm = (vRecord && vRecord.currentKm !== undefined && vRecord.currentKm !== null && !isNaN(vRecord.currentKm)) ? vRecord.currentKm : null;
             
-            let statusColor = '#94a3b8'; // Cinza: Sem dados
-            let statusText = 'Sem dados';
+            // Tom mais escuro e só mostra Em Dia nos que tiverem registro válido
+            let statusColor = '#475569'; // Cinza/slate escuro para sem registros
+            let statusText = 'Sem registros';
             let remainingText = '';
-
             let cardDangerClass = '';
-            if (currentKm !== null && !isNaN(currentKm)) {
-                const activeTarget = fixedTarget || vRecord.targetKm;
+
+            if (currentKm !== null) {
+                const activeTarget = fixedTarget || (vRecord ? vRecord.targetKm : null);
                 if (activeTarget) {
                     const diff = activeTarget - currentKm;
                     if (diff > 500) {
-                        statusColor = '#16a34a'; // Verde: Em dia
+                        statusColor = '#15803d'; // Verde escuro firme: Em Dia
                         statusText = 'Em Dia';
                         remainingText = `+${diff.toLocaleString('pt-BR')} km`;
                     } else if (diff >= 0) {
-                        statusColor = '#d97706'; // Amarelo: Atenção
+                        statusColor = '#b45309'; // Âmbar mais escuro: Atenção
                         statusText = 'Atenção';
                         remainingText = `+${diff.toLocaleString('pt-BR')} km`;
                     } else {
-                        statusColor = '#dc2626'; // Vermelho: Vencido
+                        statusColor = '#b91c1c'; // Vermelho mais encorpado: Vencido
                         statusText = 'Vencido';
                         remainingText = `-${Math.abs(diff).toLocaleString('pt-BR')} km`;
                         cardDangerClass = 'card-danger';
                     }
                 } else {
-                    statusColor = '#2563eb';
+                    statusColor = '#1d4ed8';
                     statusText = 'Sem Alvo';
                     remainingText = `${currentKm.toLocaleString('pt-BR')} km`;
                 }
@@ -8687,11 +8702,9 @@
     // =========================================================================
     // 📷 INSPEÇÃO DE VIATURA E GERENCIAMENTO DE FOTOS (6 FOTOS)
     // =========================================================================
-    let vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
-    let vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
-    let currentAvariaVehicle = null;
-    let currentAvariaDescription = '';
-    let selectedAvariaSlots = [];
+    // vehiclePhotos, vehicleAvarias, currentAvariaVehicle, etc. declared at top of script
+    vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
+    vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
 
     const DEFAULT_INSPECTION_SLOTS = [
         { id: 'dianteira', label: 'Dianteira (Frente)', icon: '🚗' },

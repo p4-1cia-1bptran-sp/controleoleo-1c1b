@@ -68,12 +68,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "TRAIL BLAZER",
-      "placa": "FSD-4079"
+      "placa": "FSD-4079",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01103",
@@ -81,12 +83,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "DUSTER",
-      "placa": "FUG-7E96"
+      "placa": "FUG-7E96",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01104",
@@ -94,12 +98,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "DUSTER",
-      "placa": "DCD-2E41"
+      "placa": "DCD-2E41",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01105",
@@ -107,12 +113,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "DUSTER",
-      "placa": "FJW-5C43"
+      "placa": "FJW-5C43",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01106",
@@ -120,12 +128,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "DUSTER",
-      "placa": "FMQ-0B54"
+      "placa": "FMQ-0B54",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01107",
@@ -133,12 +143,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "DUSTER",
-      "placa": "FWN-9E65"
+      "placa": "FWN-9E65",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01109",
@@ -146,12 +158,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "FZE-0D92"
+      "placa": "FZE-0D92",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01110",
@@ -159,12 +173,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "EJZ-2821"
+      "placa": "EJZ-2821",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01112",
@@ -172,12 +188,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "DWT-5E59"
+      "placa": "DWT-5E59",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01114",
@@ -185,12 +203,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "DRT-7A92"
+      "placa": "DRT-7A92",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01115",
@@ -198,12 +218,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "BVT-4J09"
+      "placa": "BVT-4J09",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01116",
@@ -211,12 +233,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "FCJ-6G67"
+      "placa": "FCJ-6G67",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01118",
@@ -224,12 +248,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "BSZ-1H27"
+      "placa": "BSZ-1H27",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01119",
@@ -237,12 +263,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "GBO-6B42"
+      "placa": "GBO-6B42",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01120",
@@ -250,12 +278,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "DUSTER",
-      "placa": "FTM-7A45"
+      "placa": "FTM-7A45",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01124",
@@ -263,12 +293,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "DUSTER",
-      "placa": "FRV-2C08"
+      "placa": "FRV-2C08",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01125",
@@ -276,12 +308,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "FOA-6102"
+      "placa": "FOA-6102",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01126",
@@ -289,12 +323,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "EIB-6D41"
+      "placa": "EIB-6D41",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01127",
@@ -302,12 +338,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "DIB-8F92"
+      "placa": "DIB-8F92",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01130",
@@ -315,12 +353,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "TRAIL BLAZER",
-      "placa": "FZT-1D98"
+      "placa": "FZT-1D98",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01135",
@@ -328,12 +368,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "SPIN",
-      "placa": "BWY-8C11"
+      "placa": "BWY-8C11",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01136",
@@ -341,12 +383,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "RANGER",
-      "placa": "FQF-2H92"
+      "placa": "FQF-2H92",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01137",
@@ -354,12 +398,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "RANGER",
-      "placa": "GBN-9E31"
+      "placa": "GBN-9E31",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "T-01147",
@@ -367,12 +413,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "S-10",
-      "placa": "GEV-6999"
+      "placa": "GEV-6999",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "3-106",
@@ -380,12 +428,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "S-10",
-      "placa": "GFP-3234"
+      "placa": "GFP-3234",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "19-167",
@@ -393,12 +443,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "XT-660",
-      "placa": "FXS-5E25"
+      "placa": "FXS-5E25",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "13-26",
@@ -406,12 +458,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "CARGO",
-      "placa": "EGX-1326"
+      "placa": "EGX-1326",
+      "oleoMotor": false,
+      "fluidoFreio": false
     },
     {
       "id": "26-24",
@@ -419,12 +473,14 @@
       "date": "2026-10-19",
       "currentKm": 0,
       "targetKm": 5000,
-      "oilBrand": "Padrão 1ª Cia",
-      "filtroOleo": true,
-      "filtroAr": true,
+      "oilBrand": "",
+      "filtroOleo": false,
+      "filtroAr": false,
       "filtroCombustivel": false,
       "model": "MASTER",
-      "placa": "FNV-9496"
+      "placa": "FNV-9496",
+      "oleoMotor": false,
+      "fluidoFreio": false
     }
   ],
   "mileageHistory": [],
@@ -542,5 +598,6 @@
       "model": "CARGO",
       "placa": "EGX-1326"
     }
-  }
+  },
+  "vehiclePhotos": {}
 }

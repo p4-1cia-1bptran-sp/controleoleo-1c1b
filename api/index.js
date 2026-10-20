@@ -224,6 +224,8 @@ module.exports = async (req, res) => {
                     targetMap: payload.targetMap && typeof payload.targetMap === 'object' ? payload.targetMap : (currentDb.targetMap || {}),
                     records: Array.isArray(payload.records) ? payload.records : (currentDb.records || []),
                     mileageHistory: Array.isArray(payload.mileageHistory) ? payload.mileageHistory : (currentDb.mileageHistory || []),
+                    vehiclePhotos: payload.vehiclePhotos && typeof payload.vehiclePhotos === 'object' ? payload.vehiclePhotos : (currentDb.vehiclePhotos || {}),
+                    fleetInfo: payload.fleetInfo || currentDb.fleetInfo || undefined,
                     updatedAt: payload.updatedAt || new Date().toISOString()
                 };
 
