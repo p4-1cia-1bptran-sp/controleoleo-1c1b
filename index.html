@@ -3607,92 +3607,102 @@
         </p>
         <div style="display: flex; gap: 12px; justify-content: center;">
             <button type="button" class="btn btn-outline btn-3d" style="flex: 1; min-height: 46px; font-weight: 700; font-size: 0.95rem; border-color: #cbd5e1;" onclick="onAvariaPromptNo()">
-                ❌ Não
+                Não
             </button>
             <button type="button" class="btn btn-danger-solid btn-3d" style="flex: 1; min-height: 46px; font-weight: 800; font-size: 0.95rem;" onclick="onAvariaPromptYes()">
-                ⚠️ Sim
+                Sim
             </button>
         </div>
     </div>
 </div>
 
 <!-- ========================================================================= -->
-<!-- 📝 2. MODAL: RELATO DE AVARIA E SELEÇÃO DE FOTOS COM TICK                 -->
+<!-- 📝 2. MODAL: JANELA PARA ESCREVER A AVARIA                                 -->
 <!-- ========================================================================= -->
-<div id="avariaReportModal" class="modal-overlay" style="z-index: 10052;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 680px; width: 95%; max-height: calc(100dvh - 80px); overflow-y: auto;" onclick="event.stopPropagation()">
+<div id="avariaTextModal" class="modal-overlay" style="z-index: 10052;" onclick="/* exclusivo pelos botões */">
+    <div class="modal-card" style="max-width: 580px; width: 95%; max-height: calc(100dvh - 80px); overflow-y: auto;" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <div class="modal-title" style="font-size: 1.05rem; font-weight: 800; line-height: 1.35; color: #b91c1c;">
-                <span>⚠️ Selecione a foto onde pode ser observada a avaria e a descreva abaixo:</span>
+            <div class="modal-title" style="font-size: 1.05rem; font-weight: 800; color: #b91c1c; line-height: 1.35;">
+                <span>Selecione a foto que onde pode ser observado a avaria e a descreva abaixo:</span>
             </div>
-            <button type="button" class="modal-close" onclick="closeAvariaReportModal()" title="Fechar">✖</button>
+            <button type="button" class="modal-close" onclick="closeAvariaTextModal()" title="Fechar">✖</button>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 14px; padding: 12px 0;">
             <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;">
                 <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Viatura Selecionada:</span>
-                <span id="avariaReportVtrTitle" style="font-size: 1.15rem; font-weight: 900; color: var(--primary);">--</span>
+                <span id="avariaTextVtrTitle" style="font-size: 1.15rem; font-weight: 900; color: var(--primary);">--</span>
             </div>
 
-            <!-- PASSO 1: Descrever a avaria e clicar em Enviar -->
-            <div id="avariaStep1">
+            <div>
                 <label for="avariaDescriptionInput" style="font-weight: 700; font-size: 0.88rem; display: block; margin-bottom: 6px; color: var(--text-main);">
-                    Descreva detalhadamente a avaria observada: *
+                    Descreva a avaria observada: *
                 </label>
-                <textarea id="avariaDescriptionInput" rows="4" placeholder="Ex: Risco profundo na porta dianteira direita, parachoque trincado, lanterna quebrada..." style="width: 100%; font-size: 0.95rem; padding: 12px; border: 2px solid var(--border); border-radius: 8px; resize: vertical; box-sizing: border-box;"></textarea>
-                <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                    <button type="button" id="btnSubmitAvariaText" class="btn btn-primary btn-3d" style="min-height: 44px; padding: 10px 24px; font-weight: 800; font-size: 0.95rem;" onclick="submitAvariaText()">
-                        ✉️ Enviar
-                    </button>
-                </div>
+                <textarea id="avariaDescriptionInput" rows="4" placeholder="Descreva aqui os detalhes da avaria observada..." style="width: 100%; font-size: 1rem; padding: 12px; border: 2px solid var(--border); border-radius: 8px; resize: vertical; box-sizing: border-box;"></textarea>
             </div>
 
-            <!-- PASSO 2: Selecione a foto (aparece apenas APÓS dar Enviar no texto) -->
-            <div id="avariaStep2" style="display: none; border-top: 1px solid var(--border); padding-top: 14px;">
-                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
-                    <div style="font-size: 0.78rem; font-weight: 700; color: #991b1b; text-transform: uppercase;">Descrição Registrada:</div>
-                    <div id="avariaConfirmedDescDisplay" style="font-size: 0.88rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">--</div>
-                </div>
-
-                <div style="font-size: 1.05rem; font-weight: 800; color: #dc2626; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                    <span>📸 Selecione a foto:</span>
-                </div>
-                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 10px 0;">
-                    Marque o tick abaixo de cada foto onde a avaria pode ser observada (selecione uma ou quantas quiser):
-                </p>
-
-                <div id="avariaPhotosGrid" class="avaria-photos-grid"></div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px;">
-                    <button type="button" class="btn btn-danger-solid btn-3d" style="width: 100%; min-height: 46px; font-weight: 800; font-size: 1rem; justify-content: center;" onclick="finalizeAvariaReport()">
-                        ✅ Finalizar Observação
-                    </button>
-                </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+                <button type="button" id="btnSubmitAvariaText" class="btn btn-primary btn-3d" style="min-height: 46px; padding: 10px 28px; font-weight: 800; font-size: 1rem;" onclick="submitAvariaText()">
+                    ✉️ Enviar
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- ========================================================================= -->
-<!-- 📢 3. MODAL: "INFORMAÇÕES INSERIDAS, INFORME A RESERVA IMEDIATAMENTE!"    -->
+<!-- 📸 3. MODAL: SELEÇÃO DA FOTO COM OS TICKS (Dianteira, Traseira, etc.)      -->
 <!-- ========================================================================= -->
-<div id="avariaAlertModal" class="modal-overlay" style="z-index: 10060;" onclick="/* exclusivo pelo botão */">
+<div id="avariaPhotoSelectModal" class="modal-overlay" style="z-index: 10054;" onclick="/* exclusivo pelos botões */">
+    <div class="modal-card" style="max-width: 680px; width: 95%; max-height: calc(100dvh - 80px); overflow-y: auto;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title" style="font-size: 1.12rem; font-weight: 900; color: #dc2626; line-height: 1.35;">
+                <span>selecione a foto onde onde consta a alteração</span>
+            </div>
+            <button type="button" class="modal-close" onclick="closeAvariaPhotoSelectModal()" title="Fechar">✖</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 10px 0;">
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 12px;">
+                <div style="font-size: 0.76rem; font-weight: 700; color: #991b1b; text-transform: uppercase;">Descrição Registrada:</div>
+                <div id="avariaPhotoConfirmedDesc" style="font-size: 0.88rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">--</div>
+            </div>
+
+            <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0;">
+                Marque o tick abaixo de cada foto onde a alteração pode ser observada (selecione uma ou quantas quiser):
+            </p>
+
+            <!-- Grid com as 6 mini fotos e ticks abaixo -->
+            <div id="avariaPhotosGrid" class="avaria-photos-grid"></div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
+                <button type="button" class="btn btn-danger-solid btn-3d" style="width: 100%; min-height: 48px; font-weight: 800; font-size: 1rem; justify-content: center;" onclick="finalizeAvariaReport()">
+                    Finalizar observação
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 📢 4. MODAL: "INFORMAÇÕES INSERIDAS, INFORME A RESERVA IMEDIATAMENTE!"    -->
+<!-- ========================================================================= -->
+<div id="avariaAlertModal" class="modal-overlay" style="z-index: 10060;" onclick="/* exclusivo pelo botão OK */">
     <div class="modal-card" style="max-width: 480px; text-align: center; padding: 32px 24px; border: 2.5px solid #ef4444; border-radius: 14px;" onclick="event.stopPropagation()">
         <div style="font-size: 3.5rem; margin-bottom: 12px;">🚨📢</div>
-        <h3 style="font-size: 1.25rem; font-weight: 900; color: #b91c1c; line-height: 1.35; margin-bottom: 12px; text-transform: uppercase;">
+        <h3 style="font-size: 1.25rem; font-weight: 900; color: #b91c1c; line-height: 1.35; margin-bottom: 14px; text-transform: uppercase;">
             informações inseridas, informe a reserva imediatamente!
         </h3>
         <p style="font-size: 0.92rem; color: var(--text-main); font-weight: 600; line-height: 1.5; margin-bottom: 24px; background: #fef2f2; border: 1px dashed #fca5a5; padding: 12px; border-radius: 8px;">
-            A avaria da viatura <strong id="avariaAlertVtr" style="color: #b91c1c;">--</strong> foi registrada com sucesso. Comunique o fato ao Encarregado da Reserva de Armas imediatamente.
+            A avaria da viatura <strong id="avariaAlertVtr" style="color: #b91c1c;">--</strong> foi registrada com sucesso no sistema. Comunique o fato ao Encarregado da Reserva de Armas imediatamente.
         </p>
         <div style="display: flex; justify-content: center;">
-            <button type="button" class="btn btn-danger-solid btn-3d" style="padding: 12px 38px; font-size: 1rem; font-weight: 800; border-radius: 8px;" onclick="closeAvariaAlertModal()">
-                Entendido
+            <button type="button" class="btn btn-danger-solid btn-3d" style="padding: 12px 52px; font-size: 1.1rem; font-weight: 900; border-radius: 8px;" onclick="closeAvariaAlertModal()">
+                OK
             </button>
         </div>
     </div>
 </div>
-
 <!-- ========================================================================= -->
 <!-- 👁️ MODAL LIGHTBOX DE FOTO EM TELA CHEIA (COM ROTAÇÃO E FULLSCREEN NATIVO)   -->
 <!-- ========================================================================= -->
@@ -4167,6 +4177,9 @@
     const ADMIN_PASSWORD = "PATRULHEIRO1";
     let adminPasswordResolveCallback = null;
     let isAdminAuthenticated = sessionStorage.getItem('oleo_vtr_admin_auth') === 'true';
+    // vehiclePhotos e vehicleAvarias declarados no topo do script para evitar TDZ
+    vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
+    vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
 
     function updateAdminBadgeUI() {
         const badge = document.getElementById('adminSessionBadge');
@@ -4638,17 +4651,28 @@
         for (const endpoint of endpoints) {
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 7000);
+                // Timeout estendido para 15s para garantir upload de fotos em redes móveis
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
 
                 const isFirebase = endpoint.includes('firebaseio.com');
                 const actualMethod = isFirebase ? (method === 'POST' ? 'PUT' : method) : method;
+
+                // Cache-busting para requisições GET em dispositivos móveis (evita cache de fotos antigas no celular)
+                let fetchUrl = endpoint;
+                if (method === 'GET') {
+                    const sep = endpoint.includes('?') ? '&' : '?';
+                    fetchUrl = `${endpoint}${sep}_nocache=${Date.now()}`;
+                }
 
                 const reqOpts = {
                     method: actualMethod,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
                     },
+                    cache: 'no-store',
                     signal: controller.signal
                 };
 
@@ -4656,7 +4680,7 @@
                     reqOpts.body = JSON.stringify(payload);
                 }
 
-                const response = await fetch(endpoint, reqOpts);
+                const response = await fetch(fetchUrl, reqOpts);
                 clearTimeout(timeoutId);
 
                 if (response.ok) {
@@ -4715,6 +4739,67 @@
                 try {
                     const parsed = JSON.parse(e.data);
                     if (!parsed) return;
+
+                    // 1. Sincronização e exclusão instantânea de fotos em tempo real (/vehiclePhotos/...)
+                    if (parsed.path && parsed.path.startsWith('/vehiclePhotos')) {
+                        const cleanPath = parsed.path.replace(/^\/vehiclePhotos\/?/, '');
+                        if (!cleanPath) {
+                            vehiclePhotos = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
+                        } else {
+                            const parts = cleanPath.split('/').filter(Boolean).map(decodeURIComponent);
+                            if (parts.length === 2) {
+                                const vtr = parts[0];
+                                const slot = parts[1];
+                                if (parsed.data === null) {
+                                    // Foto apagada no PC ou celular: remove imediatamente no outro aparelho!
+                                    if (vehiclePhotos[vtr]) {
+                                        delete vehiclePhotos[vtr][slot];
+                                        if (Object.keys(vehiclePhotos[vtr]).length === 0) {
+                                            delete vehiclePhotos[vtr];
+                                        }
+                                    }
+                                } else {
+                                    if (!vehiclePhotos[vtr]) vehiclePhotos[vtr] = {};
+                                    vehiclePhotos[vtr][slot] = parsed.data;
+                                }
+                            } else if (parts.length === 1) {
+                                const vtr = parts[0];
+                                if (parsed.data === null) {
+                                    delete vehiclePhotos[vtr];
+                                } else {
+                                    vehiclePhotos[vtr] = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
+                                }
+                            }
+                        }
+                        localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
+                        if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+                            renderInspectionSlots();
+                        }
+                        return;
+                    }
+
+                    // 2. Sincronização e exclusão instantânea de avarias em tempo real (/vehicleAvarias/...)
+                    if (parsed.path && parsed.path.startsWith('/vehicleAvarias')) {
+                        const cleanPath = parsed.path.replace(/^\/vehicleAvarias\/?/, '');
+                        if (!cleanPath) {
+                            vehicleAvarias = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
+                        } else {
+                            const parts = cleanPath.split('/').filter(Boolean).map(decodeURIComponent);
+                            if (parts.length >= 1) {
+                                const vtr = parts[0];
+                                if (parsed.data === null) {
+                                    delete vehicleAvarias[vtr];
+                                } else {
+                                    vehicleAvarias[vtr] = parsed.data;
+                                }
+                            }
+                        }
+                        localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+                        if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+                            renderInspectionSlots();
+                        }
+                        return;
+                    }
 
                     let incomingData = null;
                     if (parsed.path === '/' || !parsed.path) {
@@ -4776,19 +4861,15 @@
             vehicleTargetMap = data.targetMap;
             localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
         }
-        if (data.vehiclePhotos && typeof data.vehiclePhotos === 'object') {
-            vehiclePhotos = data.vehiclePhotos;
-            localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
-            if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
-                renderInspectionSlots();
-            }
-        }
-        if (data.vehicleAvarias && typeof data.vehicleAvarias === 'object') {
-            vehicleAvarias = data.vehicleAvarias;
-            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
-            if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
-                renderInspectionSlots();
-            }
+        // Substituição completa para garantir que fotos e avarias apagadas no PC sumam no celular:
+        vehiclePhotos = (data && data.vehiclePhotos && typeof data.vehiclePhotos === 'object') ? data.vehiclePhotos : {};
+        localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
+
+        vehicleAvarias = (data && data.vehicleAvarias && typeof data.vehicleAvarias === 'object') ? data.vehicleAvarias : {};
+        localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+
+        if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+            renderInspectionSlots();
         }
         if (data.appTitle) {
             appTitle = data.appTitle;
@@ -8257,6 +8338,8 @@
                 targetMap: vehicleTargetMap,
                 records: records,
                 mileageHistory: mileageHistory,
+                vehiclePhotos: vehiclePhotos || {},
+                vehicleAvarias: vehicleAvarias || {},
                 updatedAt: new Date().toISOString()
             };
 
@@ -8631,7 +8714,17 @@
             return;
         }
 
+        quickKmTargetVehicle = vehicle;
         currentInspectVehicle = vehicle;
+
+        // Fecha a janela de KM para focar na inspeção
+        const kmModal = document.getElementById('quickKmModal');
+        if (kmModal) kmModal.style.display = 'none';
+
+        // Atualização fresca de fotos em segundo plano ao abrir inspeção
+        if (typeof loadDataFromOnline === 'function') {
+            loadDataFromOnline(true);
+        }
         const modal = document.getElementById('vehicleInspectionModal');
         const titleEl = document.getElementById('inspectModalVtrTitle');
         const metaEl = document.getElementById('inspectModalVehicleMeta');
@@ -8688,22 +8781,28 @@
     function onAvariaPromptNo() {
         const modal = document.getElementById('avariaPromptModal');
         if (modal) modal.style.display = 'none';
+        const vtr = currentAvariaVehicle || quickKmTargetVehicle;
         currentAvariaVehicle = null;
+        // Volta para a janela de inspecionar viatura e inserir km
+        if (vtr) {
+            openQuickKmModal(vtr);
+        }
     }
 
     function onAvariaPromptYes() {
         const modal = document.getElementById('avariaPromptModal');
         if (modal) modal.style.display = 'none';
-        openAvariaReportModal(currentAvariaVehicle);
+        openAvariaTextModal(currentAvariaVehicle);
     }
 
-    function openAvariaReportModal(vehicle) {
+    // JANELA 2: Escrever a avaria
+    function openAvariaTextModal(vehicle) {
         currentAvariaVehicle = vehicle;
         currentAvariaDescription = '';
         selectedAvariaSlots = [];
 
-        const modal = document.getElementById('avariaReportModal');
-        const vtrTitleEl = document.getElementById('avariaReportVtrTitle');
+        const modal = document.getElementById('avariaTextModal');
+        const vtrTitleEl = document.getElementById('avariaTextVtrTitle');
         if (vtrTitleEl) vtrTitleEl.textContent = vehicle;
 
         const descInput = document.getElementById('avariaDescriptionInput');
@@ -8712,14 +8811,6 @@
             descInput.disabled = false;
         }
 
-        const btnSubmit = document.getElementById('btnSubmitAvariaText');
-        if (btnSubmit) btnSubmit.style.display = 'inline-flex';
-
-        const step1 = document.getElementById('avariaStep1');
-        const step2 = document.getElementById('avariaStep2');
-        if (step1) step1.style.display = 'block';
-        if (step2) step2.style.display = 'none';
-
         if (modal) modal.style.display = 'flex';
 
         if (descInput) {
@@ -8727,9 +8818,14 @@
         }
     }
 
-    function closeAvariaReportModal() {
-        const modal = document.getElementById('avariaReportModal');
+    function closeAvariaTextModal() {
+        const modal = document.getElementById('avariaTextModal');
         if (modal) modal.style.display = 'none';
+        const vtr = currentAvariaVehicle || quickKmTargetVehicle;
+        currentAvariaVehicle = null;
+        if (vtr) {
+            openQuickKmModal(vtr);
+        }
     }
 
     function submitAvariaText() {
@@ -8744,20 +8840,43 @@
 
         currentAvariaDescription = text;
 
-        if (descInput) descInput.disabled = true;
-        const btnSubmit = document.getElementById('btnSubmitAvariaText');
-        if (btnSubmit) btnSubmit.style.display = 'none';
+        // Fecha a janela de texto e abre a janela com o texto: "selecione a foto onde onde consta a alteração"
+        const modalText = document.getElementById('avariaTextModal');
+        if (modalText) modalText.style.display = 'none';
 
-        const descDisplay = document.getElementById('avariaConfirmedDescDisplay');
-        if (descDisplay) descDisplay.textContent = text;
+        openAvariaPhotoSelectModal(currentAvariaVehicle);
+    }
 
-        const step2 = document.getElementById('avariaStep2');
-        if (step2) {
-            step2.style.display = 'block';
-            renderAvariaPhotoSlots();
-            setTimeout(() => {
-                step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
+    // JANELA 3: Seleção da foto onde consta a alteração com ticks e títulos exatos
+    const AVARIA_SLOT_DEFS = [
+        { id: 'dianteira', label: 'Dianteira', icon: '🚗' },
+        { id: 'traseira', label: 'Traseira', icon: '🚗' },
+        { id: 'lateral_dir', label: 'Lateral direita', icon: '🚙' },
+        { id: 'lateral_esq', label: 'Lateral esquerda', icon: '🚙' },
+        { id: 'painel', label: 'Painel', icon: '🧭' },
+        { id: 'motor', label: 'Motor', icon: '⚙️' }
+    ];
+
+    function openAvariaPhotoSelectModal(vehicle) {
+        currentAvariaVehicle = vehicle;
+        selectedAvariaSlots = [];
+
+        const modal = document.getElementById('avariaPhotoSelectModal');
+        const descDisplay = document.getElementById('avariaPhotoConfirmedDesc');
+        if (descDisplay) descDisplay.textContent = currentAvariaDescription;
+
+        renderAvariaPhotoSlots();
+
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeAvariaPhotoSelectModal() {
+        const modal = document.getElementById('avariaPhotoSelectModal');
+        if (modal) modal.style.display = 'none';
+        const vtr = currentAvariaVehicle || quickKmTargetVehicle;
+        currentAvariaVehicle = null;
+        if (vtr) {
+            openQuickKmModal(vtr);
         }
     }
 
@@ -8768,7 +8887,7 @@
         const vPhotos = vehiclePhotos[currentAvariaVehicle] || {};
         let html = '';
 
-        DEFAULT_INSPECTION_SLOTS.forEach(slot => {
+        AVARIA_SLOT_DEFS.forEach(slot => {
             const photo = vPhotos[slot.id];
             const hasPhoto = Boolean(photo && photo.data);
             const isChecked = selectedAvariaSlots.includes(slot.id);
@@ -8777,7 +8896,7 @@
                 <div class="avaria-slot-card ${isChecked ? 'is-selected' : ''}" id="avariaSlotCard_${slot.id}" onclick="toggleAvariaSlotSelect('${slot.id}')">
                     <div class="avaria-slot-header">
                         <span>${slot.icon}</span>
-                        <span>${slot.label}</span>
+                        <span style="font-weight: 800;">${slot.label}</span>
                     </div>
                     <div class="avaria-slot-thumb">
                         ${hasPhoto 
@@ -8846,14 +8965,17 @@
         vehicleAvarias[currentAvariaVehicle].unshift(newAvaria);
         localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
 
-        closeAvariaReportModal();
+        const photoModal = document.getElementById('avariaPhotoSelectModal');
+        if (photoModal) photoModal.style.display = 'none';
+
         syncAllDataToOnline();
 
-        // 🚨 Abre a caixa final solicitada pelo usuário:
+        // 🚨 Abre a janela final de aviso da reserva:
         // "informações inseridas, informe a reserva imediatamente!"
         openAvariaAlertModal(currentAvariaVehicle);
     }
 
+    // JANELA 4: Aviso da reserva com botão OK
     function openAvariaAlertModal(vehicle) {
         const modal = document.getElementById('avariaAlertModal');
         const vtrEl = document.getElementById('avariaAlertVtr');
@@ -8864,9 +8986,15 @@
     function closeAvariaAlertModal() {
         const modal = document.getElementById('avariaAlertModal');
         if (modal) modal.style.display = 'none';
+        const vtr = currentAvariaVehicle || quickKmTargetVehicle;
         currentAvariaVehicle = null;
         currentAvariaDescription = '';
         selectedAvariaSlots = [];
+
+        // Volta para a janela inspecionar viatura e inserir km
+        if (vtr) {
+            openQuickKmModal(vtr);
+        }
     }
 
     function renderInspectionSlots() {
@@ -9071,9 +9199,22 @@
                         date: dateStr
                     };
 
+                    const photoObj = vehiclePhotos[currentInspectVehicle][currentUploadSlotId];
                     saveVehiclePhotos();
                     renderInspectionSlots();
-                    syncAllDataToOnline();
+
+                    // Dispara gravação pontual direta no Firebase para atualização instantânea no celular
+                    if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+                        const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+                        fetch(`${baseUrl}/vehiclePhotos/${encodeURIComponent(currentInspectVehicle)}/${encodeURIComponent(currentUploadSlotId)}.json`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(photoObj),
+                            cache: 'no-store'
+                        }).catch(err => console.warn('Erro ao enviar foto direta:', err));
+                    }
+
+                    syncAllDataToOnline(true);
                     showToast(`📷 Foto <strong>${slotInfo.label}</strong> salva com sucesso!`);
                 } catch (err) {
                     alert('Erro ao processar imagem: ' + err.message);
@@ -9096,11 +9237,42 @@
 
         const slotInfo = DEFAULT_INSPECTION_SLOTS.find(s => s.id === slotId) || { label: 'Foto' };
         if (confirm(`Deseja remover a foto "${slotInfo.label}" da viatura ${currentInspectVehicle}?`)) {
-            delete vehiclePhotos[currentInspectVehicle][slotId];
+            const vtr = currentInspectVehicle;
+
+            // 1. Remove localmente em memória e no localStorage
+            delete vehiclePhotos[vtr][slotId];
+            if (Object.keys(vehiclePhotos[vtr]).length === 0) {
+                delete vehiclePhotos[vtr];
+            }
             saveVehiclePhotos();
             renderInspectionSlots();
-            syncAllDataToOnline();
-            showToast(`🗑️ Foto removida.`);
+
+            // 2. Dispara exclusão direta e pontual no Firebase Realtime Database (REST DELETE instantâneo)
+            if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+                const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+                try {
+                    await fetch(`${baseUrl}/vehiclePhotos/${encodeURIComponent(vtr)}/${encodeURIComponent(slotId)}.json`, {
+                        method: 'DELETE',
+                        cache: 'no-store'
+                    });
+                } catch (err) {
+                    console.warn('Erro ao excluir foto direta no Firebase:', err);
+                }
+            }
+
+            // 3. Dispara exclusão direta no servidor Node.js/Express se aplicável
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                try {
+                    await fetch(`/api/oleo/photos/${encodeURIComponent(vtr)}/${encodeURIComponent(slotId)}`, {
+                        method: 'DELETE',
+                        cache: 'no-store'
+                    }).catch(() => {});
+                } catch (e) {}
+            }
+
+            // 4. Sincroniza estado completo forçado
+            await syncAllDataToOnline(true);
+            showToast(`🗑️ Foto "${slotInfo.label}" removida com sucesso!`);
         }
     }
 
