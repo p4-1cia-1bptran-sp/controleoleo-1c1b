@@ -1736,55 +1736,33 @@
         /* =========================================================================
            📺 EFEITO DE TV ANTIGA (CRT TV ON & TV OFF) PARA MODAIS
            ========================================================================= */
+        /* Animação suave e retrô sem estrobo/brilho ofuscante (elimina piscadas no celular) */
         @keyframes crtTvOn {
             0% {
-                transform: scale(0.01, 0.005);
-                filter: brightness(5);
+                transform: scale(0.88);
                 opacity: 0;
             }
-            30% {
-                transform: scale(0.08, 0.005);
-                filter: brightness(4) drop-shadow(0 0 16px #ffffff);
-                opacity: 0.95;
-            }
-            60% {
-                transform: scale(1, 0.005);
-                filter: brightness(3) contrast(2) drop-shadow(0 0 12px #ffffff);
-                opacity: 1;
-            }
-            85% {
-                transform: scale(1, 1.04);
-                filter: brightness(1.2);
+            70% {
+                transform: scale(1.02);
                 opacity: 1;
             }
             100% {
-                transform: scale(1, 1);
-                filter: brightness(1) contrast(1);
+                transform: scale(1);
                 opacity: 1;
             }
         }
 
         @keyframes crtTvOff {
             0% {
-                transform: scale(1, 1);
-                filter: brightness(1) contrast(1);
+                transform: scale(1);
                 opacity: 1;
             }
-            35% {
-                transform: scale(1, 0.005);
-                filter: brightness(3.5) contrast(2) drop-shadow(0 0 12px #ffffff);
-                background: #ffffff !important;
-                opacity: 1;
-            }
-            70% {
-                transform: scale(0.04, 0.005);
-                filter: brightness(5) drop-shadow(0 0 16px #ffffff);
-                background: #ffffff !important;
-                opacity: 0.95;
+            45% {
+                transform: scale(1, 0.08);
+                opacity: 0.8;
             }
             100% {
                 transform: scale(0, 0);
-                filter: brightness(5);
                 opacity: 0;
             }
         }
@@ -1809,6 +1787,201 @@
         .modal-overlay.tv-off-overlay {
             animation: crtOverlayFade 0.52s ease-out forwards !important;
             pointer-events: none !important;
+        }
+
+
+        /* =========================================================================
+           📷 INSPEÇÃO DE VIATURAS E REGISTRO DE FOTOS (6 FOTOS)
+           ========================================================================= */
+        .inspection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .inspection-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+        }
+
+        .inspection-slot-card {
+            background: var(--card-bg, #ffffff);
+            border: 1.5px dashed var(--border, #cbd5e1);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 165px;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .inspection-slot-card.has-photo {
+            border-style: solid;
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        [data-theme="dark"] .inspection-slot-card.has-photo {
+            background: #0f172a;
+            border-color: #2563eb;
+        }
+
+        .inspection-slot-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-main, #0f172a);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .inspection-thumb-container {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            background: #000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .inspection-thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s ease;
+            display: block;
+        }
+
+        .inspection-thumb-container:hover .inspection-thumb-img {
+            transform: scale(1.05);
+        }
+
+        .inspection-thumb-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.75));
+            color: #fff;
+            font-size: 0.72rem;
+            padding: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+
+        .inspection-empty-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--bg);
+            color: var(--text-muted);
+            border: 1px dashed var(--border);
+            transition: all 0.15s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .inspection-empty-box:hover {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #3b82f6;
+        }
+
+        [data-theme="dark"] .inspection-empty-box:hover {
+            background: #1e3a5f;
+            color: #60a5fa;
+        }
+
+        .inspection-slot-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .btn-slot-action {
+            flex: 1;
+            padding: 5px 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-slot-action:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-slot-action.view {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+        }
+
+        .btn-slot-action.delete {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+        }
+
+        /* Modal Lightbox de Foto em Tela Cheia */
+        .photo-viewer-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 30, 0.94);
+            backdrop-filter: blur(8px);
+            z-index: 10090;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .photo-viewer-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            max-width: 900px;
+            width: 100%;
+            padding: 18px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: #f8fafc;
         }
 
 </style>
@@ -2603,13 +2776,93 @@
                 <label for="quickKmValue" style="font-weight: 700; font-size: 0.9rem;">Novo KM Atual da Viatura *</label>
                 <input type="number" id="quickKmValue" min="0" placeholder="Digite a nova quilometragem" style="font-size: 1.45rem !important; font-weight: 800; text-align: center; padding: 14px; border: 2px solid var(--primary); border-radius: 10px;" onkeydown="if(event.key==='Enter') saveQuickKmUpdate()">
             </div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin: 0; text-align: center;">
-                💡 O sistema recalcula automaticamente a quilometragem restante e as cores de status em tempo real.
-            </p>
+            <!-- Botão Inspecionar Viatura -->
+            <div style="display: flex; justify-content: center; width: 100%; margin-top: 2px;">
+                <button type="button" class="btn btn-outline btn-3d" id="btnInspecionarViatura" onclick="openVehicleInspectionModal(quickKmTargetVehicle)" style="width: 100%; justify-content: center; min-height: 44px; font-weight: 700; font-size: 0.92rem; border-color: #2563eb; color: #1d4ed8; background: #eff6ff; gap: 8px;">
+                    <span style="font-size: 1.1rem;">🔍</span>
+                    <span>Inspecionar Viatura</span>
+                </button>
+            </div>
         </div>
         <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
             <button type="button" class="btn btn-outline btn-3d" style="flex: 1; justify-content: center; min-height: 44px; font-weight: 700;" onclick="closeQuickKmModal()">Fechar</button>
             <button type="button" class="btn btn-primary btn-3d" style="flex: 1.4; justify-content: center; min-height: 44px; font-weight: 800; font-size: 0.95rem;" onclick="saveQuickKmUpdate()">💾 Atualizar KM</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- 🔍 MODAL DE INSPEÇÃO DA VIATURA (6 FOTOS)                                 -->
+<!-- ========================================================================= -->
+<div id="vehicleInspectionModal" class="modal-overlay" style="z-index: 10040;" onclick="/* Manter aberto ao clicar fora */">
+    <div class="modal-card" style="max-width: 680px; width: 95%; max-height: 92vh;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title">
+                <span>🔍 Inspeção da Viatura:</span>
+                <span id="inspectModalVtrTitle" style="color: var(--primary); font-weight: 800;">--</span>
+            </div>
+            <button type="button" class="modal-close" onclick="closeVehicleInspectionModal()" title="Fechar">✖</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 6px 0; overflow-y: auto;">
+            <!-- Header Informativo da Viatura -->
+            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div>
+                    <div id="inspectModalVehicleMeta" style="font-size: 0.9rem; font-weight: 800; color: var(--text-main);">--</div>
+                    <div id="inspectModalVehicleKm" style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">KM Atual: --</div>
+                </div>
+                <div id="inspectModalPhotoCountBadge" class="badge badge-info" style="font-size: 0.82rem; font-weight: 700;">
+                    0 de 6 fotos salvas
+                </div>
+            </div>
+
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
+                📷 <strong>Fotos da viatura (6 posições):</strong> Toque em cada quadro para tirar foto ou selecionar da galeria. Ao tocar em uma foto salva, ela abrirá em tela cheia na tela sem baixar.
+            </p>
+
+            <!-- Grid com as 6 Fotos da Viatura -->
+            <div id="inspectionSlotsGrid" class="inspection-grid"></div>
+
+            <input type="file" id="inspectionFileInput" accept="image/*" capture="environment" style="display: none;" onchange="onInspectionFileChosen(event)">
+        </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <button type="button" class="btn btn-outline btn-3d" onclick="closeVehicleInspectionModal()" style="min-height: 44px; font-weight: 700;">
+                Fechar
+            </button>
+            <button type="button" class="btn btn-primary btn-3d" onclick="saveAndSyncInspectionPhotos()" style="min-height: 44px; font-weight: 800; font-size: 0.95rem;">
+                💾 Salvar Fotos
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 👁️ MODAL LIGHTBOX DE FOTO EM TELA CHEIA (SEM BAIXAR, SÓ SAI NO FECHAR)    -->
+<!-- ========================================================================= -->
+<div id="photoViewerModal" class="photo-viewer-overlay" onclick="/* Manter aberto até clicar no botão Fechar */">
+    <div class="photo-viewer-card" onclick="event.stopPropagation()">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                <span style="font-size: 1.25rem;">📷</span>
+                <div style="min-width: 0;">
+                    <h3 id="photoViewerTitle" style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Viatura</h3>
+                    <span id="photoViewerDate" style="font-size: 0.74rem; color: #94a3b8;">--</span>
+                </div>
+            </div>
+            <button type="button" class="modal-close" onclick="closePhotoViewerModal()" title="Fechar Visualização" style="color: #cbd5e1; font-size: 1.5rem; line-height: 1;">✖</button>
+        </div>
+
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 240px; max-height: 72vh; overflow: hidden; background: #020617; border-radius: 8px; border: 1px solid #1e293b; padding: 6px;">
+            <img id="photoViewerImg" src="" alt="Foto da Viatura" style="max-width: 100%; max-height: 70vh; width: auto; height: auto; object-fit: contain; border-radius: 6px; display: block; user-select: none;">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 12px; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 0.76rem; color: #94a3b8;">ℹ️ A foto está ampliada na tela. Toque em <strong>Fechar</strong> para sair.</span>
+            <button type="button" class="btn btn-outline btn-3d" onclick="closePhotoViewerModal()" style="min-width: 140px; font-weight: 800; font-size: 0.95rem; min-height: 44px; background: #ffffff; color: #0f172a; border-radius: 8px; margin-left: auto;">
+                ✖ Fechar
+            </button>
         </div>
     </div>
 </div>
@@ -3190,12 +3443,12 @@
             modal.style.display = 'flex';
         }
 
-        setTimeout(() => {
-            if (valInput) {
+        // No celular, não força o teclado a abrir automaticamente para evitar oscilações de tela (piscadas)
+        if (window.innerWidth > 768 && valInput) {
+            setTimeout(() => {
                 valInput.focus();
-                valInput.select();
-            }
-        }, 150);
+            }, 100);
+        }
     }
 
     function closeQuickKmModal(skipAnimation = false) {
@@ -3523,7 +3776,8 @@
             records: obj.records || [],
             vehicles: obj.vehicles || [],
             targetMap: obj.targetMap || {},
-            mileageHistory: obj.mileageHistory || []
+            mileageHistory: obj.mileageHistory || [],
+            vehiclePhotos: obj.vehiclePhotos || {}
         };
         return JSON.stringify(clean);
     }
@@ -3614,6 +3868,13 @@
             vehicleTargetMap = data.targetMap;
             localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
         }
+        if (data.vehiclePhotos && typeof data.vehiclePhotos === 'object') {
+            vehiclePhotos = data.vehiclePhotos;
+            localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
+            if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+                renderInspectionSlots();
+            }
+        }
         if (data.appTitle) {
             appTitle = data.appTitle;
             localStorage.setItem('oleo_vtr_app_title', appTitle);
@@ -3678,6 +3939,7 @@
             mileageHistory: mileageHistory || [],
             vehicles: customVehicles || [],
             targetMap: vehicleTargetMap || {},
+            vehiclePhotos: vehiclePhotos || {},
             appTitle: appTitle || '🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN',
             lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
             updatedAt: new Date().toISOString()
@@ -4778,6 +5040,7 @@
                 mileageHistory: JSON.parse(JSON.stringify(mileageHistory)),
                 vehicles: JSON.parse(JSON.stringify(customVehicles)),
                 targetMap: JSON.parse(JSON.stringify(vehicleTargetMap)),
+                vehiclePhotos: JSON.parse(JSON.stringify(vehiclePhotos)),
                 appTitle: appTitle
             };
             localStorage.setItem('oleo_vtr_original_baseline', JSON.stringify(baseline));
@@ -5088,6 +5351,8 @@
                 mileageHistory = b.mileageHistory || [];
                 customVehicles = b.vehicles || [...defaultVehicles];
                 vehicleTargetMap = b.targetMap || {};
+                vehiclePhotos = b.vehiclePhotos || {};
+                localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
                 if (b.appTitle) appTitle = b.appTitle;
                 showToast('🔄 Dados restaurados para a Base Original!');
             } else {
@@ -5164,6 +5429,8 @@
 
         records = [];
         mileageHistory = [];
+        vehiclePhotos = {};
+        localStorage.removeItem('oleo_vtr_vehicle_photos');
         customVehicles = [...defaultVehicles];
         vehicleTargetMap = {};
         appTitle = '🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN';
@@ -5422,7 +5689,8 @@
             vehicles: customVehicles,
             targetMap: vehicleTargetMap,
             records: records,
-            mileageHistory: mileageHistory
+            mileageHistory: mileageHistory,
+            vehiclePhotos: vehiclePhotos
         };
 
         const defaultName = `Controle_Oleo_Viaturas_Backup_${new Date().toISOString().slice(0,10)}`;
@@ -5772,6 +6040,10 @@
 
         if (imported.mileageHistory && Array.isArray(imported.mileageHistory)) {
             mileageHistory = imported.mileageHistory;
+        }
+        if (imported.vehiclePhotos && typeof imported.vehiclePhotos === 'object') {
+            vehiclePhotos = imported.vehiclePhotos;
+            localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
         }
 
         let newRecords = Array.isArray(imported) ? imported : (imported.records || []);
@@ -7154,6 +7426,267 @@
         }
     }
 
+
+    
+    // =========================================================================
+    // 📷 INSPEÇÃO DE VIATURA E GERENCIAMENTO DE FOTOS (6 FOTOS)
+    // =========================================================================
+    let vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
+
+    const DEFAULT_INSPECTION_SLOTS = [
+        { id: 'dianteira', label: 'Dianteira (Frente)', icon: '🚗' },
+        { id: 'traseira', label: 'Traseira', icon: '🚗' },
+        { id: 'lateral_dir', label: 'Lateral Direita', icon: '🚙' },
+        { id: 'lateral_esq', label: 'Lateral Esquerda', icon: '🚙' },
+        { id: 'painel', label: 'Painel / Odômetro', icon: '🧭' },
+        { id: 'motor', label: 'Motor / Pneus', icon: '⚙️' }
+    ];
+
+    let currentInspectVehicle = null;
+    let currentUploadSlotId = null;
+
+    function openVehicleInspectionModal(vehicle) {
+        if (!vehicle) {
+            vehicle = quickKmTargetVehicle || (document.getElementById('vehicleSelect') ? document.getElementById('vehicleSelect').value : null);
+        }
+        if (!vehicle) {
+            alert('Selecione uma viatura para inspecionar.');
+            return;
+        }
+
+        currentInspectVehicle = vehicle;
+        const modal = document.getElementById('vehicleInspectionModal');
+        const titleEl = document.getElementById('inspectModalVtrTitle');
+        const metaEl = document.getElementById('inspectModalVehicleMeta');
+        const kmEl = document.getElementById('inspectModalVehicleKm');
+
+        if (titleEl) titleEl.textContent = vehicle;
+
+        const vRec = records.find(r => r.vehicle === vehicle);
+        const vInfo = VEHICLE_FLEET_INFO[vehicle] || {};
+        const modelText = vInfo.model || (vRec && vRec.model) || 'VIATURA';
+        const placaText = vInfo.placa || (vRec && vRec.placa) || '';
+
+        if (metaEl) {
+            metaEl.textContent = `${modelText}${placaText ? ' • Placa: ' + placaText : ''}`;
+        }
+        if (kmEl) {
+            const kmVal = vRec && vRec.currentKm !== undefined ? vRec.currentKm.toLocaleString('pt-BR') + ' km' : 'Sem registro';
+            kmEl.textContent = `Último KM Registrado: ${kmVal}`;
+        }
+
+        renderInspectionSlots();
+
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeVehicleInspectionModal() {
+        const modal = document.getElementById('vehicleInspectionModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function renderInspectionSlots() {
+        const grid = document.getElementById('inspectionSlotsGrid');
+        const badge = document.getElementById('inspectModalPhotoCountBadge');
+        if (!grid || !currentInspectVehicle) return;
+
+        if (!vehiclePhotos[currentInspectVehicle]) {
+            vehiclePhotos[currentInspectVehicle] = {};
+        }
+        const vPhotos = vehiclePhotos[currentInspectVehicle];
+        const savedCount = Object.keys(vPhotos).filter(k => vPhotos[k] && vPhotos[k].data).length;
+
+        if (badge) {
+            badge.textContent = `${savedCount} de 6 fotos salvas`;
+            badge.className = savedCount === 6 ? 'badge badge-ok' : (savedCount > 0 ? 'badge badge-warning' : 'badge badge-info');
+        }
+
+        let html = '';
+        DEFAULT_INSPECTION_SLOTS.forEach((slot) => {
+            const photo = vPhotos[slot.id];
+            const hasPhoto = Boolean(photo && photo.data);
+
+            html += `
+                <div class="inspection-slot-card ${hasPhoto ? 'has-photo' : ''}" data-slot="${slot.id}">
+                    <div class="inspection-slot-label">
+                        <span>${slot.icon}</span>
+                        <span>${slot.label}</span>
+                    </div>
+            `;
+
+            if (hasPhoto) {
+                html += `
+                    <div class="inspection-thumb-container" onclick="openPhotoViewerModal('${slot.id}')" title="Toque para visualizar na tela cheia">
+                        <img src="${photo.data}" alt="${slot.label}" class="inspection-thumb-img">
+                        <div class="inspection-thumb-overlay">
+                            <span>👁️ Ampliar Foto</span>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                        ${photo.date || 'Foto Salva'}
+                    </div>
+                    <div class="inspection-slot-actions">
+                        <button type="button" class="btn-slot-action view" onclick="openPhotoViewerModal('${slot.id}')" title="Visualizar Foto na tela">
+                            👁️ Ver
+                        </button>
+                        <button type="button" class="btn-slot-action" onclick="triggerPhotoUpload('${slot.id}')" title="Substituir Foto">
+                            📷 Trocar
+                        </button>
+                        <button type="button" class="btn-slot-action delete" onclick="deleteInspectionPhoto('${slot.id}')" title="Remover Foto">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="inspection-empty-box" onclick="triggerPhotoUpload('${slot.id}')" title="Tirar foto ou escolher da galeria">
+                        <span style="font-size: 1.8rem;">📷</span>
+                        <span style="font-size: 0.76rem; font-weight: 700;">+ Adicionar Foto</span>
+                        <span style="font-size: 0.65rem; color: var(--text-muted);">(Câmera / Galeria)</span>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+        });
+
+        grid.innerHTML = html;
+    }
+
+    function triggerPhotoUpload(slotId) {
+        currentUploadSlotId = slotId;
+        const fileInput = document.getElementById('inspectionFileInput');
+        if (fileInput) {
+            fileInput.value = '';
+            fileInput.click();
+        }
+    }
+
+    function onInspectionFileChosen(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file || !currentInspectVehicle || !currentUploadSlotId) return;
+
+        showToast('⏳ <strong>Processando foto da viatura...</strong>');
+
+        // Redimensiona e comprime via Canvas para manter o banco leve (~40-60KB por foto)
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 900;
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.72);
+
+                    if (!vehiclePhotos[currentInspectVehicle]) {
+                        vehiclePhotos[currentInspectVehicle] = {};
+                    }
+
+                    const slotInfo = DEFAULT_INSPECTION_SLOTS.find(s => s.id === currentUploadSlotId) || { label: 'Foto' };
+
+                    const now = new Date();
+                    const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                    vehiclePhotos[currentInspectVehicle][currentUploadSlotId] = {
+                        id: currentUploadSlotId,
+                        label: slotInfo.label,
+                        data: compressedData,
+                        date: dateStr
+                    };
+
+                    saveVehiclePhotos();
+                    renderInspectionSlots();
+                    syncAllDataToOnline();
+                    showToast(`📷 Foto <strong>${slotInfo.label}</strong> salva com sucesso!`);
+                } catch (err) {
+                    alert('Erro ao processar imagem: ' + err.message);
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function deleteInspectionPhoto(slotId) {
+        if (!currentInspectVehicle || !vehiclePhotos[currentInspectVehicle]) return;
+
+        const slotInfo = DEFAULT_INSPECTION_SLOTS.find(s => s.id === slotId) || { label: 'Foto' };
+        if (confirm(`Deseja remover a foto "${slotInfo.label}" da viatura ${currentInspectVehicle}?`)) {
+            delete vehiclePhotos[currentInspectVehicle][slotId];
+            saveVehiclePhotos();
+            renderInspectionSlots();
+            syncAllDataToOnline();
+            showToast(`🗑️ Foto removida.`);
+        }
+    }
+
+    function saveVehiclePhotos() {
+        localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
+    }
+
+    function saveAndSyncInspectionPhotos() {
+        saveVehiclePhotos();
+        syncAllDataToOnline(true);
+        showToast('💾 <strong>Fotos da viatura salvas e sincronizadas!</strong>');
+        closeVehicleInspectionModal();
+    }
+
+    function openPhotoViewerModal(slotIdOrDataUrl) {
+        const modal = document.getElementById('photoViewerModal');
+        const imgEl = document.getElementById('photoViewerImg');
+        const titleEl = document.getElementById('photoViewerTitle');
+        const dateEl = document.getElementById('photoViewerDate');
+
+        let photoData = '';
+        let photoTitle = 'Foto da Viatura';
+        let photoDate = '';
+
+        if (currentInspectVehicle && vehiclePhotos[currentInspectVehicle] && vehiclePhotos[currentInspectVehicle][slotIdOrDataUrl]) {
+            const photoObj = vehiclePhotos[currentInspectVehicle][slotIdOrDataUrl];
+            photoData = photoObj.data;
+            photoTitle = `Viatura ${currentInspectVehicle} - ${photoObj.label}`;
+            photoDate = photoObj.date ? `Registrada em: ${photoObj.date}` : '';
+        } else {
+            photoData = slotIdOrDataUrl;
+        }
+
+        if (imgEl) imgEl.src = photoData;
+        if (titleEl) titleEl.textContent = photoTitle;
+        if (dateEl) dateEl.textContent = photoDate;
+
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closePhotoViewerModal() {
+        const modal = document.getElementById('photoViewerModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        const imgEl = document.getElementById('photoViewerImg');
+        if (imgEl) imgEl.src = '';
+    }
 
     // Inicialização Completa
     applyTheme(currentTheme);
