@@ -1984,6 +1984,174 @@
             color: #f8fafc;
         }
 
+
+        /* =========================================================================
+           🚗 DRAG AND DROP / REORDENAÇÃO DE VIATURAS
+           ========================================================================= */
+        .manage-vehicles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 52vh;
+            overflow-y: auto;
+            padding: 4px 2px;
+        }
+
+        .draggable-vehicle-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-bg, #ffffff);
+            border: 1.5px solid var(--border, #cbd5e1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            transition: all 0.15s ease;
+            user-select: none;
+            position: relative;
+        }
+
+        .draggable-vehicle-item:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .draggable-vehicle-item.is-dragging {
+            opacity: 0.45;
+            background: #eff6ff;
+            border: 2px dashed #2563eb;
+            transform: scale(0.99);
+        }
+
+        .draggable-vehicle-item.drag-over-top {
+            border-top: 3px solid #2563eb !important;
+        }
+
+        .draggable-vehicle-item.drag-over-bottom {
+            border-bottom: 3px solid #2563eb !important;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            padding: 4px 6px;
+            display: flex;
+            align-items: center;
+            user-select: none;
+            touch-action: none;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .seq-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            min-width: 32px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .vtr-col {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vtr-prefix {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        [data-theme="dark"] .vtr-prefix {
+            color: #60a5fa;
+        }
+
+        .vtr-meta {
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-arrow {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-arrow:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-arrow:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
+        .btn-item-action {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-item-action.edit:hover {
+            background: #fef08a;
+            border-color: #eab308;
+            color: #854d0e;
+        }
+
+        .btn-item-action.delete:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #b91c1c;
+        }
+
+        [data-theme="dark"] .draggable-vehicle-item {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        [data-theme="dark"] .btn-arrow, [data-theme="dark"] .btn-item-action {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
 </style>
     <!-- Google Identity Services (OAuth 2.0 e Google Drive) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -2818,7 +2986,7 @@
             </div>
 
             <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
-                📷 <strong>Fotos da viatura (6 posições):</strong> Toque em cada quadro para tirar foto ou selecionar da galeria. Ao tocar em uma foto salva, ela abrirá em tela cheia na tela sem baixar.
+                📷 <strong>Fotos da viatura (6 posições):</strong> Toque em qualquer foto salva para visualizar em tela cheia (livre para todos). Adicionar ou alterar fotos é permitido apenas para o administrador 🔒.
             </p>
 
             <!-- Grid com as 6 Fotos da Viatura -->
@@ -3053,21 +3221,35 @@
     </div>
 </div>
 
-<!-- Modal de Gerenciamento de Viaturas Cadastradas -->
+<!-- Modal de Gerenciamento de Viaturas Cadastradas (Com Arrastar para Sequência) -->
 <div id="manageVehiclesModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
-    <div class="modal-card">
+    <div class="modal-card" style="max-width: 620px; width: 95%; max-height: 88vh;">
         <div class="modal-header">
             <div class="modal-title"><span>🚗 Gerenciar e Renomear Viaturas Cadastradas</span></div>
             <button class="modal-close" onclick="closeManageVehiclesModal()" title="Fechar">✖</button>
         </div>
-        <div style="display:flex; flex-direction:column; gap:16px; max-height: 70vh; overflow-y: auto; padding-right: 4px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <span style="font-size:0.88rem; color:var(--text-muted);">Viaturas cadastradas no sistema: <strong id="manageVehiclesCount">0</strong></span>
-                <button class="btn btn-primary btn-3d btn-sm" onclick="addNewVehiclePrompt()">➕ Adicionar Nova Viatura</button>
+        <div style="display:flex; flex-direction:column; gap:12px; max-height: 70vh; overflow-y: auto; padding-right: 4px;">
+            <!-- Dica de arrastar e soltar -->
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: #1e40af; line-height: 1.4; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.4rem;">↕️</span>
+                <div>
+                    <strong>Organizar Sequência:</strong> Arraste os cards para colocar as viaturas na ordem desejada (ou use os botões 🔼 🔽). Ao adicionar uma viatura nova, arraste-a para a sua sequência exata!
+                </div>
             </div>
-            <div class="manage-tags-list" id="manageVehiclesListContainer"></div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <span style="font-size:0.88rem; color:var(--text-muted);">Viaturas cadastradas: <strong id="manageVehiclesCount">0</strong></span>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-outline btn-3d btn-sm" onclick="sortVehiclesAlphabetically()" title="Reordenar todas as viaturas em ordem alfabética/numérica padrão">🔤 Ordem Padrão</button>
+                    <button type="button" class="btn btn-primary btn-3d btn-sm" onclick="addNewVehiclePrompt()">➕ Adicionar Nova Viatura</button>
+                </div>
+            </div>
+
+            <!-- Lista Reordenável de Viaturas -->
+            <div class="manage-vehicles-list" id="manageVehiclesListContainer"></div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 0.76rem; color: var(--text-muted);">💾 A nova sequência é salva e sincronizada automaticamente no banco.</span>
             <button type="button" class="btn btn-primary btn-3d" onclick="closeManageVehiclesModal()">Concluído</button>
         </div>
     </div>
@@ -3309,6 +3491,9 @@
             oilBrandInput.readOnly = !isAdminAuthenticated;
             oilBrandInput.style.cursor = isAdminAuthenticated ? 'text' : 'not-allowed';
             oilBrandInput.style.backgroundColor = isAdminAuthenticated ? 'var(--input-bg, #ffffff)' : 'var(--input-bg-disabled, rgba(0,0,0,0.03))';
+        }
+        if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+            renderInspectionSlots();
         }
     }
 
@@ -4659,7 +4844,15 @@
         const currentMileageFilter = filterMileageSelect ? filterMileageSelect.value : 'ALL';
 
         const vehicleSet = new Set([...customVehicles, ...records.map(r => r.vehicle), ...mileageHistory.map(r => r.vehicle)]);
-        const sortedVehicles = Array.from(vehicleSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+        // Preserva a ordem exata configurada pelo usuário em customVehicles (arrastar e soltar)
+        const sortedVehicles = [];
+        customVehicles.forEach(v => {
+            if (vehicleSet.has(v)) {
+                sortedVehicles.push(v);
+                vehicleSet.delete(v);
+            }
+        });
+        Array.from(vehicleSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })).forEach(v => sortedVehicles.push(v));
 
         if (vehicleSelect) {
             vehicleSelect.innerHTML = '';
@@ -5191,23 +5384,262 @@
         if (e.target.id === 'manageVehiclesModal') closeManageVehiclesModal();
     }
 
+    let draggedVehicleIndex = null;
+
     function renderManageVehiclesModal() {
         const container = document.getElementById('manageVehiclesListContainer');
         const countEl = document.getElementById('manageVehiclesCount');
         if (!container) return;
 
-        const sorted = [...customVehicles].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-        if (countEl) countEl.textContent = sorted.length;
+        if (countEl) countEl.textContent = customVehicles.length;
 
         container.innerHTML = '';
-        sorted.forEach(v => {
-            container.innerHTML += `
-                <div class="manage-tag-item">
-                    <span>🚓 ${v}</span>
-                    <span class="remove-tag" onclick="deleteVehicleDirect('${v}')" title="Excluir Viatura">✖</span>
+        customVehicles.forEach((v, index) => {
+            const vRec = records.find(r => r.vehicle === v);
+            const vInfo = VEHICLE_FLEET_INFO[v] || {};
+            const modelText = vInfo.model || (vRec && vRec.model) || '';
+            const placaText = vInfo.placa || (vRec && vRec.placa) || '';
+
+            const item = document.createElement('div');
+            item.className = 'draggable-vehicle-item';
+            item.draggable = true;
+            item.dataset.index = index;
+            item.dataset.vehicle = v;
+
+            item.innerHTML = `
+                <div class="drag-handle" title="Arraste para reposicionar na sequência">
+                    <span style="font-size: 1.15rem; line-height: 1;">⠿</span>
+                </div>
+                <div class="seq-badge">#${index + 1}</div>
+                <div class="vtr-col">
+                    <div class="vtr-prefix">🚓 ${v}</div>
+                    <div class="vtr-meta">${modelText}${placaText ? ' • ' + placaText : ''}</div>
+                </div>
+                <div class="item-actions">
+                    <button type="button" class="btn-arrow" onclick="moveVehicleInSequence(${index}, -1)" title="Mover para cima" ${index === 0 ? 'disabled' : ''}>▲</button>
+                    <button type="button" class="btn-arrow" onclick="moveVehicleInSequence(${index}, 1)" title="Mover para baixo" ${index === customVehicles.length - 1 ? 'disabled' : ''}>▼</button>
+                    <button type="button" class="btn-item-action edit" onclick="renameVehicleDirect('${v}')" title="Renomear Viatura">✏️</button>
+                    <button type="button" class="btn-item-action delete" onclick="deleteVehicleDirect('${v}')" title="Excluir Viatura">🗑️</button>
                 </div>
             `;
+
+            // HTML5 Drag and Drop events
+            item.addEventListener('dragstart', (e) => {
+                draggedVehicleIndex = index;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', index);
+                setTimeout(() => item.classList.add('is-dragging'), 0);
+            });
+
+            item.addEventListener('dragend', () => {
+                item.classList.remove('is-dragging');
+                document.querySelectorAll('.draggable-vehicle-item').forEach(el => {
+                    el.classList.remove('drag-over-top', 'drag-over-bottom');
+                });
+                draggedVehicleIndex = null;
+            });
+
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (draggedVehicleIndex === null || draggedVehicleIndex === index) return;
+
+                const rect = item.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                item.classList.remove('drag-over-top', 'drag-over-bottom');
+                if (e.clientY < midY) {
+                    item.classList.add('drag-over-top');
+                } else {
+                    item.classList.add('drag-over-bottom');
+                }
+            });
+
+            item.addEventListener('dragleave', () => {
+                item.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                item.classList.remove('drag-over-top', 'drag-over-bottom');
+                if (draggedVehicleIndex === null || draggedVehicleIndex === index) return;
+
+                const rect = item.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                let targetIndex = index;
+                if (e.clientY >= midY && draggedVehicleIndex < index) {
+                    targetIndex = index;
+                } else if (e.clientY < midY && draggedVehicleIndex > index) {
+                    targetIndex = index;
+                }
+
+                const movedItem = customVehicles.splice(draggedVehicleIndex, 1)[0];
+                customVehicles.splice(targetIndex, 0, movedItem);
+
+                saveCustomVehiclesOrder();
+                renderManageVehiclesModal();
+                renderVehicleMiniCards();
+                populateVehicleSelects();
+                renderDashboard();
+                syncAllDataToOnline();
+
+                showToast(`↕️ Viatura <strong>${movedItem}</strong> reposicionada para a posição <strong>#${targetIndex + 1}</strong>!`);
+            });
+
+            // Touch Drag Support para Celulares
+            const handle = item.querySelector('.drag-handle');
+            if (handle) {
+                let touchMoved = false;
+
+                handle.addEventListener('touchstart', (e) => {
+                    touchMoved = false;
+                    draggedVehicleIndex = index;
+                    item.classList.add('is-dragging');
+                }, { passive: true });
+
+                handle.addEventListener('touchmove', (e) => {
+                    touchMoved = true;
+                    const touch = e.touches[0];
+                    const elemUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const targetCard = elemUnder ? elemUnder.closest('.draggable-vehicle-item') : null;
+                    document.querySelectorAll('.draggable-vehicle-item').forEach(el => {
+                        el.classList.remove('drag-over-top', 'drag-over-bottom');
+                    });
+                    if (targetCard && targetCard !== item) {
+                        const rect = targetCard.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        if (touch.clientY < midY) {
+                            targetCard.classList.add('drag-over-top');
+                        } else {
+                            targetCard.classList.add('drag-over-bottom');
+                        }
+                    }
+                }, { passive: true });
+
+                handle.addEventListener('touchend', (e) => {
+                    item.classList.remove('is-dragging');
+                    document.querySelectorAll('.draggable-vehicle-item').forEach(el => {
+                        el.classList.remove('drag-over-top', 'drag-over-bottom');
+                    });
+                    if (touchMoved) {
+                        const touch = e.changedTouches[0];
+                        const elemUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                        const targetCard = elemUnder ? elemUnder.closest('.draggable-vehicle-item') : null;
+                        if (targetCard && targetCard !== item) {
+                            const targetIdx = parseInt(targetCard.dataset.index, 10);
+                            if (!isNaN(targetIdx) && targetIdx !== index) {
+                                const movedItem = customVehicles.splice(index, 1)[0];
+                                customVehicles.splice(targetIdx, 0, movedItem);
+
+                                saveCustomVehiclesOrder();
+                                renderManageVehiclesModal();
+                                renderVehicleMiniCards();
+                                populateVehicleSelects();
+                                renderDashboard();
+                                syncAllDataToOnline();
+
+                                showToast(`↕️ Viatura <strong>${movedItem}</strong> reposicionada para <strong>#${targetIdx + 1}</strong>!`);
+                            }
+                        }
+                    }
+                    draggedVehicleIndex = null;
+                });
+            }
+
+            container.appendChild(item);
         });
+    }
+
+    function moveVehicleInSequence(fromIndex, offset) {
+        const toIndex = fromIndex + offset;
+        if (toIndex < 0 || toIndex >= customVehicles.length) return;
+        const item = customVehicles.splice(fromIndex, 1)[0];
+        customVehicles.splice(toIndex, 0, item);
+        saveCustomVehiclesOrder();
+        renderManageVehiclesModal();
+        renderVehicleMiniCards();
+        populateVehicleSelects();
+        renderDashboard();
+        syncAllDataToOnline();
+        showToast(`↕️ Viatura <strong>${item}</strong> movida para a posição <strong>#${toIndex + 1}</strong>!`);
+    }
+
+    function sortVehiclesAlphabetically() {
+        if (confirm("Deseja reordenar a sequência de todas as viaturas em ordem alfabética/numérica padrão?")) {
+            customVehicles.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+            saveCustomVehiclesOrder();
+            renderManageVehiclesModal();
+            renderVehicleMiniCards();
+            populateVehicleSelects();
+            renderDashboard();
+            syncAllDataToOnline();
+            showToast("🔤 Viaturas organizadas em ordem sequencial padrão!");
+        }
+    }
+
+    function saveCustomVehiclesOrder() {
+        localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
+    }
+
+    async function renameVehicleDirect(selected) {
+        const ok = await requestAdminPassword(`renomear a viatura ${selected}`);
+        if (!ok) return;
+
+        const newName = prompt(`Digite o novo prefixo para a viatura "${selected}":`, selected);
+        if (!newName || !newName.trim()) return;
+
+        const cleanNewName = normalizeVehiclePrefix(newName);
+        if (cleanNewName === selected) return;
+
+        if (customVehicles.includes(cleanNewName)) {
+            alert('Já existe outra viatura com esse nome!');
+            return;
+        }
+
+        const index = customVehicles.indexOf(selected);
+        if (index !== -1) {
+            customVehicles[index] = cleanNewName;
+        } else {
+            customVehicles.push(cleanNewName);
+        }
+        localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
+
+        if (vehicleTargetMap[selected]) {
+            vehicleTargetMap[cleanNewName] = vehicleTargetMap[selected];
+            delete vehicleTargetMap[selected];
+            localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
+        }
+
+        if (vehiclePhotos && vehiclePhotos[selected]) {
+            vehiclePhotos[cleanNewName] = vehiclePhotos[selected];
+            delete vehiclePhotos[selected];
+            saveVehiclePhotos();
+        }
+
+        records.forEach(r => {
+            if (r.vehicle === selected) {
+                r.vehicle = cleanNewName;
+                r.id = cleanNewName;
+            }
+        });
+
+        mileageHistory.forEach(r => {
+            if (r.vehicle === selected) {
+                r.vehicle = cleanNewName;
+            }
+        });
+
+        saveRecords();
+        updateStatusTimestamp();
+
+        populateVehicleSelects();
+        document.getElementById('vehicleSelect').value = cleanNewName;
+        onVehicleSelectChange();
+        renderDashboard();
+        renderMileageTable();
+        renderManageVehiclesModal();
+        syncAllDataToOnline();
+
+        showToast(`✏️ Viatura renomeada de <strong>"${selected}"</strong> para <strong>"${cleanNewName}"</strong>!`);
     }
 
     async function openEditModal(vehicleId) {
@@ -6209,7 +6641,15 @@
             filteredRecords = baseRecords.filter(r => r.vehicle === filterVal);
         }
 
-        filteredRecords.sort((a, b) => (a.vehicle || '').localeCompare(b.vehicle || '', undefined, { numeric: true, sensitivity: 'base' }));
+        // Ordena registros respeitando a sequência personalizada definida em customVehicles
+        filteredRecords.sort((a, b) => {
+            const idxA = customVehicles.indexOf(a.vehicle);
+            const idxB = customVehicles.indexOf(b.vehicle);
+            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+            if (idxA !== -1) return -1;
+            if (idxB !== -1) return 1;
+            return (a.vehicle || '').localeCompare(b.vehicle || '', undefined, { numeric: true, sensitivity: 'base' });
+        });
 
         // RENDERIZAÇÃO DA TABELA (COM COLUNA DE PREFIXO FIXA)
         const tbody = document.getElementById('tableBody');
@@ -7518,7 +7958,7 @@
 
             if (hasPhoto) {
                 html += `
-                    <div class="inspection-thumb-container" onclick="openPhotoViewerModal('${slot.id}')" title="Toque para visualizar na tela cheia">
+                    <div class="inspection-thumb-container" onclick="openPhotoViewerModal('${slot.id}')" title="Toque para visualizar na tela cheia (Livre para todos)">
                         <img src="${photo.data}" alt="${slot.label}" class="inspection-thumb-img">
                         <div class="inspection-thumb-overlay">
                             <span>👁️ Ampliar Foto</span>
@@ -7528,23 +7968,23 @@
                         ${photo.date || 'Foto Salva'}
                     </div>
                     <div class="inspection-slot-actions">
-                        <button type="button" class="btn-slot-action view" onclick="openPhotoViewerModal('${slot.id}')" title="Visualizar Foto na tela">
+                        <button type="button" class="btn-slot-action view" onclick="openPhotoViewerModal('${slot.id}')" title="Visualizar Foto na tela (Livre para todos)">
                             👁️ Ver
                         </button>
-                        <button type="button" class="btn-slot-action" onclick="triggerPhotoUpload('${slot.id}')" title="Substituir Foto">
-                            📷 Trocar
+                        <button type="button" class="btn-slot-action" onclick="triggerPhotoUpload('${slot.id}')" title="${isAdminAuthenticated ? 'Substituir Foto' : 'Substituir Foto (Requer Senha ADM)'}">
+                            ${isAdminAuthenticated ? '📷 Trocar' : '🔒 Trocar'}
                         </button>
-                        <button type="button" class="btn-slot-action delete" onclick="deleteInspectionPhoto('${slot.id}')" title="Remover Foto">
+                        <button type="button" class="btn-slot-action delete" onclick="deleteInspectionPhoto('${slot.id}')" title="${isAdminAuthenticated ? 'Remover Foto' : 'Remover Foto (Requer Senha ADM)'}">
                             🗑️
                         </button>
                     </div>
                 `;
             } else {
                 html += `
-                    <div class="inspection-empty-box" onclick="triggerPhotoUpload('${slot.id}')" title="Tirar foto ou escolher da galeria">
+                    <div class="inspection-empty-box" onclick="triggerPhotoUpload('${slot.id}')" title="${isAdminAuthenticated ? 'Tirar foto ou escolher da galeria' : 'Adicionar Foto (Requer Senha ADM)'}">
                         <span style="font-size: 1.8rem;">📷</span>
                         <span style="font-size: 0.76rem; font-weight: 700;">+ Adicionar Foto</span>
-                        <span style="font-size: 0.65rem; color: var(--text-muted);">(Câmera / Galeria)</span>
+                        <span style="font-size: 0.65rem; color: var(--text-muted);">${isAdminAuthenticated ? '(Câmera / Galeria)' : '🔒 Requer ADM'}</span>
                     </div>
                 `;
             }
@@ -7555,7 +7995,14 @@
         grid.innerHTML = html;
     }
 
-    function triggerPhotoUpload(slotId) {
+    async function triggerPhotoUpload(slotId) {
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("adicionar ou alterar fotos da viatura");
+            if (!ok) {
+                openBilaoModal();
+                return;
+            }
+        }
         currentUploadSlotId = slotId;
         const fileInput = document.getElementById('inspectionFileInput');
         if (fileInput) {
@@ -7627,8 +8074,16 @@
         reader.readAsDataURL(file);
     }
 
-    function deleteInspectionPhoto(slotId) {
+    async function deleteInspectionPhoto(slotId) {
         if (!currentInspectVehicle || !vehiclePhotos[currentInspectVehicle]) return;
+
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("excluir foto de inspeção da viatura");
+            if (!ok) {
+                openBilaoModal();
+                return;
+            }
+        }
 
         const slotInfo = DEFAULT_INSPECTION_SLOTS.find(s => s.id === slotId) || { label: 'Foto' };
         if (confirm(`Deseja remover a foto "${slotInfo.label}" da viatura ${currentInspectVehicle}?`)) {
