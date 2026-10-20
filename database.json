@@ -1,6 +1,6 @@
 {
   "appTitle": "🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN",
-  "lastStatusUpdate": "",
+  "lastStatusUpdate": "19/10/2026 14:00:00",
   "vehicles": [
     "T-01100",
     "T-01103",
@@ -31,8 +31,516 @@
     "13-26",
     "26-24"
   ],
-  "targetMap": {},
-  "records": [],
+  "targetMap": {
+    "T-01100": 5000,
+    "T-01103": 5000,
+    "T-01104": 5000,
+    "T-01105": 5000,
+    "T-01106": 5000,
+    "T-01107": 5000,
+    "T-01109": 5000,
+    "T-01110": 5000,
+    "T-01112": 5000,
+    "T-01114": 5000,
+    "T-01115": 5000,
+    "T-01116": 5000,
+    "T-01118": 5000,
+    "T-01119": 5000,
+    "T-01120": 5000,
+    "T-01124": 5000,
+    "T-01125": 5000,
+    "T-01126": 5000,
+    "T-01127": 5000,
+    "T-01130": 5000,
+    "T-01135": 5000,
+    "T-01136": 5000,
+    "T-01137": 5000,
+    "T-01147": 5000,
+    "3-106": 5000,
+    "19-167": 5000,
+    "13-26": 5000,
+    "26-24": 5000
+  },
+  "records": [
+    {
+      "id": "T-01100",
+      "vehicle": "T-01100",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "TRAIL BLAZER",
+      "placa": "FSD-4079"
+    },
+    {
+      "id": "T-01103",
+      "vehicle": "T-01103",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "DUSTER",
+      "placa": "FUG-7E96"
+    },
+    {
+      "id": "T-01104",
+      "vehicle": "T-01104",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "DUSTER",
+      "placa": "DCD-2E41"
+    },
+    {
+      "id": "T-01105",
+      "vehicle": "T-01105",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "DUSTER",
+      "placa": "FJW-5C43"
+    },
+    {
+      "id": "T-01106",
+      "vehicle": "T-01106",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "DUSTER",
+      "placa": "FMQ-0B54"
+    },
+    {
+      "id": "T-01107",
+      "vehicle": "T-01107",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "DUSTER",
+      "placa": "FWN-9E65"
+    },
+    {
+      "id": "T-01109",
+      "vehicle": "T-01109",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "FZE-0D92"
+    },
+    {
+      "id": "T-01110",
+      "vehicle": "T-01110",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "EJZ-2821"
+    },
+    {
+      "id": "T-01112",
+      "vehicle": "T-01112",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "DWT-5E59"
+    },
+    {
+      "id": "T-01114",
+      "vehicle": "T-01114",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "DRT-7A92"
+    },
+    {
+      "id": "T-01115",
+      "vehicle": "T-01115",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "BVT-4J09"
+    },
+    {
+      "id": "T-01116",
+      "vehicle": "T-01116",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "FCJ-6G67"
+    },
+    {
+      "id": "T-01118",
+      "vehicle": "T-01118",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "BSZ-1H27"
+    },
+    {
+      "id": "T-01119",
+      "vehicle": "T-01119",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "GBO-6B42"
+    },
+    {
+      "id": "T-01120",
+      "vehicle": "T-01120",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "DUSTER",
+      "placa": "FTM-7A45"
+    },
+    {
+      "id": "T-01124",
+      "vehicle": "T-01124",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "DUSTER",
+      "placa": "FRV-2C08"
+    },
+    {
+      "id": "T-01125",
+      "vehicle": "T-01125",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "FOA-6102"
+    },
+    {
+      "id": "T-01126",
+      "vehicle": "T-01126",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "EIB-6D41"
+    },
+    {
+      "id": "T-01127",
+      "vehicle": "T-01127",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "DIB-8F92"
+    },
+    {
+      "id": "T-01130",
+      "vehicle": "T-01130",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "TRAIL BLAZER",
+      "placa": "FZT-1D98"
+    },
+    {
+      "id": "T-01135",
+      "vehicle": "T-01135",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "SPIN",
+      "placa": "BWY-8C11"
+    },
+    {
+      "id": "T-01136",
+      "vehicle": "T-01136",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "RANGER",
+      "placa": "FQF-2H92"
+    },
+    {
+      "id": "T-01137",
+      "vehicle": "T-01137",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "RANGER",
+      "placa": "GBN-9E31"
+    },
+    {
+      "id": "T-01147",
+      "vehicle": "T-01147",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "S-10",
+      "placa": "GEV-6999"
+    },
+    {
+      "id": "3-106",
+      "vehicle": "3-106",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "S-10",
+      "placa": "GFP-3234"
+    },
+    {
+      "id": "19-167",
+      "vehicle": "19-167",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "XT-660",
+      "placa": "FXS-5E25"
+    },
+    {
+      "id": "13-26",
+      "vehicle": "13-26",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "CARGO",
+      "placa": "EGX-1326"
+    },
+    {
+      "id": "26-24",
+      "vehicle": "26-24",
+      "date": "2026-10-19",
+      "currentKm": 0,
+      "targetKm": 5000,
+      "oilBrand": "Padrão 1ª Cia",
+      "filtroOleo": true,
+      "filtroAr": true,
+      "filtroCombustivel": false,
+      "model": "MASTER",
+      "placa": "FNV-9496"
+    }
+  ],
   "mileageHistory": [],
-  "updatedAt": ""
+  "updatedAt": "2026-10-19T14:00:00.000Z",
+  "fleetInfo": {
+    "T-01100": {
+      "model": "TRAIL BLAZER",
+      "placa": "FSD-4079"
+    },
+    "T-01103": {
+      "model": "DUSTER",
+      "placa": "FUG-7E96"
+    },
+    "T-01104": {
+      "model": "DUSTER",
+      "placa": "DCD-2E41"
+    },
+    "T-01105": {
+      "model": "DUSTER",
+      "placa": "FJW-5C43"
+    },
+    "T-01106": {
+      "model": "DUSTER",
+      "placa": "FMQ-0B54"
+    },
+    "T-01107": {
+      "model": "DUSTER",
+      "placa": "FWN-9E65"
+    },
+    "T-01109": {
+      "model": "SPIN",
+      "placa": "FZE-0D92"
+    },
+    "T-01110": {
+      "model": "SPIN",
+      "placa": "EJZ-2821"
+    },
+    "T-01112": {
+      "model": "SPIN",
+      "placa": "DWT-5E59"
+    },
+    "T-01114": {
+      "model": "SPIN",
+      "placa": "DRT-7A92"
+    },
+    "T-01115": {
+      "model": "SPIN",
+      "placa": "BVT-4J09"
+    },
+    "T-01116": {
+      "model": "SPIN",
+      "placa": "FCJ-6G67"
+    },
+    "T-01118": {
+      "model": "SPIN",
+      "placa": "BSZ-1H27"
+    },
+    "T-01119": {
+      "model": "SPIN",
+      "placa": "GBO-6B42"
+    },
+    "T-01120": {
+      "model": "DUSTER",
+      "placa": "FTM-7A45"
+    },
+    "T-01124": {
+      "model": "DUSTER",
+      "placa": "FRV-2C08"
+    },
+    "T-01125": {
+      "model": "SPIN",
+      "placa": "FOA-6102"
+    },
+    "T-01126": {
+      "model": "SPIN",
+      "placa": "EIB-6D41"
+    },
+    "T-01127": {
+      "model": "SPIN",
+      "placa": "DIB-8F92"
+    },
+    "T-01130": {
+      "model": "TRAIL BLAZER",
+      "placa": "FZT-1D98"
+    },
+    "T-01135": {
+      "model": "SPIN",
+      "placa": "BWY-8C11"
+    },
+    "T-01136": {
+      "model": "RANGER",
+      "placa": "FQF-2H92"
+    },
+    "T-01137": {
+      "model": "RANGER",
+      "placa": "GBN-9E31"
+    },
+    "T-01147": {
+      "model": "S-10",
+      "placa": "GEV-6999"
+    },
+    "3-106": {
+      "model": "S-10",
+      "placa": "GFP-3234"
+    },
+    "26-24": {
+      "model": "MASTER",
+      "placa": "FNV-9496"
+    },
+    "19-167": {
+      "model": "XT-660",
+      "placa": "FXS-5E25"
+    },
+    "13-26": {
+      "model": "CARGO",
+      "placa": "EGX-1326"
+    }
+  }
 }

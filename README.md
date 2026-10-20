@@ -1,93 +1,69 @@
 # 🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN
 
-Sistema online de gerenciamento de troca de óleo, acompanhamento de quilometragem (KM) e controle mensal de rodagem da frota de viaturas da 1ª Companhia do 1º Batalhão de Polícia de Trânsito (1º BPTran).
-
-Otimizado para **Vercel** (Serverless Edge de alta velocidade, sem hibernação ou erro de timeout) e 100% compatível com **Render** e execução local em **Node.js**.
+Sistema online de controle de manutenção preventiva de lubrificantes, registro de troca de óleo e acompanhamento mensal de rodagem da frota com sincronização instantânea em tempo real entre múltiplos computadores e celulares, integração com Google Drive e interface minimalista otimizada para smartphones.
 
 ---
 
-## ⚡ Por que migrar do Render para a Vercel?
+## 📱 Mini Cards Minimalistas com Modelo e Placa
 
-* **Fim do "Erro de Tempo" (Timeout)**: No plano gratuito do Render, os servidores entram em modo de suspensão (*spin down*) após 15 minutos sem uso. Ao reabrir a página, o Render leva de 30 a 50 segundos para inicializar. Como o sistema possui um limite de espera de 7 segundos no navegador, ocorria a mensagem de erro de tempo (*Tempo limite esgotado*).
-* **Carregamento Instantâneo na Vercel**: Na Vercel, o frontend estático é distribuído pela CDN Edge mundial (carrega em milissegundos) e a API roda sob demanda via *Serverless Functions*, respondendo de forma imediata sem atrasos de inicialização.
+1. **Exibição Cadastral nos Cards:**
+   - No setor **Registrar Óleo de Viatura**, cada mini card exibe o **Prefixo Oficial** em destaque e, logo abaixo, o **Modelo da Viatura** e a **Placa Oficial** de forma limpa e minimalista:
+     - Exemplo: `T-01100` ➔ `TRAIL BLAZER` | `FSD-4079`
+     - Exemplo: `T-01103` ➔ `DUSTER` | `FUG-7E96`
+     - Exemplo: `19-167` ➔ `XT-660` | `FXS-5E25`
+   - O ponto indicador colorido da situação do lubrificante permanece integrado de forma discreta (*Em Dia*, *Atenção*, *Vencido* ou *Sem Alvo*).
+   - O painel de destaque superior da viatura selecionada também reflete o Modelo e Placa em tempo real.
 
----
-
-## 📁 Estrutura do Projeto para Vercel e Render
-
-```text
-├── api/
-│   ├── index.js      # Handler Serverless principal (CORS, leitura/gravação atômica, rotas de API)
-│   ├── oleo.js       # Rota Serverless direta /api/oleo
-│   ├── frota.js      # Rota Serverless direta /api/frota
-│   ├── dados.js      # Rota Serverless direta /api/dados
-│   └── status.js     # Health check /api/status
-├── database.json     # Banco de dados inicial da frota com os prefixos cadastrados
-├── index.html        # Interface completa (Dashboard, formulário, gráficos, exportações)
-├── package.json      # Metadados e scripts de inicialização
-├── render.yaml       # Configuração para deploy no Render
-├── vercel.json       # Configuração de rotas e rewrites da Vercel
-├── server.js         # Servidor HTTP nativo para execução local ou Render
-└── README.md         # Documentação e instruções de implantação
-```
+2. **Navegação Estável:**
+   - Disposição flexível lado a lado com transições suaves de cor de borda, sem saltos de tela (`scrollIntoView` desativado na seleção rápida).
 
 ---
 
-## 🚀 Passo a Passo: Como Publicar na Vercel
+## 🥚 Easter Egg: Entrar como Administrador (5x em "Sd PM Vagner")
 
-### Opção 1: Pelo GitHub (Recomendado)
-
-1. **Subir os arquivos para o GitHub**:
-   - Descompacte o arquivo ZIP.
-   - Crie um novo repositório no seu GitHub (ex: `controle-oleo-frota-1cia`).
-   - Envie todos os arquivos para a branch principal (`main`).
-
-2. **Importar na Vercel**:
-   - Acesse o painel da [Vercel](https://vercel.com/) e faça login (pode usar sua conta GitHub).
-   - Clique no botão **"Add New..."** e selecione **"Project"**.
-   - Na lista de repositórios do GitHub, encontre o repositório `controle-oleo-frota-1cia` e clique em **"Import"**.
-   - Na tela de configuração:
-     - **Framework Preset**: Deixe em `Other`.
-     - **Root Directory**: `./` (padrão).
-     - **Build and Output Settings**: Pode deixar os padrões (não precisa alterar nada).
-   - Clique em **"Deploy"**.
-
-3. **Pronto!**
-   - Em menos de 1 minuto, a Vercel gerará o link de produção (ex: `https://controle-oleo-frota-1cia.vercel.app`).
-   - Ao abrir o link, o status da nuvem ficará verde (**🟢 Online**).
+- No rodapé da aplicação, foi configurado o acesso oculto por **Easter Egg**:
+  - Basta tocar/clicar **5 vezes seguidas** no nome **`Sd PM Vagner`**.
+  - O sistema reconhece a sequência e abre a solicitação da senha mestre (`PATRULHEIRO1`).
+  - Ao confirmar, o modo **`🔓 ADM Ativo`** é ativado para toda a sessão, liberando a edição de metas, especificações de óleo e exibindo os controles avançados.
 
 ---
 
-### Opção 2: Deploy Direto via Vercel CLI (Sem GitHub)
+## ⚡ Transmissão em Tempo Real Multi-Dispositivos (Firebase Realtime Stream)
 
-Se tiver o Node.js instalado no seu computador:
+1. **Atualização Instantânea Entre Computadores (~80 ms):**
+   - Ao registrar quilometragem, alterar meta ou editar qualquer viatura no PC 1, a alteração é transmitida instantaneamente para o **Firebase Realtime Database**.
+   - O Firebase distribui o evento imediatamente via **Stream contínuo SSE (EventSource)** para todos os outros computadores e celulares conectados.
+   - A tela do outro dispositivo atualiza automaticamente em menos de 100 milissegundos, **sem precisar recarregar a página (F5)**.
+
+2. **Configuração da Conexão em Tempo Real:**
+   - Link oficial configurado: `https://controlevtr-1c1b-default-rtdb.firebaseio.com/oleo_database.json`.
+   - Compatível com Vercel (arquivos serverless em `api/`), Render (`server.js`) e execução local.
+
+---
+
+## 🔒 Conexão e Sincronização com o Google Drive (Exclusiva para Administrador)
+
+- A opção de conectar e sincronizar com o Google / Google Drive fica **totalmente oculta** por padrão (`display: none`).
+- O botão surge no cabeçalho **exclusivamente** após o login como Administrador (`🔓 ADM Ativo`).
+
+---
+
+## 🛡️ Regras Operacionais e Matriz de Acesso
+
+1. **KM Atual Livre:** Qualquer operador pode registrar o KM Atual da viatura sem necessidade de senha.
+2. **Data Protegida:** Padrão de hoje; alterações de data exigem senha de Administrador.
+3. **KM Alvo Fixo:** Primeiro alvo livre; alterações subsequentes exigem senha de Administrador.
+4. **Filtros Inteligentes:** Checkboxes inselecionáveis se o KM Alvo não for alterado; selecionáveis apenas em nova troca de óleo.
+5. **Especificação do Óleo:** Ineditável para operadores comuns; liberada para Administrador.
+6. **Tela do Bilão:** Frase oficial padronizada caso a senha de administrador seja cancelada.
+7. **Bloqueios Anti-Inspeção:** Atalhos de DevTools (`F12`, etc.) e clique direito desativados, mantendo menu de contexto restrito (Copiar, Colar, Recortar).
+8. **Prevenção de Fechamento Acidental de Modais:** Janelas só fecham ao clicar em "Fechar", "✖" ou "💾 Salvar Novo KM".
+
+---
+
+## 🚀 Como Executar Localmente
 ```bash
-# 1. Instalar a CLI da Vercel globalmente
-npm install -g vercel
-
-# 2. Entrar na pasta do projeto
-cd controle_oleo_frota_vercel
-
-# 3. Fazer deploy em produção
-vercel --prod
-```
-Basta confirmar as opções com `Enter` e o link será gerado imediatamente.
-
----
-
-## 💻 Como Executar Localmente
-
-```bash
-# Iniciar o servidor local nativo
+npm install
 npm start
-# ou diretamente:
-node server.js
 ```
-Abra o navegador em: `http://localhost:3000`
-
----
-
-## 👮 Informações do Sistema
-- **Unidade**: 1ª Cia do 1º BPTran - Polícia Militar do Estado de São Paulo
-- **Desenvolvido por**: Sd Vagner - Telemática
-- **Finalidade**: Controle de Óleo e Quilometragem da Frota Operacional
+Acesse no navegador: `http://localhost:3000`

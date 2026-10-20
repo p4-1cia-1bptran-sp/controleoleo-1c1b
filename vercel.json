@@ -1,17 +1,27 @@
 {
   "version": 2,
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "src": "index.html",
+      "use": "@vercel/static"
     },
     {
-      "source": "/healthz",
-      "destination": "/api/index.js"
+      "src": "database.json",
+      "use": "@vercel/static"
     },
     {
-      "source": "/ping",
-      "destination": "/api/index.js"
+      "src": "api/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }

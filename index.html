@@ -1679,17 +1679,37 @@
             box-shadow: 0 0 0 2px #2563eb !important;
         }
 
-        .vehicle-mini-card .card-prefix {
+                .vehicle-mini-card .card-prefix {
             font-size: 0.95rem;
             font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: 0.5px;
+            color: var(--text-main, #0f172a);
+            letter-spacing: 0.4px;
+            line-height: 1.2;
+        }
+
+        .vehicle-mini-card .card-meta {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted, #64748b);
+            text-transform: uppercase;
+            margin: 2px 0;
+            line-height: 1.25;
+            letter-spacing: 0.2px;
         }
 
         .vehicle-mini-card .card-km {
-            font-size: 0.72rem;
-            color: var(--text-muted);
+            font-size: 0.7rem;
+            color: var(--text-muted, #64748b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-weight: 600;
             margin-top: 2px;
+        }
+
+        [data-theme="dark"] .vehicle-mini-card .card-meta {
+            color: #94a3b8;
         }
 
         .vehicle-mini-card .card-status-dot {
@@ -1769,6 +1789,7 @@
                 <div>
                     <span class="info-label">Viatura Selecionada</span>
                     <div class="info-val" id="selectedVehicleTitle" style="font-size: 1.25rem; color: var(--primary);">T-01100</div>
+                    <div id="selectedVehicleMeta" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-top: 2px;">TRAIL BLAZER • Placa: FSD-4079</div>
                 </div>
                 <div class="vehicle-info-details">
                     <div class="info-item">
@@ -1812,8 +1833,231 @@
                         </button>
                     </div>
                     <div id="vehicleMiniCardsGrid" class="vehicle-mini-cards-grid">
-                        <div class="vehicle-mini-card active" data-prefix="T-01100" onclick="selectVehicleFromMiniCard('T-01100')" title="Viatura T-01100">
+                        <div class="vehicle-mini-card active" data-prefix="T-01100" onclick="selectVehicleFromMiniCard('T-01100')" title="Viatura T-01100 - TRAIL BLAZER - FSD-4079">
                             <div class="card-prefix">T-01100</div>
+                            <div class="card-meta">TRAIL BLAZER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FSD-4079</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01103" onclick="selectVehicleFromMiniCard('T-01103')" title="Viatura T-01103 - DUSTER - FUG-7E96">
+                            <div class="card-prefix">T-01103</div>
+                            <div class="card-meta">DUSTER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FUG-7E96</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01104" onclick="selectVehicleFromMiniCard('T-01104')" title="Viatura T-01104 - DUSTER - DCD-2E41">
+                            <div class="card-prefix">T-01104</div>
+                            <div class="card-meta">DUSTER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">DCD-2E41</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01105" onclick="selectVehicleFromMiniCard('T-01105')" title="Viatura T-01105 - DUSTER - FJW-5C43">
+                            <div class="card-prefix">T-01105</div>
+                            <div class="card-meta">DUSTER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FJW-5C43</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01106" onclick="selectVehicleFromMiniCard('T-01106')" title="Viatura T-01106 - DUSTER - FMQ-0B54">
+                            <div class="card-prefix">T-01106</div>
+                            <div class="card-meta">DUSTER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FMQ-0B54</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01107" onclick="selectVehicleFromMiniCard('T-01107')" title="Viatura T-01107 - DUSTER - FWN-9E65">
+                            <div class="card-prefix">T-01107</div>
+                            <div class="card-meta">DUSTER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FWN-9E65</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01109" onclick="selectVehicleFromMiniCard('T-01109')" title="Viatura T-01109 - SPIN - FZE-0D92">
+                            <div class="card-prefix">T-01109</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FZE-0D92</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01110" onclick="selectVehicleFromMiniCard('T-01110')" title="Viatura T-01110 - SPIN - EJZ-2821">
+                            <div class="card-prefix">T-01110</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">EJZ-2821</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01112" onclick="selectVehicleFromMiniCard('T-01112')" title="Viatura T-01112 - SPIN - DWT-5E59">
+                            <div class="card-prefix">T-01112</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">DWT-5E59</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01114" onclick="selectVehicleFromMiniCard('T-01114')" title="Viatura T-01114 - SPIN - DRT-7A92">
+                            <div class="card-prefix">T-01114</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">DRT-7A92</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01115" onclick="selectVehicleFromMiniCard('T-01115')" title="Viatura T-01115 - SPIN - BVT-4J09">
+                            <div class="card-prefix">T-01115</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">BVT-4J09</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01116" onclick="selectVehicleFromMiniCard('T-01116')" title="Viatura T-01116 - SPIN - FCJ-6G67">
+                            <div class="card-prefix">T-01116</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FCJ-6G67</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01118" onclick="selectVehicleFromMiniCard('T-01118')" title="Viatura T-01118 - SPIN - BSZ-1H27">
+                            <div class="card-prefix">T-01118</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">BSZ-1H27</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01119" onclick="selectVehicleFromMiniCard('T-01119')" title="Viatura T-01119 - SPIN - GBO-6B42">
+                            <div class="card-prefix">T-01119</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">GBO-6B42</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01120" onclick="selectVehicleFromMiniCard('T-01120')" title="Viatura T-01120 - DUSTER - FTM-7A45">
+                            <div class="card-prefix">T-01120</div>
+                            <div class="card-meta">DUSTER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FTM-7A45</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01124" onclick="selectVehicleFromMiniCard('T-01124')" title="Viatura T-01124 - DUSTER - FRV-2C08">
+                            <div class="card-prefix">T-01124</div>
+                            <div class="card-meta">DUSTER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FRV-2C08</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01125" onclick="selectVehicleFromMiniCard('T-01125')" title="Viatura T-01125 - SPIN - FOA-6102">
+                            <div class="card-prefix">T-01125</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FOA-6102</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01126" onclick="selectVehicleFromMiniCard('T-01126')" title="Viatura T-01126 - SPIN - EIB-6D41">
+                            <div class="card-prefix">T-01126</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">EIB-6D41</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01127" onclick="selectVehicleFromMiniCard('T-01127')" title="Viatura T-01127 - SPIN - DIB-8F92">
+                            <div class="card-prefix">T-01127</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">DIB-8F92</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01130" onclick="selectVehicleFromMiniCard('T-01130')" title="Viatura T-01130 - TRAIL BLAZER - FZT-1D98">
+                            <div class="card-prefix">T-01130</div>
+                            <div class="card-meta">TRAIL BLAZER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FZT-1D98</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01135" onclick="selectVehicleFromMiniCard('T-01135')" title="Viatura T-01135 - SPIN - BWY-8C11">
+                            <div class="card-prefix">T-01135</div>
+                            <div class="card-meta">SPIN<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">BWY-8C11</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01136" onclick="selectVehicleFromMiniCard('T-01136')" title="Viatura T-01136 - RANGER - FQF-2H92">
+                            <div class="card-prefix">T-01136</div>
+                            <div class="card-meta">RANGER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FQF-2H92</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01137" onclick="selectVehicleFromMiniCard('T-01137')" title="Viatura T-01137 - RANGER - GBN-9E31">
+                            <div class="card-prefix">T-01137</div>
+                            <div class="card-meta">RANGER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">GBN-9E31</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="T-01147" onclick="selectVehicleFromMiniCard('T-01147')" title="Viatura T-01147 - S-10 - GEV-6999">
+                            <div class="card-prefix">T-01147</div>
+                            <div class="card-meta">S-10<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">GEV-6999</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="3-106" onclick="selectVehicleFromMiniCard('3-106')" title="Viatura 3-106 - S-10 - GFP-3234">
+                            <div class="card-prefix">3-106</div>
+                            <div class="card-meta">S-10<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">GFP-3234</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="26-24" onclick="selectVehicleFromMiniCard('26-24')" title="Viatura 26-24 - MASTER - FNV-9496">
+                            <div class="card-prefix">26-24</div>
+                            <div class="card-meta">MASTER<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FNV-9496</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="19-167" onclick="selectVehicleFromMiniCard('19-167')" title="Viatura 19-167 - XT-660 - FXS-5E25">
+                            <div class="card-prefix">19-167</div>
+                            <div class="card-meta">XT-660<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">FXS-5E25</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-mini-card " data-prefix="13-26" onclick="selectVehicleFromMiniCard('13-26')" title="Viatura 13-26 - CARGO - EGX-1326">
+                            <div class="card-prefix">13-26</div>
+                            <div class="card-meta">CARGO<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">EGX-1326</span></div>
+                            <div class="card-km">
+                                <span class="card-status-dot" style="background-color: #16a34a;"></span>
+                                <span style="font-size: 0.68rem; color: #16a34a; font-weight: 700;">Em Dia</span>
+                            </div>
+                        </div>
+                    </div>
                             <div class="card-km" style="display: flex; align-items: center; justify-content: center; gap: 4px; font-weight: 600;">
                                 <span class="card-status-dot" style="background-color: #16a34a;"></span>
                                 <span style="font-size: 0.72rem; color: #16a34a;">Em Dia</span>
@@ -2369,7 +2613,7 @@
 
     <!-- Rodapé Discreto com Easter Egg Suave ao Hover -->
     <footer style="text-align: center; margin-top: 10px; padding: 16px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">
-        Criado por: <span class="easter-egg-author">Sd Vagner<span class="tooltip-text">📧 vagnerdjs@policiamilitar.sp.gov.br</span></span> - Telemática
+        Criado por: <span class="easter-egg-author" id="authorEasterEgg" onclick="handleAuthorEasterEggClick()" title="Toque 5x para entrar como Administrador" style="cursor: pointer; user-select: none; font-weight: 700; color: var(--primary);">Sd PM Vagner<span class="tooltip-text">📧 vagnerdjs@policiamilitar.sp.gov.br (Toque 5x para modo Administrador)</span></span> - Telemática
     </footer>
 </div>
 <!-- ========================================================================= -->
@@ -2683,6 +2927,24 @@
             <button class="modal-close" onclick="closeServerConfigModal()" title="Fechar">✖</button>
         </div>
         <div style="display: flex; flex-direction: column; gap: 14px; padding: 4px 0;">
+                        <!-- Configuração do Firebase Realtime Database (Nuvem em Tempo Real) -->
+            <div style="background: rgba(37, 99, 235, 0.05); border: 1px solid rgba(37, 99, 235, 0.25); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="customDatabaseUrlInput" style="font-size: 0.86rem; font-weight: 700; color: #1e3a8a;">
+                        ☁️ Link do Banco em Tempo Real (Firebase):
+                    </label>
+                    <button type="button" class="btn btn-outline btn-sm" style="font-size: 0.72rem; padding: 2px 8px;" onclick="resetCustomDatabaseUrl()">Restaurar Padrão</button>
+                </div>
+                <div style="font-size: 0.76rem; color: #1e40af; line-height: 1.3;">
+                    Transmissão instantânea contínua (Stream SSE). Ao alterar em um computador ou celular, a mudança aparece nos outros em menos de 100 milissegundos sem recarregar a página!
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <input type="text" id="customDatabaseUrlInput" placeholder="https://controlevtr-1c1b-default-rtdb.firebaseio.com/oleo_database.json" style="flex: 1; font-size: 0.82rem; padding: 8px 10px; border-radius: 6px; border: 1px solid #93c5fd; font-family: monospace;">
+                    <button type="button" class="btn btn-primary btn-3d" style="padding: 8px 14px; font-size: 0.82rem; white-space: nowrap;" onclick="saveCustomDatabaseUrl()">💾 Salvar e Conectar</button>
+                </div>
+                <div id="customDbStatusText" style="font-size: 0.76rem; color: #16a34a; font-weight: 600;">🟢 Conectado ao Firebase Realtime</div>
+            </div>
+
             <div class="modal-section-box modal-section-online">
                 <label style="font-size: 0.88rem; font-weight: 700; color: #166534; display: block; margin-bottom: 4px;">📡 Status Atual da Conexão:</label>
                 <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
@@ -3228,31 +3490,35 @@
     let lastSyncedHash = '';
     let lastActiveEndpoint = localStorage.getItem('oleo_vtr_active_endpoint') || '';
 
-    const UNIVERSAL_CLOUD_URL = 'https://controle-frota-vagner-default-rtdb.firebaseio.com/oleo_vtr_database.json';
+    const DEFAULT_FIREBASE_URL = 'https://controlevtr-1c1b-default-rtdb.firebaseio.com/oleo_database.json';
+    let UNIVERSAL_CLOUD_URL = localStorage.getItem('oleo_vtr_firebase_url') || DEFAULT_FIREBASE_URL;
+    let firebaseEventSource = null;
 
     function getApiCandidateEndpoints() {
         const list = [];
+        // Prioridade máxima: Firebase Realtime Database (ultrarrápido, ~80ms, sincronia instantânea entre PCs)
+        if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+            list.push(UNIVERSAL_CLOUD_URL);
+        }
+
+        if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+            const originEndpoint = window.location.origin + '/api/oleo';
+            if (!list.includes(originEndpoint)) list.push(originEndpoint);
+            if (!list.includes('/api/oleo')) list.push('/api/oleo');
+            if (!list.includes('/api/dados')) list.push('/api/dados');
+            if (!list.includes('/api/database')) list.push('/api/database');
+        }
+
         const customUrl = localStorage.getItem('oleo_vtr_api_url');
         if (customUrl && customUrl.trim()) {
             let u = customUrl.trim();
             if (!u.startsWith('http') && !u.startsWith('/')) u = 'https://' + u;
-            if (u.endsWith('/')) u = u.slice(0, -1);
-            if (!u.endsWith('/api/oleo') && !u.endsWith('.json')) {
-                u += '/api/oleo';
-            }
-            list.push(u);
+            if (!list.includes(u)) list.push(u);
         }
 
         if (lastActiveEndpoint && !list.includes(lastActiveEndpoint)) {
             list.push(lastActiveEndpoint);
         }
-
-        if (window.location.protocol !== 'file:') {
-            if (!list.includes('/api/oleo')) list.push('/api/oleo');
-            if (!list.includes('/api/frota')) list.push('/api/frota');
-        }
-
-        if (!list.includes(UNIVERSAL_CLOUD_URL)) list.push(UNIVERSAL_CLOUD_URL);
 
         return list;
     }
@@ -3322,6 +3588,112 @@
         if (txt) txt.textContent = text;
     }
 
+    
+    // ⚡ STREAM EM TEMPO REAL BIDIRECIONAL CONTÍNUO (FIREBASE SSE / EVENTSOURCE)
+    function initFirebaseRealtimeStream() {
+        if (!window.EventSource) return;
+        if (!UNIVERSAL_CLOUD_URL || !UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) return;
+
+        if (firebaseEventSource) {
+            try { firebaseEventSource.close(); } catch(e) {}
+            firebaseEventSource = null;
+        }
+
+        try {
+            firebaseEventSource = new EventSource(UNIVERSAL_CLOUD_URL);
+
+            firebaseEventSource.addEventListener('put', function(e) {
+                try {
+                    const parsed = JSON.parse(e.data);
+                    if (!parsed) return;
+
+                    let incomingData = null;
+                    if (parsed.path === '/' || !parsed.path) {
+                        incomingData = parsed.data;
+                    } else {
+                        loadDataFromOnline(true);
+                        return;
+                    }
+
+                    if (incomingData && typeof incomingData === 'object') {
+                        applyOnlineData(incomingData, true);
+                    }
+                } catch(err) {
+                    console.warn('Erro ao processar evento de tempo real:', err);
+                }
+            });
+
+            firebaseEventSource.addEventListener('patch', function() {
+                loadDataFromOnline(true);
+            });
+
+            firebaseEventSource.onerror = function() {
+                // Reconexão automática gerenciada pelo navegador
+            };
+        } catch(err) {
+            console.warn('Não foi possível iniciar o stream SSE:', err);
+        }
+    }
+
+    function applyOnlineData(data, isBackground = false) {
+        if (!data || typeof data !== 'object') return;
+        const currentHash = generateDataHash(data);
+        if (currentHash && currentHash === lastSyncedHash) {
+            setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
+            isCloudConnected = true;
+            return;
+        }
+
+        const active = document.activeElement;
+        const isUserTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+
+        lastSyncedHash = currentHash;
+        isRemoteUpdate = true;
+
+        if (Array.isArray(data.records)) {
+            records = data.records;
+            localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
+        }
+        if (Array.isArray(data.mileageHistory)) {
+            mileageHistory = data.mileageHistory;
+            localStorage.setItem('oleo_vtr_mileage_history', JSON.stringify(mileageHistory));
+        }
+        if (Array.isArray(data.vehicles)) {
+            customVehicles = data.vehicles;
+            if (!customVehicles.includes('26-24')) customVehicles.push('26-24');
+            localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
+        }
+        if (data.targetMap && typeof data.targetMap === 'object') {
+            vehicleTargetMap = data.targetMap;
+            localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
+        }
+        if (data.appTitle) {
+            appTitle = data.appTitle;
+            localStorage.setItem('oleo_vtr_app_title', appTitle);
+            updateAppTitleDisplay();
+        }
+        if (data.lastStatusUpdate) {
+            const el = document.getElementById('lastStatusUpdateText');
+            if (el) el.textContent = data.lastStatusUpdate;
+            localStorage.setItem('oleo_vtr_last_status_update', data.lastStatusUpdate);
+        }
+
+        if (!isUserTyping) {
+            populateMonthSelect();
+            populateVehicleSelects();
+        }
+        renderDashboard();
+        renderMileageTable();
+        renderVehicleMiniCards();
+
+        isRemoteUpdate = false;
+        isCloudConnected = true;
+        setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
+        if (!isBackground) {
+            showToast('☁️ <strong>Dados sincronizados em tempo real!</strong>');
+        }
+    }
+
     async function loadDataFromOnline(isBackground = false) {
         if (!isBackground) setCloudStatusBadge('syncing', 'Conectando Online...');
         try {
@@ -3337,59 +3709,12 @@
 
             const data = res.data;
             if (data && typeof data === 'object' && Object.keys(data).length > 0 && (Array.isArray(data.records) || data.vehicles || data.appTitle)) {
-                const currentHash = generateDataHash(data);
-                if (currentHash === lastSyncedHash) {
-                    setCloudStatusBadge('connected', '🟢 Online');
-                    isCloudConnected = true;
-                    return;
-                }
-                lastSyncedHash = currentHash;
-                isRemoteUpdate = true;
-
-                if (Array.isArray(data.records)) {
-                    records = data.records;
-                    localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
-                }
-                if (Array.isArray(data.mileageHistory)) {
-                    mileageHistory = data.mileageHistory;
-                    localStorage.setItem('oleo_vtr_mileage_history', JSON.stringify(mileageHistory));
-                }
-                if (Array.isArray(data.vehicles)) {
-                    customVehicles = data.vehicles;
-                    if (!customVehicles.includes('26-24')) customVehicles.push('26-24');
-                    localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
-                }
-                if (data.targetMap && typeof data.targetMap === 'object') {
-                    vehicleTargetMap = data.targetMap;
-                    localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
-                }
-                if (data.appTitle) {
-                    appTitle = data.appTitle;
-                    localStorage.setItem('oleo_vtr_app_title', appTitle);
-                    updateAppTitleDisplay();
-                }
-                if (data.lastStatusUpdate) {
-                    const el = document.getElementById('lastStatusUpdateText');
-                    if (el) el.textContent = data.lastStatusUpdate;
-                    localStorage.setItem('oleo_vtr_last_status_update', data.lastStatusUpdate);
-                }
-
-                populateMonthSelect();
-                populateVehicleSelects();
-                renderDashboard();
-                renderMileageTable();
-
-                isRemoteUpdate = false;
-                isCloudConnected = true;
-                setCloudStatusBadge('connected', '🟢 Online');
-                if (!isBackground) {
-                    showToast('☁️ <strong>Dados sincronizados Online com sucesso!</strong>');
-                }
+                applyOnlineData(data, isBackground);
             } else {
                 if (records && records.length > 0) {
                     syncAllDataToOnline(true);
                 } else {
-                    setCloudStatusBadge('connected', '🟢 Online');
+                    setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
                     isCloudConnected = true;
                 }
             }
@@ -3428,16 +3753,33 @@
     }
 
     function startAutoSync() {
+        // Conexão direta por Stream contínuo em Tempo Real (~80ms entre computadores)
+        initFirebaseRealtimeStream();
+
         if (autoSyncInterval) clearInterval(autoSyncInterval);
-        // Sincronização periódica suave a cada 20 segundos
         autoSyncInterval = setInterval(() => {
-            // Evita atualizar a tela se o usuário estiver digitando em qualquer campo
+            if (document.hidden) return;
             const active = document.activeElement;
             const isUserTyping = active && (active.tagName === 'INPUT' || active.tagName === 'SELECT' || active.tagName === 'TEXTAREA');
             if (!isUserTyping) {
                 loadDataFromOnline(true);
             }
-        }, 20000);
+        }, 2500);
+
+        window.addEventListener('focus', () => { 
+            initFirebaseRealtimeStream();
+            loadDataFromOnline(false); 
+        });
+        window.addEventListener('online', () => { 
+            initFirebaseRealtimeStream();
+            loadDataFromOnline(false); 
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                initFirebaseRealtimeStream();
+                loadDataFromOnline(false);
+            }
+        });
     }
 
     function openServerConfigModal() {
@@ -3681,6 +4023,123 @@
         }
         return clean;
     }
+
+    
+    // 🚓 DADOS CADASTRAIS OFICIAIS DAS VIATURAS (MODELO E PLACA)
+    const VEHICLE_FLEET_INFO = {
+    "T-01100": {
+        "model": "TRAIL BLAZER",
+        "placa": "FSD-4079"
+    },
+    "T-01103": {
+        "model": "DUSTER",
+        "placa": "FUG-7E96"
+    },
+    "T-01104": {
+        "model": "DUSTER",
+        "placa": "DCD-2E41"
+    },
+    "T-01105": {
+        "model": "DUSTER",
+        "placa": "FJW-5C43"
+    },
+    "T-01106": {
+        "model": "DUSTER",
+        "placa": "FMQ-0B54"
+    },
+    "T-01107": {
+        "model": "DUSTER",
+        "placa": "FWN-9E65"
+    },
+    "T-01109": {
+        "model": "SPIN",
+        "placa": "FZE-0D92"
+    },
+    "T-01110": {
+        "model": "SPIN",
+        "placa": "EJZ-2821"
+    },
+    "T-01112": {
+        "model": "SPIN",
+        "placa": "DWT-5E59"
+    },
+    "T-01114": {
+        "model": "SPIN",
+        "placa": "DRT-7A92"
+    },
+    "T-01115": {
+        "model": "SPIN",
+        "placa": "BVT-4J09"
+    },
+    "T-01116": {
+        "model": "SPIN",
+        "placa": "FCJ-6G67"
+    },
+    "T-01118": {
+        "model": "SPIN",
+        "placa": "BSZ-1H27"
+    },
+    "T-01119": {
+        "model": "SPIN",
+        "placa": "GBO-6B42"
+    },
+    "T-01120": {
+        "model": "DUSTER",
+        "placa": "FTM-7A45"
+    },
+    "T-01124": {
+        "model": "DUSTER",
+        "placa": "FRV-2C08"
+    },
+    "T-01125": {
+        "model": "SPIN",
+        "placa": "FOA-6102"
+    },
+    "T-01126": {
+        "model": "SPIN",
+        "placa": "EIB-6D41"
+    },
+    "T-01127": {
+        "model": "SPIN",
+        "placa": "DIB-8F92"
+    },
+    "T-01130": {
+        "model": "TRAIL BLAZER",
+        "placa": "FZT-1D98"
+    },
+    "T-01135": {
+        "model": "SPIN",
+        "placa": "BWY-8C11"
+    },
+    "T-01136": {
+        "model": "RANGER",
+        "placa": "FQF-2H92"
+    },
+    "T-01137": {
+        "model": "RANGER",
+        "placa": "GBN-9E31"
+    },
+    "T-01147": {
+        "model": "S-10",
+        "placa": "GEV-6999"
+    },
+    "3-106": {
+        "model": "S-10",
+        "placa": "GFP-3234"
+    },
+    "26-24": {
+        "model": "MASTER",
+        "placa": "FNV-9496"
+    },
+    "19-167": {
+        "model": "XT-660",
+        "placa": "FXS-5E25"
+    },
+    "13-26": {
+        "model": "CARGO",
+        "placa": "EGX-1326"
+    }
+};
 
     const defaultVehicles = [
         "T-01100", "T-01103", "T-01104", "T-01105", "T-01106", "T-01107", 
@@ -4081,6 +4540,11 @@
         if (!selected) return;
 
         document.getElementById('selectedVehicleTitle').textContent = selected;
+        const vInfoSelected = VEHICLE_FLEET_INFO[selected] || { model: (vRecord && vRecord.model) || '', placa: (vRecord && vRecord.placa) || '' };
+        const metaEl = document.getElementById('selectedVehicleMeta');
+        if (metaEl) {
+            metaEl.textContent = (vInfoSelected.model ? vInfoSelected.model : '') + (vInfoSelected.placa ? ' • Placa: ' + vInfoSelected.placa : '');
+        }
         // Sincroniza destaque no card ativo
         document.querySelectorAll('.vehicle-mini-card').forEach(card => {
             if (card.getAttribute('data-prefix') === selected) {
@@ -6561,12 +7025,17 @@
 
             const isSelected = (v === currentSelected);
 
+            const vInfo = VEHICLE_FLEET_INFO[v] || { model: (vRecord && vRecord.model) || '', placa: (vRecord && vRecord.placa) || '' };
+            const modelText = vInfo.model || 'VIATURA';
+            const placaText = vInfo.placa || '';
+
             cardsHtml += `
-                <div class="vehicle-mini-card ${isSelected ? 'active' : ''}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${statusText}">
+                <div class="vehicle-mini-card ${isSelected ? 'active' : ''}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${modelText} - ${placaText} (${statusText})">
                     <div class="card-prefix">${v}</div>
-                    <div class="card-km" style="display: flex; align-items: center; justify-content: center; gap: 4px; font-weight: 600;">
+                    <div class="card-meta">${modelText}<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">${placaText}</span></div>
+                    <div class="card-km">
                         <span class="card-status-dot" style="background-color: ${statusColor};"></span>
-                        <span style="color: ${statusColor}; font-size: 0.72rem;">${remainingText || statusText}</span>
+                        <span style="color: ${statusColor}; font-size: 0.68rem; font-weight: 700;">${remainingText || statusText}</span>
                     </div>
                 </div>
             `;
@@ -6595,6 +7064,98 @@
 
 
     // 🔄 SINCRONIZAÇÃO COMPLETA DO BANCO DE DADOS (1-CLIQUE)
+    
+    function initDatabaseConfigUI() {
+        const input = document.getElementById('customDatabaseUrlInput');
+        if (input) {
+            input.value = localStorage.getItem('oleo_vtr_firebase_url') || DEFAULT_FIREBASE_URL;
+        }
+    }
+
+    async function saveCustomDatabaseUrl() {
+        const input = document.getElementById('customDatabaseUrlInput');
+        const statusEl = document.getElementById('customDbStatusText');
+        if (!input) return;
+
+        let url = input.value.trim();
+        if (!url) url = DEFAULT_FIREBASE_URL;
+
+        if (url.includes('firebaseio.com') && !url.endsWith('.json')) {
+            url += '.json';
+        }
+
+        UNIVERSAL_CLOUD_URL = url;
+        localStorage.setItem('oleo_vtr_firebase_url', url);
+
+        if (statusEl) {
+            statusEl.textContent = '⏳ Testando conexão com o Firebase...';
+            statusEl.style.color = '#2563eb';
+        }
+
+        try {
+            const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (res.ok) {
+                if (statusEl) {
+                    statusEl.textContent = '🟢 Conectado ao Firebase com sucesso!';
+                    statusEl.style.color = '#16a34a';
+                }
+                showToast('☁️ <strong>Firebase conectado em tempo real!</strong>');
+                initFirebaseRealtimeStream();
+                await loadDataFromOnline(false);
+            } else {
+                if (statusEl) {
+                    statusEl.textContent = '⚠️ Erro ao acessar (' + res.status + ') - Verifique Regras no Firebase';
+                    statusEl.style.color = '#dc2626';
+                }
+            }
+        } catch (err) {
+            if (statusEl) {
+                statusEl.textContent = '❌ Erro de conexão';
+                statusEl.style.color = '#dc2626';
+            }
+        }
+    }
+
+    function resetCustomDatabaseUrl() {
+        const input = document.getElementById('customDatabaseUrlInput');
+        if (input) input.value = DEFAULT_FIREBASE_URL;
+        saveCustomDatabaseUrl();
+    }
+
+    
+    // 🥚 EASTER EGG: CLICAR 5X EM "Sd PM Vagner" PARA ENTRAR COMO ADMINISTRADOR
+    let authorEasterEggClicks = 0;
+    let authorEasterEggTimer = null;
+
+    async function handleAuthorEasterEggClick() {
+        authorEasterEggClicks++;
+        if (authorEasterEggTimer) clearTimeout(authorEasterEggTimer);
+        authorEasterEggTimer = setTimeout(() => {
+            authorEasterEggClicks = 0;
+        }, 3000);
+
+        if (authorEasterEggClicks >= 5) {
+            authorEasterEggClicks = 0;
+            if (authorEasterEggTimer) clearTimeout(authorEasterEggTimer);
+
+            if (isAdminAuthenticated) {
+                showToast('🔓 <strong>Você já está autenticado como Administrador!</strong>');
+                return;
+            }
+
+            showToast('🕵️‍♂️ <strong>Easter Egg ativado!</strong> Solicitando senha de Administrador...');
+            const ok = await requestAdminPassword("entrar como Administrador Geral");
+            if (ok) {
+                showToast('🔓 <strong>Acesso de Administrador liberado com sucesso!</strong>');
+            } else {
+                openBilaoModal();
+            }
+        } else if (authorEasterEggClicks >= 3) {
+            const remaining = 5 - authorEasterEggClicks;
+            showToast(`⚡ Quase lá... mais ${remaining} toque${remaining > 1 ? 's' : ''} para entrar como Administrador!`);
+        }
+    }
+
     async function syncDatabaseNow() {
         showToast('🔄 <strong>Sincronizando banco de dados...</strong>');
         setCloudStatusBadge('syncing', 'Sincronizando...');
