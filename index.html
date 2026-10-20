@@ -658,7 +658,6 @@
         }
 
         .oil-card-item {
-            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 16px;
@@ -668,7 +667,26 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
             border-left: 6px solid var(--primary);
             position: relative;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* Zebra striping idêntico à tabela de Controle VTR */
+        .oil-card-item:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .oil-card-item:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+
+        [data-theme="dark"] .oil-card-item:nth-child(odd) {
+            background-color: #1e293b;
+        }
+
+        [data-theme="dark"] .oil-card-item:nth-child(even) {
+            background-color: #141f30;
         }
 
         .oil-card-item:hover {
@@ -678,7 +696,39 @@
 
         .oil-card-item.status-ok { border-left-color: var(--success); }
         .oil-card-item.status-warning { border-left-color: var(--warning); }
-        .oil-card-item.status-danger { border-left-color: var(--danger); }
+        
+        /* Quando a viatura estourar os KM (vencida): card fica levemente vermelho sinalizando */
+        .oil-card-item.status-danger {
+            border-left-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            border-color: #fca5a5 !important;
+        }
+
+        .oil-card-item.status-danger:hover {
+            background-color: #fee2e2 !important;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.22) !important;
+        }
+
+        [data-theme="dark"] .oil-card-item.status-danger {
+            border-left-color: #ef4444 !important;
+            background-color: rgba(127, 29, 29, 0.3) !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
+        }
+
+        [data-theme="dark"] .oil-card-item.status-danger:hover {
+            background-color: rgba(127, 29, 29, 0.42) !important;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35) !important;
+        }
+
+        .oil-card-item.status-danger .oil-life-bar-box {
+            background-color: #ffffff;
+            border-color: #fecdd3;
+        }
+
+        [data-theme="dark"] .oil-card-item.status-danger .oil-life-bar-box {
+            background-color: #181116;
+            border-color: rgba(239, 68, 68, 0.35);
+        }
 
         .oil-card-header {
             display: flex;
@@ -1513,7 +1563,21 @@
 
         /* Ajustes Responsivos para Celular */
         @media (max-width: 768px) {
-            body { padding: 10px 10px; }
+            body { 
+                padding: 10px 8px; 
+                touch-action: pan-y;
+                -webkit-overflow-scrolling: touch;
+            }
+            .dashboard-container { gap: 14px; width: 100%; max-width: 100%; }
+            .oil-cards-container { 
+                grid-template-columns: 1fr !important; 
+                gap: 12px; 
+                width: 100%; 
+            }
+            .oil-card-item {
+                width: 100%;
+                padding: 14px 12px;
+            }
             header { padding: 14px 14px; gap: 12px; }
             header .title-area h1 { font-size: 1.15rem; }
             header .title-area p { font-size: 0.8rem; }
@@ -1687,6 +1751,24 @@
         .vehicle-mini-card:hover {
             border-color: var(--primary, #1e3a8a);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .vehicle-mini-card:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        [data-theme="dark"] .vehicle-mini-card:nth-child(even) {
+            background-color: #162235;
+        }
+
+        .vehicle-mini-card.card-danger {
+            background-color: #fef2f2 !important;
+            border-color: #fca5a5 !important;
+        }
+
+        [data-theme="dark"] .vehicle-mini-card.card-danger {
+            background-color: rgba(127, 29, 29, 0.3) !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
         }
 
         .vehicle-mini-card.active {
@@ -2351,6 +2433,142 @@
             }
         }
 
+
+                /* =========================================================================
+           ⚠️ MODAIS DE RELATO DE AVARIAS DA VIATURA
+           ========================================================================= */
+        .avaria-photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .avaria-photos-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+        }
+
+        .avaria-slot-card {
+            background: var(--card-bg, #ffffff);
+            border: 2px solid var(--border, #cbd5e1);
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .avaria-slot-card:hover {
+            border-color: #ef4444;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+        }
+
+        .avaria-slot-card.is-selected {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            box-shadow: 0 0 0 2px #ef4444 !important;
+        }
+
+        [data-theme="dark"] .avaria-slot-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        [data-theme="dark"] .avaria-slot-card.is-selected {
+            background-color: rgba(127, 29, 29, 0.35) !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px #ef4444 !important;
+        }
+
+        .avaria-slot-header {
+            font-size: 0.74rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            text-align: center;
+        }
+
+        .avaria-slot-thumb {
+            width: 100%;
+            height: 90px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avaria-thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .avaria-no-photo {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .avaria-slot-footer {
+            width: 100%;
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .avaria-tick-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 5px 8px;
+            border-radius: 6px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            transition: all 0.15s ease;
+            user-select: none;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .avaria-slot-card.is-selected .avaria-tick-label {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #dc2626;
+        }
+
+        .avaria-tick-checkbox {
+            width: 16px !important;
+            height: 16px !important;
+            accent-color: #ef4444;
+            cursor: pointer;
+            margin: 0 !important;
+        }
+
+        .avaria-tick-icon {
+            font-size: 0.85rem;
+            font-weight: 900;
+        }
 
         /* =========================================================================
            🚗 DRAG AND DROP / REORDENAÇÃO DE VIATURAS
@@ -3300,10 +3518,7 @@
     <div class="modal-card" style="max-width: 420px; width: 92%;" onclick="event.stopPropagation()">
         <div class="modal-header">
             <div class="modal-title"><span>⏱️ Atualizar Odômetro (KM)</span></div>
-            <button type="button" class="btn btn-outline btn-sm btn-3d" onclick="closeQuickKmModal()" title="Fechar janela" style="font-weight: 700; min-height: 34px; padding: 4px 10px; font-size: 0.82rem; border-color: #cbd5e1; gap: 4px;">
-                <span>✖</span>
-                <span>Fechar</span>
-            </button>
+            <button type="button" class="modal-close" onclick="closeQuickKmModal()" title="Fechar">✖</button>
         </div>
         <div style="display: flex; flex-direction: column; gap: 14px; padding: 10px 0;">
             <div style="background: var(--bg); padding: 14px; border-radius: 10px; border: 1px solid var(--border); text-align: center;">
@@ -3343,6 +3558,9 @@
         </div>
 
         <div class="modal-inspection-body">
+            <!-- Banner de Avaria Registrada (Se houver) -->
+            <div id="inspectModalAvariasBanner" style="display: none; background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 8px; padding: 10px 14px; margin-bottom: 2px;"></div>
+
             <!-- Header Informativo da Viatura -->
             <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                 <div>
@@ -3370,6 +3588,106 @@
             </button>
             <button type="button" id="btnSaveInspectionPhotos" class="btn btn-primary btn-3d" onclick="saveAndSyncInspectionPhotos()" style="display: none; min-height: 44px; font-weight: 800; font-size: 0.95rem;">
                 💾 Salvar Fotos
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- ⚠️ 1. MODAL: "ENCONTROU ALGUMA AVARIA?"                                    -->
+<!-- ========================================================================= -->
+<div id="avariaPromptModal" class="modal-overlay" style="z-index: 10050;" onclick="/* exclusivo pelos botões */">
+    <div class="modal-card" style="max-width: 440px; text-align: center; padding: 26px 20px; border-radius: 14px;" onclick="event.stopPropagation()">
+        <div style="font-size: 2.8rem; margin-bottom: 8px;">🔍⚠️</div>
+        <h3 style="font-size: 1.28rem; font-weight: 800; color: var(--primary); margin-bottom: 6px;">
+            Encontrou alguma avaria?
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 22px;">
+            Inspeção da viatura <strong id="avariaVtrPrefixPrompt" style="color: var(--primary);">--</strong>
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button type="button" class="btn btn-outline btn-3d" style="flex: 1; min-height: 46px; font-weight: 700; font-size: 0.95rem; border-color: #cbd5e1;" onclick="onAvariaPromptNo()">
+                ❌ Não
+            </button>
+            <button type="button" class="btn btn-danger-solid btn-3d" style="flex: 1; min-height: 46px; font-weight: 800; font-size: 0.95rem;" onclick="onAvariaPromptYes()">
+                ⚠️ Sim
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 📝 2. MODAL: RELATO DE AVARIA E SELEÇÃO DE FOTOS COM TICK                 -->
+<!-- ========================================================================= -->
+<div id="avariaReportModal" class="modal-overlay" style="z-index: 10052;" onclick="/* exclusivo pelos botões */">
+    <div class="modal-card" style="max-width: 680px; width: 95%; max-height: calc(100dvh - 80px); overflow-y: auto;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title" style="font-size: 1.05rem; font-weight: 800; line-height: 1.35; color: #b91c1c;">
+                <span>⚠️ Selecione a foto onde pode ser observada a avaria e a descreva abaixo:</span>
+            </div>
+            <button type="button" class="modal-close" onclick="closeAvariaReportModal()" title="Fechar">✖</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px; padding: 12px 0;">
+            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Viatura Selecionada:</span>
+                <span id="avariaReportVtrTitle" style="font-size: 1.15rem; font-weight: 900; color: var(--primary);">--</span>
+            </div>
+
+            <!-- PASSO 1: Descrever a avaria e clicar em Enviar -->
+            <div id="avariaStep1">
+                <label for="avariaDescriptionInput" style="font-weight: 700; font-size: 0.88rem; display: block; margin-bottom: 6px; color: var(--text-main);">
+                    Descreva detalhadamente a avaria observada: *
+                </label>
+                <textarea id="avariaDescriptionInput" rows="4" placeholder="Ex: Risco profundo na porta dianteira direita, parachoque trincado, lanterna quebrada..." style="width: 100%; font-size: 0.95rem; padding: 12px; border: 2px solid var(--border); border-radius: 8px; resize: vertical; box-sizing: border-box;"></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                    <button type="button" id="btnSubmitAvariaText" class="btn btn-primary btn-3d" style="min-height: 44px; padding: 10px 24px; font-weight: 800; font-size: 0.95rem;" onclick="submitAvariaText()">
+                        ✉️ Enviar
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASSO 2: Selecione a foto (aparece apenas APÓS dar Enviar no texto) -->
+            <div id="avariaStep2" style="display: none; border-top: 1px solid var(--border); padding-top: 14px;">
+                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #991b1b; text-transform: uppercase;">Descrição Registrada:</div>
+                    <div id="avariaConfirmedDescDisplay" style="font-size: 0.88rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">--</div>
+                </div>
+
+                <div style="font-size: 1.05rem; font-weight: 800; color: #dc2626; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                    <span>📸 Selecione a foto:</span>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0 0 10px 0;">
+                    Marque o tick abaixo de cada foto onde a avaria pode ser observada (selecione uma ou quantas quiser):
+                </p>
+
+                <div id="avariaPhotosGrid" class="avaria-photos-grid"></div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px;">
+                    <button type="button" class="btn btn-danger-solid btn-3d" style="width: 100%; min-height: 46px; font-weight: 800; font-size: 1rem; justify-content: center;" onclick="finalizeAvariaReport()">
+                        ✅ Finalizar Observação
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 📢 3. MODAL: "INFORMAÇÕES INSERIDAS, INFORME A RESERVA IMEDIATAMENTE!"    -->
+<!-- ========================================================================= -->
+<div id="avariaAlertModal" class="modal-overlay" style="z-index: 10060;" onclick="/* exclusivo pelo botão */">
+    <div class="modal-card" style="max-width: 480px; text-align: center; padding: 32px 24px; border: 2.5px solid #ef4444; border-radius: 14px;" onclick="event.stopPropagation()">
+        <div style="font-size: 3.5rem; margin-bottom: 12px;">🚨📢</div>
+        <h3 style="font-size: 1.25rem; font-weight: 900; color: #b91c1c; line-height: 1.35; margin-bottom: 12px; text-transform: uppercase;">
+            informações inseridas, informe a reserva imediatamente!
+        </h3>
+        <p style="font-size: 0.92rem; color: var(--text-main); font-weight: 600; line-height: 1.5; margin-bottom: 24px; background: #fef2f2; border: 1px dashed #fca5a5; padding: 12px; border-radius: 8px;">
+            A avaria da viatura <strong id="avariaAlertVtr" style="color: #b91c1c;">--</strong> foi registrada com sucesso. Comunique o fato ao Encarregado da Reserva de Armas imediatamente.
+        </p>
+        <div style="display: flex; justify-content: center;">
+            <button type="button" class="btn btn-danger-solid btn-3d" style="padding: 12px 38px; font-size: 1rem; font-weight: 800; border-radius: 8px;" onclick="closeAvariaAlertModal()">
+                Entendido
             </button>
         </div>
     </div>
@@ -3995,8 +4313,13 @@
     // ⏱️ ATUALIZAÇÃO RÁPIDA DE KM (2 CLIQUES)
     // =========================================================================
     let quickKmTargetVehicle = null;
+    let quickKmCloseTimer = null;
 
     function openQuickKmModal(vehicle) {
+        if (quickKmCloseTimer) {
+            clearTimeout(quickKmCloseTimer);
+            quickKmCloseTimer = null;
+        }
         quickKmTargetVehicle = vehicle;
         const vRec = records.find(r => r.vehicle === vehicle);
         const vInfo = VEHICLE_FLEET_INFO[vehicle] || {};
@@ -4048,12 +4371,14 @@
         card.classList.add('tv-off-active');
         modal.classList.add('tv-off-overlay');
 
-        setTimeout(() => {
+        if (quickKmCloseTimer) clearTimeout(quickKmCloseTimer);
+        quickKmCloseTimer = setTimeout(() => {
             modal.style.display = 'none';
             card.classList.remove('tv-off-active');
             modal.classList.remove('tv-off-overlay');
             quickKmTargetVehicle = null;
-        }, 520);
+            quickKmCloseTimer = null;
+        }, 360);
     }
 
     function onQuickKmOverlayClick(e) {
@@ -4359,7 +4684,8 @@
             vehicles: obj.vehicles || [],
             targetMap: obj.targetMap || {},
             mileageHistory: obj.mileageHistory || [],
-            vehiclePhotos: obj.vehiclePhotos || {}
+            vehiclePhotos: obj.vehiclePhotos || {},
+            vehicleAvarias: obj.vehicleAvarias || {}
         };
         return JSON.stringify(clean);
     }
@@ -4457,6 +4783,13 @@
                 renderInspectionSlots();
             }
         }
+        if (data.vehicleAvarias && typeof data.vehicleAvarias === 'object') {
+            vehicleAvarias = data.vehicleAvarias;
+            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+            if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+                renderInspectionSlots();
+            }
+        }
         if (data.appTitle) {
             appTitle = data.appTitle;
             localStorage.setItem('oleo_vtr_app_title', appTitle);
@@ -4522,6 +4855,7 @@
             vehicles: customVehicles || [],
             targetMap: vehicleTargetMap || {},
             vehiclePhotos: vehiclePhotos || {},
+            vehicleAvarias: vehicleAvarias || {},
             appTitle: appTitle || '🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN',
             lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
             updatedAt: new Date().toISOString()
@@ -8084,6 +8418,7 @@
             let statusText = 'Sem dados';
             let remainingText = '';
 
+            let cardDangerClass = '';
             if (currentKm !== null && !isNaN(currentKm)) {
                 const activeTarget = fixedTarget || vRecord.targetKm;
                 if (activeTarget) {
@@ -8100,6 +8435,7 @@
                         statusColor = '#dc2626'; // Vermelho: Vencido
                         statusText = 'Vencido';
                         remainingText = `-${Math.abs(diff).toLocaleString('pt-BR')} km`;
+                        cardDangerClass = 'card-danger';
                     }
                 } else {
                     statusColor = '#2563eb';
@@ -8115,7 +8451,7 @@
             const placaText = vInfo.placa || '';
 
             cardsHtml += `
-                <div class="vehicle-mini-card ${isSelected ? 'active' : ''}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${modelText} - ${placaText} (${statusText})">
+                <div class="vehicle-mini-card ${isSelected ? 'active' : ''} ${cardDangerClass}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${modelText} - ${placaText} (${statusText})">
                     <div class="card-prefix">${v}</div>
                     <div class="card-meta">${modelText}<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">${placaText}</span></div>
                     <div class="card-km">
@@ -8269,6 +8605,10 @@
     // 📷 INSPEÇÃO DE VIATURA E GERENCIAMENTO DE FOTOS (6 FOTOS)
     // =========================================================================
     let vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
+    let vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
+    let currentAvariaVehicle = null;
+    let currentAvariaDescription = '';
+    let selectedAvariaSlots = [];
 
     const DEFAULT_INSPECTION_SLOTS = [
         { id: 'dianteira', label: 'Dianteira (Frente)', icon: '🚗' },
@@ -8327,12 +8667,241 @@
     function closeVehicleInspectionModal() {
         const modal = document.getElementById('vehicleInspectionModal');
         if (modal) modal.style.display = 'none';
+
+        // ⚠️ Abre a pergunta: "Encontrou alguma avaria?"
+        if (currentInspectVehicle) {
+            openAvariaPromptModal(currentInspectVehicle);
+        }
+    }
+
+    // =========================================================================
+    // ⚠️ FLUXO DE RELATO DE AVARIAS
+    // =========================================================================
+    function openAvariaPromptModal(vehicle) {
+        currentAvariaVehicle = vehicle;
+        const modal = document.getElementById('avariaPromptModal');
+        const vtrEl = document.getElementById('avariaVtrPrefixPrompt');
+        if (vtrEl) vtrEl.textContent = vehicle;
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function onAvariaPromptNo() {
+        const modal = document.getElementById('avariaPromptModal');
+        if (modal) modal.style.display = 'none';
+        currentAvariaVehicle = null;
+    }
+
+    function onAvariaPromptYes() {
+        const modal = document.getElementById('avariaPromptModal');
+        if (modal) modal.style.display = 'none';
+        openAvariaReportModal(currentAvariaVehicle);
+    }
+
+    function openAvariaReportModal(vehicle) {
+        currentAvariaVehicle = vehicle;
+        currentAvariaDescription = '';
+        selectedAvariaSlots = [];
+
+        const modal = document.getElementById('avariaReportModal');
+        const vtrTitleEl = document.getElementById('avariaReportVtrTitle');
+        if (vtrTitleEl) vtrTitleEl.textContent = vehicle;
+
+        const descInput = document.getElementById('avariaDescriptionInput');
+        if (descInput) {
+            descInput.value = '';
+            descInput.disabled = false;
+        }
+
+        const btnSubmit = document.getElementById('btnSubmitAvariaText');
+        if (btnSubmit) btnSubmit.style.display = 'inline-flex';
+
+        const step1 = document.getElementById('avariaStep1');
+        const step2 = document.getElementById('avariaStep2');
+        if (step1) step1.style.display = 'block';
+        if (step2) step2.style.display = 'none';
+
+        if (modal) modal.style.display = 'flex';
+
+        if (descInput) {
+            setTimeout(() => descInput.focus(), 150);
+        }
+    }
+
+    function closeAvariaReportModal() {
+        const modal = document.getElementById('avariaReportModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function submitAvariaText() {
+        const descInput = document.getElementById('avariaDescriptionInput');
+        const text = descInput ? descInput.value.trim() : '';
+
+        if (!text) {
+            alert('Por favor, descreva a avaria observada antes de enviar.');
+            if (descInput) descInput.focus();
+            return;
+        }
+
+        currentAvariaDescription = text;
+
+        if (descInput) descInput.disabled = true;
+        const btnSubmit = document.getElementById('btnSubmitAvariaText');
+        if (btnSubmit) btnSubmit.style.display = 'none';
+
+        const descDisplay = document.getElementById('avariaConfirmedDescDisplay');
+        if (descDisplay) descDisplay.textContent = text;
+
+        const step2 = document.getElementById('avariaStep2');
+        if (step2) {
+            step2.style.display = 'block';
+            renderAvariaPhotoSlots();
+            setTimeout(() => {
+                step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+    }
+
+    function renderAvariaPhotoSlots() {
+        const grid = document.getElementById('avariaPhotosGrid');
+        if (!grid || !currentAvariaVehicle) return;
+
+        const vPhotos = vehiclePhotos[currentAvariaVehicle] || {};
+        let html = '';
+
+        DEFAULT_INSPECTION_SLOTS.forEach(slot => {
+            const photo = vPhotos[slot.id];
+            const hasPhoto = Boolean(photo && photo.data);
+            const isChecked = selectedAvariaSlots.includes(slot.id);
+
+            html += `
+                <div class="avaria-slot-card ${isChecked ? 'is-selected' : ''}" id="avariaSlotCard_${slot.id}" onclick="toggleAvariaSlotSelect('${slot.id}')">
+                    <div class="avaria-slot-header">
+                        <span>${slot.icon}</span>
+                        <span>${slot.label}</span>
+                    </div>
+                    <div class="avaria-slot-thumb">
+                        ${hasPhoto 
+                            ? `<img src="${photo.data}" alt="${slot.label}" class="avaria-thumb-img">`
+                            : `<div class="avaria-no-photo"><span>📷</span><span>Sem foto</span></div>`
+                        }
+                    </div>
+                    <div class="avaria-slot-footer">
+                        <label class="avaria-tick-label" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="avariaChk_${slot.id}" class="avaria-tick-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleAvariaSlotSelect('${slot.id}')">
+                            <span class="avaria-tick-icon">✔</span>
+                            <span>Selecionar</span>
+                        </label>
+                    </div>
+                </div>
+            `;
+        });
+
+        grid.innerHTML = html;
+    }
+
+    function toggleAvariaSlotSelect(slotId) {
+        const idx = selectedAvariaSlots.indexOf(slotId);
+        if (idx === -1) {
+            selectedAvariaSlots.push(slotId);
+        } else {
+            selectedAvariaSlots.splice(idx, 1);
+        }
+
+        const card = document.getElementById(`avariaSlotCard_${slotId}`);
+        const chk = document.getElementById(`avariaChk_${slotId}`);
+        const isSelected = selectedAvariaSlots.includes(slotId);
+
+        if (card) {
+            if (isSelected) card.classList.add('is-selected');
+            else card.classList.remove('is-selected');
+        }
+        if (chk) {
+            chk.checked = isSelected;
+        }
+    }
+
+    function finalizeAvariaReport() {
+        if (!currentAvariaVehicle) return;
+
+        if (selectedAvariaSlots.length === 0) {
+            const confirmNoPhoto = confirm('Nenhuma foto foi selecionada com o tick. Deseja finalizar a observação de avaria mesmo assim?');
+            if (!confirmNoPhoto) return;
+        }
+
+        const now = new Date();
+        const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        const newAvaria = {
+            id: Date.now(),
+            vehicle: currentAvariaVehicle,
+            description: currentAvariaDescription,
+            slots: [...selectedAvariaSlots],
+            date: dateStr,
+            timestamp: now.toISOString()
+        };
+
+        if (!vehicleAvarias[currentAvariaVehicle]) {
+            vehicleAvarias[currentAvariaVehicle] = [];
+        }
+        vehicleAvarias[currentAvariaVehicle].unshift(newAvaria);
+        localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+
+        closeAvariaReportModal();
+        syncAllDataToOnline();
+
+        // 🚨 Abre a caixa final solicitada pelo usuário:
+        // "informações inseridas, informe a reserva imediatamente!"
+        openAvariaAlertModal(currentAvariaVehicle);
+    }
+
+    function openAvariaAlertModal(vehicle) {
+        const modal = document.getElementById('avariaAlertModal');
+        const vtrEl = document.getElementById('avariaAlertVtr');
+        if (vtrEl) vtrEl.textContent = vehicle;
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeAvariaAlertModal() {
+        const modal = document.getElementById('avariaAlertModal');
+        if (modal) modal.style.display = 'none';
+        currentAvariaVehicle = null;
+        currentAvariaDescription = '';
+        selectedAvariaSlots = [];
     }
 
     function renderInspectionSlots() {
         const grid = document.getElementById('inspectionSlotsGrid');
         const badge = document.getElementById('inspectModalPhotoCountBadge');
+        const avariasBanner = document.getElementById('inspectModalAvariasBanner');
         if (!grid || !currentInspectVehicle) return;
+
+        const avariasList = vehicleAvarias[currentInspectVehicle] || [];
+        if (avariasBanner) {
+            if (avariasList.length > 0) {
+                avariasBanner.style.display = 'block';
+                const latest = avariasList[0];
+                const slotsText = latest.slots && latest.slots.length > 0 
+                    ? latest.slots.map(s => {
+                        const found = DEFAULT_INSPECTION_SLOTS.find(sl => sl.id === s);
+                        return found ? found.label : s;
+                    }).join(', ') 
+                    : 'Geral';
+                avariasBanner.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-size: 0.86rem; font-weight: 800; color: #b91c1c;">⚠️ Avaria Registrada (${avariasList.length})</span>
+                        <span style="font-size: 0.72rem; color: #7f1d1d; font-weight: 700;">${latest.date}</span>
+                    </div>
+                    <div style="font-size: 0.82rem; color: #991b1b; line-height: 1.4;">
+                        <strong>Relato:</strong> ${latest.description}
+                    </div>
+                    <div style="font-size: 0.74rem; color: #7f1d1d; margin-top: 4px;">
+                        <strong>Foto(s) apontada(s):</strong> ${slotsText}
+                    </div>
+                `;
+            } else {
+                avariasBanner.style.display = 'none';
+            }
+        }
 
         if (!vehiclePhotos[currentInspectVehicle]) {
             vehiclePhotos[currentInspectVehicle] = {};
@@ -8775,6 +9344,11 @@
     });
 
     document.addEventListener('contextmenu', (e) => {
+        // Dispositivos touchscreen / smartphones: preserva rolagem nativa e gestos de toque
+        if (window.matchMedia('(pointer: coarse)').matches || ('ontouchstart' in window && !e.button)) {
+            return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
