@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title id="pageTitle">🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN - Painel da Frota</title>
+    <title id="pageTitle">🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN - Painel da Frota</title>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SheetJS (XLSX) CDN para Leitura e Exportação nativa de Planilhas Excel/CSV -->
@@ -203,15 +203,23 @@
             box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.06);
         }
 
-        .btn-3d:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18), 0 10px 16px rgba(0, 0, 0, 0.14);
-            filter: brightness(1.06);
+        @media (hover: hover) and (pointer: fine) {
+            .btn-3d:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18), 0 10px 16px rgba(0, 0, 0, 0.14);
+                filter: brightness(1.06);
+            }
         }
 
         .btn-3d:active {
-            transform: translateY(2px);
+            transform: scale(0.97) translateY(1px);
             box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
+            filter: brightness(0.96);
+        }
+
+        .btn, .modal-close, .btn-floating-action, .btn-slot-action, .btn-card-action, .btn-view-switch, .btn-interval-pill {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-primary { background-color: var(--primary); color: white; }
@@ -1202,47 +1210,87 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(4px);
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
-            padding: 14px;
-            padding-top: max(16px, env(safe-area-inset-top, 16px));
-            padding-bottom: max(55px, calc(env(safe-area-inset-bottom, 0px) + 45px)) !important;
-            padding-left: max(12px, env(safe-area-inset-left, 12px));
-            padding-right: max(12px, env(safe-area-inset-right, 12px));
+            z-index: 10050;
+            padding: 12px;
             box-sizing: border-box;
+            overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
         }
 
         .modal-card {
-            background: #ffffff;
-            border-radius: 12px;
+            background: var(--card-bg, #ffffff);
+            border-radius: 14px;
             max-width: 620px;
             width: 100%;
-            padding: 22px 20px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.25);
+            box-shadow: 0 20px 30px -8px rgba(0,0,0,0.35);
             border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            max-height: calc(100dvh - 95px);
-            max-height: calc(100vh - 95px);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-bottom: max(40px, calc(env(safe-area-inset-bottom, 0px) + 30px));
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            max-height: calc(100dvh - 30px) !important;
+            max-height: calc(100vh - 30px) !important;
+            margin: auto !important;
             box-sizing: border-box;
+            position: relative;
+            padding: 0 !important;
+        }
+
+        .modal-card.modal-alert-card {
+            padding: 24px 20px !important;
+            overflow-y: auto !important;
+            text-align: center !important;
+            border-radius: 14px !important;
+            gap: 14px !important;
+        }
+
+        .modal-card > form {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .modal-card > div:not(.modal-header):not(.modal-footer),
+        .modal-card > form > div:not(.modal-header):not(.modal-footer),
+        .modal-body {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding: 14px 18px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            box-sizing: border-box !important;
+            overscroll-behavior: contain !important;
         }
 
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 12px;
-            gap: 10px;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            border-bottom: 1px solid var(--border) !important;
+            padding: 12px 18px !important;
+            background: var(--card-bg, #ffffff) !important;
+            z-index: 20 !important;
+            gap: 10px !important;
+            box-sizing: border-box !important;
+            position: sticky !important;
+            top: 0 !important;
         }
 
         .modal-title {
@@ -1256,25 +1304,64 @@
         }
 
         .modal-close {
-            background: transparent;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            padding: 4px;
-            line-height: 1;
+            background: var(--bg, #f1f5f9) !important;
+            border: 1.5px solid var(--border, #cbd5e1) !important;
+            border-radius: 10px !important;
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+            min-height: 44px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 1.25rem !important;
+            font-weight: 800 !important;
+            cursor: pointer !important;
+            color: var(--text-muted, #64748b) !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            flex-shrink: 0 !important;
+            transition: all 0.15s ease !important;
+            touch-action: manipulation !important;
+            -webkit-tap-highlight-color: transparent !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+            user-select: none !important;
         }
 
-        .modal-close:hover { color: var(--danger); }
+        .modal-close:hover, .modal-close:active {
+            background: #fee2e2 !important;
+            color: #b91c1c !important;
+            border-color: #fca5a5 !important;
+            transform: scale(0.96) !important;
+        }
+
+        [data-theme="dark"] .modal-close {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] .modal-close:hover, [data-theme="dark"] .modal-close:active {
+            background: rgba(127, 29, 29, 0.4) !important;
+            color: #fca5a5 !important;
+            border-color: #ef4444 !important;
+        }
 
         .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            border-top: 1px solid var(--border);
-            padding-top: 16px;
-            margin-top: 8px;
-            flex-wrap: wrap;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            gap: 10px !important;
+            border-top: 1px solid var(--border) !important;
+            padding: 12px 18px !important;
+            padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+            background: var(--card-bg, #ffffff) !important;
+            z-index: 20 !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            position: sticky !important;
+            bottom: 0 !important;
+            flex-wrap: wrap !important;
         }
 
         .import-tabs {
@@ -1600,8 +1687,44 @@
             .input-btn-group { flex-direction: row; width: 100%; }
             .input-btn-group select { flex: 1 1 140px; min-width: 0; }
             .btn { padding: 10px 14px; font-size: 0.85rem; min-height: 44px; }
-            .modal-overlay { padding: 10px !important; padding-top: max(12px, env(safe-area-inset-top, 12px)) !important; padding-bottom: max(60px, calc(env(safe-area-inset-bottom, 0px) + 48px)) !important; }
-            .modal-card { padding: 18px 14px !important; margin: 8px auto !important; margin-bottom: max(48px, calc(env(safe-area-inset-bottom, 0px) + 38px)) !important; max-height: calc(100dvh - 105px) !important; max-height: calc(100vh - 105px) !important; }
+            .modal-overlay { 
+                padding: 6px !important; 
+                padding-top: max(8px, env(safe-area-inset-top, 8px)) !important; 
+                padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important; 
+                align-items: flex-start !important; 
+                overflow-y: auto !important; 
+                overscroll-behavior: contain !important; 
+            }
+            .modal-card { 
+                padding: 0 !important; 
+                margin: auto !important; 
+                margin-top: max(6px, env(safe-area-inset-top, 6px)) !important; 
+                margin-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important; 
+                max-height: calc(100dvh - 20px) !important; 
+                max-height: calc(100vh - 20px) !important; 
+                width: 98% !important; 
+                max-width: 98% !important; 
+                border-radius: 12px !important; 
+            }
+            .modal-header {
+                padding: 10px 14px !important;
+            }
+            .modal-title {
+                font-size: 1.02rem !important;
+            }
+            .modal-body {
+                padding: 12px 14px !important;
+                gap: 10px !important;
+            }
+            .modal-footer {
+                padding: 10px 14px !important;
+                padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+                gap: 8px !important;
+            }
+            .modal-footer .btn {
+                min-height: 46px !important;
+                font-size: 0.92rem !important;
+            }
             .photo-viewer-overlay:not(.is-fullscreen) { padding: 8px !important; padding-top: max(12px, env(safe-area-inset-top, 12px)) !important; padding-bottom: max(65px, calc(env(safe-area-inset-bottom, 0px) + 52px)) !important; }
             .photo-viewer-card:not(.is-fullscreen) { padding: 12px 10px !important; gap: 8px !important; max-height: calc(100dvh - 110px) !important; max-height: calc(100vh - 110px) !important; margin-bottom: max(50px, calc(env(safe-area-inset-bottom, 0px) + 40px)) !important; border-radius: 12px !important; }
             .photo-viewer-card:not(.is-fullscreen) .photo-viewer-img-container { max-height: calc(100dvh - 220px) !important; max-height: calc(100vh - 220px) !important; min-height: 150px !important; }
@@ -2307,12 +2430,12 @@
         /* 🔴 BARRA FLUTUANTE SUPERIOR: POSICIONADA ACIMA, UM POUCO ABAIXO DA LATERAL DA TELA */
         .photo-viewer-floating-bar {
             position: fixed !important;
-            top: max(22px, calc(env(safe-area-inset-top, 0px) + 16px)) !important;
-            right: max(18px, calc(env(safe-area-inset-right, 0px) + 14px)) !important;
+            top: max(24px, calc(env(safe-area-inset-top, 0px) + 16px)) !important;
+            right: max(16px, calc(env(safe-area-inset-right, 0px) + 12px)) !important;
             z-index: 10100 !important;
             display: none;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             pointer-events: auto;
         }
 
@@ -2397,12 +2520,12 @@
             .photo-viewer-floating-bar {
                 gap: 6px !important;
                 right: max(10px, calc(env(safe-area-inset-right, 0px) + 8px)) !important;
-                top: max(16px, calc(env(safe-area-inset-top, 0px) + 12px)) !important;
+                top: max(20px, calc(env(safe-area-inset-top, 0px) + 12px)) !important;
             }
             .btn-floating-action {
-                padding: 7px 11px !important;
-                font-size: 0.78rem !important;
-                min-height: 38px !important;
+                padding: 8px 12px !important;
+                font-size: 0.82rem !important;
+                min-height: 44px !important;
             }
         }
 
@@ -2754,8 +2877,8 @@
     <!-- Header -->
     <header>
         <div class="title-area">
-            <h1 id="appTitleText">🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN</h1>
-            <p>Gerenciamento, registro de troca de óleo e controle mensal de rodagem da frota</p>
+            <h1 id="appTitleText">🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN</h1>
+            <p>Gerenciamento, registro de troca de óleo e controle mensal de rodagem da frota e avarias das viaturas</p>
         </div>
 
         <div class="header-actions-area" style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: auto;">
@@ -3431,6 +3554,9 @@
                 <button class="btn btn-outline btn-3d" title="Gerenciamento do Banco de Dados (Importar, Exportar, Original, Limpar)" onclick="openDatabaseActionsModal()">
                     💾 Banco de Dados
                 </button>
+                <button class="btn btn-danger-solid btn-3d" title="Avarias avisadas e relatadas nas viaturas da frota (visualizar fotos, exportar e gerenciar)" onclick="openAdminAvariaNotificationModal()">
+                    🚨 Avarias
+                </button>
                 <button class="btn btn-excel btn-3d" title="Exportar Tabelas da Frota (Óleo / Rodagem)" onclick="openTablesExportModal()">
                     📊 Tabelas
                 </button>
@@ -3453,10 +3579,10 @@
 <div id="adminPasswordModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
     <div class="modal-card" style="max-width: 440px;" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <div class="modal-title"><span>alteração permitida apenas pelo administrador</span></div>
+            <div class="modal-title"><span>Alteração permitida apenas pelo administrador</span></div>
             <button type="button" class="modal-close" onclick="closeAdminPasswordModal(false)" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 12px; padding: 10px 0;">
+        <div class="modal-body">
             <p id="adminPasswordDesc" style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.4;">
                 Para prosseguir com esta ação, digite a senha de administrador:
             </p>
@@ -3485,7 +3611,7 @@
 <!-- 💀 MODAL "NÃO É BILÃO O SUFICIENTE" (DESIGN MINIMALISTA DO CRÂNIO SEM CANETA) -->
 <!-- ========================================================================= -->
 <div id="bilaoModal" class="modal-overlay" onclick="closeBilaoModal()" style="z-index: 10006;">
-    <div class="modal-card" style="max-width: 460px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid #334155; color: #f8fafc; border-radius: 14px;" onclick="event.stopPropagation()">
+    <div class="modal-card modal-alert-card" style="max-width: 460px; background: #0f172a; border: 1px solid #334155; color: #f8fafc;" onclick="event.stopPropagation()">
         <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 18px;">
             <svg width="78" height="78" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2a8 8 0 0 0-8 8c0 3.2 1.9 5.8 4.6 7v3a1 1 0 0 0 1 1h4.8a1 1 0 0 0 1-1v-3c2.7-1.2 4.6-3.8 4.6-7a8 8 0 0 0-8-8z" fill="rgba(234, 179, 8, 0.08)"/>
@@ -3509,7 +3635,7 @@
 
 <!-- Modal de Parabéns / Sucesso no Registro -->
 <div id="congratsModal" class="modal-overlay" onclick="closeCongratsModal()">
-    <div class="modal-card" style="max-width: 500px; text-align: center; padding: 30px 24px;" onclick="event.stopPropagation()">
+    <div class="modal-card modal-alert-card" style="max-width: 480px;" onclick="event.stopPropagation()">
         <div style="font-size: 3.2rem; margin-bottom: 8px;">🎉🚓</div>
         <h3 style="font-size: 1.25rem; color: var(--primary); font-weight: 800; margin-bottom: 12px;">Registro Concluído com Sucesso!</h3>
         <div style="background-color: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
@@ -3532,7 +3658,7 @@
             <div class="modal-title"><span>⏱️ Atualizar Odômetro (KM)</span></div>
             <button type="button" class="modal-close" onclick="closeQuickKmModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 14px; padding: 10px 0;">
+        <div class="modal-body">
             <div style="background: var(--bg); padding: 14px; border-radius: 10px; border: 1px solid var(--border); text-align: center;">
                 <span style="font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Viatura Selecionada:</span>
                 <div id="quickKmVehicleTitle" style="font-size: 1.45rem; font-weight: 800; color: var(--primary); margin-top: 2px;">T-01100</div>
@@ -3567,6 +3693,7 @@
                 <span>🔍 Inspeção da Viatura:</span>
                 <span id="inspectModalVtrTitle" style="color: var(--primary); font-weight: 800;">--</span>
             </div>
+            <button type="button" class="modal-close" onclick="closeVehicleInspectionModal()" title="Fechar Inspeção">✖</button>
         </div>
 
         <div class="modal-inspection-body">
@@ -3609,7 +3736,7 @@
 <!-- ⚠️ 1. MODAL: "ENCONTROU ALGUMA AVARIA?"                                    -->
 <!-- ========================================================================= -->
 <div id="avariaPromptModal" class="modal-overlay" style="z-index: 10050;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 440px; text-align: center; padding: 26px 20px; border-radius: 14px;" onclick="event.stopPropagation()">
+    <div class="modal-card modal-alert-card" style="max-width: 440px;" onclick="event.stopPropagation()">
         <div style="font-size: 2.8rem; margin-bottom: 8px;">🔍⚠️</div>
         <h3 style="font-size: 1.28rem; font-weight: 800; color: var(--primary); margin-bottom: 6px;">
             Encontrou alguma avaria?
@@ -3632,15 +3759,15 @@
 <!-- 📝 2. MODAL: JANELA PARA ESCREVER A AVARIA                                 -->
 <!-- ========================================================================= -->
 <div id="avariaTextModal" class="modal-overlay" style="z-index: 10052;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 580px; width: 95%; max-height: calc(100dvh - 80px); overflow-y: auto;" onclick="event.stopPropagation()">
+    <div class="modal-card" style="max-width: 580px; width: 95%;" onclick="event.stopPropagation()">
         <div class="modal-header">
             <div class="modal-title" style="font-size: 1.05rem; font-weight: 800; color: #b91c1c; line-height: 1.35;">
-                <span>Selecione a foto que onde pode ser observado a avaria e a descreva abaixo:</span>
+                <span>Selecione a foto onde pode ser observada a avaria e descreva-a abaixo:</span>
             </div>
             <button type="button" class="modal-close" onclick="closeAvariaTextModal()" title="Fechar">✖</button>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 14px; padding: 12px 0;">
+        <div class="modal-body">
             <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;">
                 <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Viatura Selecionada:</span>
                 <span id="avariaTextVtrTitle" style="font-size: 1.15rem; font-weight: 900; color: var(--primary);">--</span>
@@ -3652,15 +3779,15 @@
                 </label>
                 <textarea id="avariaDescriptionInput" rows="4" placeholder="Descreva aqui os detalhes da avaria observada..." style="width: 100%; font-size: 1rem; padding: 12px; border: 2px solid var(--border); border-radius: 8px; resize: vertical; box-sizing: border-box;"></textarea>
             </div>
+        </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; gap: 10px;">
-                <button type="button" class="btn btn-outline btn-3d" style="min-height: 44px; padding: 8px 20px; font-weight: 700; border-color: #cbd5e1;" onclick="closeAvariaTextModal()">
-                    ↩️ Cancelar
-                </button>
-                <button type="button" id="btnSubmitAvariaText" class="btn btn-primary btn-3d" style="min-height: 46px; padding: 10px 28px; font-weight: 800; font-size: 1rem;" onclick="submitAvariaText()">
-                    ✉️ Enviar
-                </button>
-            </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <button type="button" class="btn btn-outline btn-3d" style="min-height: 44px; padding: 8px 20px; font-weight: 700; border-color: #cbd5e1;" onclick="closeAvariaTextModal()">
+                ↩️ Cancelar
+            </button>
+            <button type="button" id="btnSubmitAvariaText" class="btn btn-primary btn-3d" style="min-height: 46px; padding: 10px 28px; font-weight: 800; font-size: 1rem;" onclick="submitAvariaText()">
+                ✉️ Enviar
+            </button>
         </div>
     </div>
 </div>
@@ -3669,14 +3796,15 @@
 <!-- 📸 3. MODAL: SELEÇÃO DA FOTO COM OS TICKS (Dianteira, Traseira, etc.)      -->
 <!-- ========================================================================= -->
 <div id="avariaPhotoSelectModal" class="modal-overlay" style="z-index: 10054;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 680px; width: 95%; max-height: calc(100dvh - 80px); overflow-y: auto;" onclick="event.stopPropagation()">
+    <div class="modal-card" style="max-width: 680px; width: 95%;" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <div class="modal-title" style="font-size: 1.12rem; font-weight: 900; color: #dc2626; line-height: 1.35;">
-                <span>selecione a foto onde onde consta a alteração</span>
+            <div class="modal-title" style="font-size: 1.08rem; font-weight: 900; color: #dc2626; line-height: 1.35;">
+                <span>Selecione a foto onde consta a alteração</span>
             </div>
+            <button type="button" class="modal-close" onclick="cancelAvariaPhotoSelectToPrevious()" title="Voltar para a janela anterior">✖</button>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 12px; padding: 10px 0;">
+        <div class="modal-body">
             <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 12px;">
                 <div style="font-size: 0.76rem; font-weight: 700; color: #991b1b; text-transform: uppercase;">Descrição Registrada:</div>
                 <div id="avariaPhotoConfirmedDesc" style="font-size: 0.88rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">--</div>
@@ -3689,16 +3817,85 @@
             <!-- Grid com as 8 mini fotos e ticks abaixo -->
             <div id="avariaPhotosGrid" class="avaria-photos-grid"></div>
             <input type="file" id="avariaSlotFileInput" accept="image/*" capture="environment" style="display: none;" onchange="onAvariaSlotFileChosen(event)">
+        </div>
 
-            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
-                <button type="button" class="btn btn-danger-solid btn-3d" style="width: 100%; min-height: 48px; font-weight: 800; font-size: 1rem; justify-content: center;" onclick="finalizeAvariaReport()">
-                    Finalizar observação
+        <div class="modal-footer" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; width: 100%;">
+            <button type="button" class="btn btn-danger-solid btn-3d" style="width: 100%; min-height: 48px; font-weight: 800; font-size: 1rem; justify-content: center;" onclick="finalizeAvariaReport()">
+                Finalizar observação
+            </button>
+            <button type="button" class="btn btn-outline btn-3d" style="width: 100%; min-height: 44px; font-weight: 700; font-size: 0.95rem; justify-content: center; border-color: #cbd5e1; color: var(--text-muted);" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
+                ↩️ Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 👮 MODAL: IDENTIFICAÇÃO DO MILITAR QUE VERIFICOU A AVARIA                   -->
+<!-- ========================================================================= -->
+<div id="avariaMilitarModal" class="modal-overlay" style="z-index: 10058;" onclick="/* exclusivo pelos botões */">
+    <div class="modal-card" style="max-width: 480px; width: 95%;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title" style="font-size: 1.15rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                <span>👮 Militar que Verificou a Avaria</span>
+            </div>
+            <button type="button" class="modal-close" onclick="closeAvariaMilitarModal()" title="Voltar">✖</button>
+        </div>
+
+        <form id="avariaMilitarForm" onsubmit="confirmAvariaMilitarSubmit(event)">
+            <div class="modal-body">
+                <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Viatura Inspecionada:</span>
+                    <span id="avariaMilitarVtrTitle" style="font-size: 1.15rem; font-weight: 900; color: #b91c1c;">--</span>
+                </div>
+
+                <p style="font-size: 0.86rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
+                    Antes de terminar, informe o <strong>Posto / Graduação</strong> e o <strong>QRA (Nome de Guerra)</strong> do militar que realizou a verificação da viatura:
+                </p>
+
+                <div class="form-group">
+                    <label for="avariaPostoGradInput" style="font-weight: 700; font-size: 0.86rem;">Posto / Graduação *</label>
+                    <select id="avariaPostoGradInput" required style="font-weight: 700;">
+                        <option value="Sd PM" selected>Sd PM (Soldado PM)</option>
+                        <option value="Cb PM">Cb PM (Cabo PM)</option>
+                        <option value="3º Sgt PM">3º Sgt PM (3º Sargento PM)</option>
+                        <option value="2º Sgt PM">2º Sgt PM (2º Sargento PM)</option>
+                        <option value="1º Sgt PM">1º Sgt PM (1º Sargento PM)</option>
+                        <option value="Subten PM">Subten PM (Subtenente PM)</option>
+                        <option value="2º Ten PM">2º Ten PM (2º Tenente PM)</option>
+                        <option value="1º Ten PM">1º Ten PM (1º Tenente PM)</option>
+                        <option value="Cap PM">Cap PM (Capitão PM)</option>
+                        <option value="Major PM">Major PM</option>
+                        <option value="Ten Cel PM">Ten Cel PM</option>
+                        <option value="Cel PM">Cel PM</option>
+                        <option value="Civil / Outro">Civil / Outro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="avariaQraInput" style="font-weight: 700; font-size: 0.86rem;">QRA (Nome de Guerra do Militar) *</label>
+                    <input type="text" id="avariaQraInput" placeholder="Ex: SILVA, SANTOS, VAGNER" required style="font-weight: 700; text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                </div>
+
+                <div class="form-group">
+                    <label for="avariaReInput" style="font-weight: 700; font-size: 0.86rem;">RE (Registro Estatístico - Opcional)</label>
+                    <input type="text" id="avariaReInput" placeholder="Ex: 123456-7 (opcional)">
+                </div>
+
+                <div id="avariaMilitarError" style="display: none; color: #ef4444; font-size: 0.82rem; font-weight: 700;">
+                    ⚠️ Por favor, informe o QRA do policial militar.
+                </div>
+            </div>
+
+            <div class="modal-footer" style="display: flex; justify-content: space-between; gap: 10px;">
+                <button type="button" class="btn btn-outline btn-3d" onclick="closeAvariaMilitarModal()">
+                    ↩️ Voltar
                 </button>
-                <button type="button" class="btn btn-outline btn-3d" style="width: 100%; min-height: 44px; font-weight: 700; font-size: 0.95rem; justify-content: center; border-color: #cbd5e1; color: var(--text-muted);" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
-                    ↩️ Cancelar
+                <button type="submit" class="btn btn-primary btn-3d" style="font-weight: 800; font-size: 0.95rem;">
+                    💾 Confirmar e Finalizar
                 </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -3706,13 +3903,13 @@
 <!-- 📢 4. MODAL: "INFORMAÇÕES INSERIDAS, INFORME A RESERVA IMEDIATAMENTE!"    -->
 <!-- ========================================================================= -->
 <div id="avariaAlertModal" class="modal-overlay" style="z-index: 10060;" onclick="/* exclusivo pelo botão OK */">
-    <div class="modal-card" style="max-width: 480px; text-align: center; padding: 32px 24px; border: 2.5px solid #ef4444; border-radius: 14px;" onclick="event.stopPropagation()">
+    <div class="modal-card modal-alert-card" style="max-width: 480px; border: 2.5px solid #ef4444;" onclick="event.stopPropagation()">
         <div style="font-size: 3.5rem; margin-bottom: 12px;">🚨📢</div>
         <h3 style="font-size: 1.25rem; font-weight: 900; color: #b91c1c; line-height: 1.35; margin-bottom: 14px; text-transform: uppercase;">
-            informações inseridas, informe a reserva imediatamente!
+            Informações inseridas, informe a reserva imediatamente!
         </h3>
         <p style="font-size: 0.92rem; color: var(--text-main); font-weight: 600; line-height: 1.5; margin-bottom: 24px; background: #fef2f2; border: 1px dashed #fca5a5; padding: 12px; border-radius: 8px;">
-            A avaria da viatura <strong id="avariaAlertVtr" style="color: #b91c1c;">--</strong> foi registrada com sucesso no sistema. Comunique o fato ao encarregado da reserva de material e ao P4 imediatamente.
+            A avaria da viatura <strong id="avariaAlertVtr" style="color: #b91c1c;">--</strong> <span id="avariaAlertMilitarSpan" style="display: none;">(verificada por <strong id="avariaAlertMilitar" style="color: #1e3a8a;">--</strong>)</span> foi registrada com sucesso no sistema. Comunique o fato ao encarregado da reserva de material e ao P4 imediatamente.
         </p>
         <div style="display: flex; justify-content: center;">
             <button type="button" class="btn btn-danger-solid btn-3d" style="padding: 12px 52px; font-size: 1.1rem; font-weight: 900; border-radius: 8px;" onclick="closeAvariaAlertModal()">
@@ -3726,27 +3923,30 @@
 <!-- 🚨 MODAL: NOTIFICAÇÃO DE AVARIAS OBSERVADAS PARA O ADMINISTRADOR           -->
 <!-- ========================================================================= -->
 <div id="adminAvariaNotificationModal" class="modal-overlay" style="z-index: 10070;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 660px; width: 95%; max-height: calc(100dvh - 80px); overflow-y: auto;" onclick="event.stopPropagation()">
-        <div class="modal-header" style="background: #fef2f2; border-bottom: 2px solid #fecaca; margin: -22px -20px 14px -20px; padding: 16px 20px; border-radius: 12px 12px 0 0;">
-            <div class="modal-title" style="color: #b91c1c; font-size: 1.16rem; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+    <div class="modal-card" style="max-width: 660px; width: 95%;" onclick="event.stopPropagation()">
+        <div class="modal-header" style="background: #fef2f2; border-bottom: 2px solid #fecaca;">
+            <div class="modal-title" style="color: #b91c1c; font-size: 1.12rem; font-weight: 900; display: flex; align-items: center; gap: 8px;">
                 <span>🚨 Avarias Observadas Relatadas na Frota</span>
             </div>
             <button type="button" class="modal-close" onclick="closeAdminAvariaNotificationModal()" title="Fechar">✖</button>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 14px; padding: 4px 0;">
+        <div class="modal-body">
             <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px 14px; font-size: 0.88rem; color: #9f1239; line-height: 1.45;">
                 📢 <strong>Atenção Administrador:</strong> Foram enviadas mensagens relatando avarias observadas nas viaturas da frota. Verifique os relatos abaixo:
             </div>
 
             <!-- Lista de Avarias Relatadas -->
-            <div id="adminAvariasListContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; padding: 4px 2px;">
+            <div id="adminAvariasListContainer" style="display: flex; flex-direction: column; gap: 10px; padding: 2px 0;">
                 <!-- Preenchido via renderAdminAvariasList() -->
             </div>
         </div>
 
         <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 14px;">
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromAdmin()" style="font-weight: 800; gap: 6px;" title="Registrar nova avaria observada em uma viatura">
+                    ➕ Inserir Avaria
+                </button>
                 <button type="button" class="btn btn-outline btn-3d" onclick="exportAvariasExcel()" style="font-weight: 700; border-color: #cbd5e1; gap: 6px;" title="Exportar planilha Excel de avarias">
                     📊 Exportar Relatório (.xlsx)
                 </button>
@@ -3841,7 +4041,7 @@
             <div class="modal-title"><span>✏️ Gerenciar Viatura</span></div>
             <button class="modal-close" onclick="closeVehicleAdminOptionsModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 8px 0;">
+        <div class="modal-body" style="gap: 10px;">
             <button type="button" class="btn btn-outline btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeVehicleAdminOptionsModal(); addNewVehiclePrompt();">
                 ➕ Nova Viatura (Requer Senha)
             </button>
@@ -3870,7 +4070,7 @@
         </div>
         <form id="modalEditForm" onsubmit="saveModalEdit(event)">
             <input type="hidden" id="modalVehicleId">
-            <div class="form-grid">
+            <div class="modal-body form-grid">
                 <div class="form-group"><label for="modalPrefixInput">Viatura (Prefixo)</label><input type="text" id="modalPrefixInput" readonly style="font-weight: 700; background: #e2e8f0; cursor: not-allowed;"></div>
                 <div class="form-group"><label for="modalCurrentKm">KM Atual *</label><input type="number" id="modalCurrentKm" min="0" placeholder="Ex: 123456" required></div>
                 <div class="form-group"><label for="modalDate">Data da Leitura / Troca * <span class="locked-tag" title="Alteração de data protegida por senha de administrador">🔒</span></label><input type="date" id="modalDate" required></div>
@@ -3917,7 +4117,7 @@
             <div class="modal-title"><span>📥 Importar e Alimentar Banco de Dados de Óleo & Rodagem</span></div>
             <button class="modal-close" onclick="closeMergeModal()" title="Fechar">✖</button>
         </div>
-        <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="modal-body">
             <div class="import-tabs">
                 <button type="button" class="import-tab-btn active" id="tabBtnOnline" onclick="switchImportTab('online')">🌐 Link Online (Google Sheets)</button>
                 <button type="button" class="import-tab-btn" id="tabBtnDrive" onclick="switchImportTab('drive')">☁️ Do Google Drive</button>
@@ -4022,12 +4222,12 @@
 
 <!-- Modal de Gerenciamento de Viaturas Cadastradas (Com Arrastar para Sequência) -->
 <div id="manageVehiclesModal" class="modal-overlay" onclick="/* Manter aberto ao clicar fora */">
-    <div class="modal-card" style="max-width: 620px; width: 95%; max-height: 88vh;">
+    <div class="modal-card" style="max-width: 620px; width: 95%;">
         <div class="modal-header">
             <div class="modal-title"><span>🚗 Gerenciar e Renomear Viaturas Cadastradas</span></div>
             <button class="modal-close" onclick="closeManageVehiclesModal()" title="Fechar">✖</button>
         </div>
-        <div style="display:flex; flex-direction:column; gap:12px; max-height: 70vh; overflow-y: auto; padding-right: 4px;">
+        <div class="modal-body">
             <!-- Dica de arrastar e soltar -->
             <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: #1e40af; line-height: 1.4; display: flex; align-items: center; gap: 10px;">
                 <span style="font-size: 1.4rem;">↕️</span>
@@ -4061,7 +4261,7 @@
             <div class="modal-title"><span>🌐 Conexão do Banco de Dados Online</span></div>
             <button class="modal-close" onclick="closeServerConfigModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 14px; padding: 4px 0;">
+        <div class="modal-body">
                         <!-- Configuração do Firebase Realtime Database (Nuvem em Tempo Real) -->
             <div style="background: rgba(37, 99, 235, 0.05); border: 1px solid rgba(37, 99, 235, 0.25); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -4121,7 +4321,7 @@
             <div class="modal-title"><span>💾 Banco de Dados & Google Drive</span></div>
             <button class="modal-close" onclick="closeDatabaseActionsModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 8px 0;">
+        <div class="modal-body" style="gap: 10px;">
             <!-- Configuração do Google Drive / Gmail (OAuth Client ID) -->
             <div style="padding: 12px; background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px;">
                 <label for="googleClientIdInput" style="display: block; font-size: 0.84rem; font-weight: 700; color: #991b1b; margin-bottom: 4px;">
@@ -4144,6 +4344,9 @@
             </button>
             <button type="button" class="btn btn-outline btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeDatabaseActionsModal(); exportJSON();">
                 📤 Exportar Backup do Banco de Dados (.json)
+            </button>
+            <button type="button" class="btn btn-danger-solid btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeDatabaseActionsModal(); openAdminAvariaNotificationModal();">
+                🚨 Visualizar Avarias Avisadas da Frota
             </button>
             <button type="button" class="btn btn-outline btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem; border-color: #fca5a5; color: #b91c1c; font-weight: 700;" onclick="closeDatabaseActionsModal(); exportAvariasExcel();">
                 ⚠️ Exportar Relatório de Avarias Observadas (.xlsx)
@@ -4168,7 +4371,7 @@
             <div class="modal-title"><span>📊 Tabelas da Frota</span></div>
             <button class="modal-close" onclick="closeTablesExportModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 8px 0;">
+        <div class="modal-body" style="gap: 10px;">
             <button type="button" class="btn btn-excel btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeTablesExportModal(); exportExcel();">
                 📊 Exportar Tabela de Óleo para Excel (.xlsx)
             </button>
@@ -4192,7 +4395,7 @@
             <div class="modal-title"><span>✏️ Editar Tabela</span></div>
             <button class="modal-close" onclick="closeEditTableModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 8px 0;">
+        <div class="modal-body" style="gap: 10px;">
             <button type="button" class="btn btn-outline btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeEditTableModal(); editAppTitle();">
                 ✏️ Editar Título do Painel (Requer Senha)
             </button>
@@ -4213,7 +4416,7 @@
             <div class="modal-title"><span>✏️ Opções da Tabela de Óleo</span></div>
             <button class="modal-close" onclick="closeOilTableEditModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 8px 0;">
+        <div class="modal-body" style="gap: 10px;">
             <button type="button" class="btn btn-excel btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeOilTableEditModal(); exportExcel();">
                 📊 Exportar Tabela de Óleo para Excel (.xlsx)
             </button>
@@ -4234,7 +4437,7 @@
             <div class="modal-title"><span>✏️ Opções do Controle de Rodagem</span></div>
             <button class="modal-close" onclick="closeMileageTableEditModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 8px 0;">
+        <div class="modal-body" style="gap: 10px;">
             <button type="button" class="btn btn-excel btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeMileageTableEditModal(); exportMileageExcel();">
                 📊 Exportar Relatório de Rodagem para Excel (.xlsx)
             </button>
@@ -4259,6 +4462,37 @@
     let isAdminAuthenticated = sessionStorage.getItem('oleo_vtr_admin_auth') === 'true';
     // State variables declared at the top of the script (avoiding TDZ ReferenceError)
     let vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
+    (function normalizeStoredPhotoLabels() {
+        try {
+            if (vehiclePhotos && typeof vehiclePhotos === 'object') {
+                const labelMap = {
+                    'dianteira': 'Dianteira',
+                    'traseira': 'Traseira',
+                    'lateral_dir': 'Lateral direita',
+                    'lateral_esq': 'Lateral esquerda',
+                    'motor': 'Motor',
+                    'interna_vtr': 'Interna da VTR',
+                    'guarda_preso': 'Guarda preso',
+                    'estepe': 'Estepe'
+                };
+                let changed = false;
+                Object.keys(vehiclePhotos).forEach(vtr => {
+                    const slots = vehiclePhotos[vtr];
+                    if (slots && typeof slots === 'object') {
+                        Object.keys(slots).forEach(slotId => {
+                            if (slots[slotId] && labelMap[slotId] && slots[slotId].label !== labelMap[slotId]) {
+                                slots[slotId].label = labelMap[slotId];
+                                changed = true;
+                            }
+                        });
+                    }
+                });
+                if (changed) {
+                    localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
+                }
+            }
+        } catch(e) {}
+    })();
     let vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
     // currentInspectVehicle and currentUploadSlotId declared at top of script
     let currentAvariaVehicle = null;
@@ -5034,7 +5268,7 @@
             targetMap: vehicleTargetMap || {},
             vehiclePhotos: vehiclePhotos || {},
             vehicleAvarias: vehicleAvarias || {},
-            appTitle: appTitle || '🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN',
+            appTitle: appTitle || '🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN',
             lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
             updatedAt: new Date().toISOString()
         };
@@ -5266,7 +5500,11 @@
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
 
-    let appTitle = localStorage.getItem('oleo_vtr_app_title') || '🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN';
+    let appTitle = localStorage.getItem('oleo_vtr_app_title') || '🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN';
+    if (!localStorage.getItem('oleo_vtr_app_title') || appTitle.includes('CONTROLE DE ÓLEO - FROTA') || appTitle === '🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN') {
+        appTitle = '🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN';
+        localStorage.setItem('oleo_vtr_app_title', appTitle);
+    }
     function updateAppTitleDisplay() {
         document.getElementById('appTitleText').innerHTML = appTitle;
         document.getElementById('pageTitle').textContent = appTitle.replace(/<[^>]*>?/gm, '') + ' - Painel da Frota';
@@ -6776,7 +7014,7 @@
         localStorage.removeItem('oleo_vtr_vehicle_photos');
         customVehicles = [...defaultVehicles];
         vehicleTargetMap = {};
-        appTitle = '🚓 CONTROLE DE ÓLEO - FROTA 1ª CIA DO 1º BPTRAN';
+        appTitle = '🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN';
 
         updateAppTitleDisplay();
         updateStatusTimestamp();
@@ -8796,13 +9034,13 @@
     vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
 
     const DEFAULT_INSPECTION_SLOTS = [
-        { id: 'dianteira', label: 'dianteira', icon: '🚗' },
-        { id: 'traseira', label: 'traseira', icon: '🚗' },
+        { id: 'dianteira', label: 'Dianteira', icon: '🚗' },
+        { id: 'traseira', label: 'Traseira', icon: '🚗' },
         { id: 'lateral_dir', label: 'Lateral direita', icon: '🚙' },
         { id: 'lateral_esq', label: 'Lateral esquerda', icon: '🚙' },
         { id: 'motor', label: 'Motor', icon: '⚙️' },
-        { id: 'interna_vtr', label: 'interna da VTR', icon: '💺' },
-        { id: 'guarda_preso', label: 'Guarda "preso"', icon: '🔒' },
+        { id: 'interna_vtr', label: 'Interna da VTR', icon: '💺' },
+        { id: 'guarda_preso', label: 'Guarda preso', icon: '🔒' },
         { id: 'estepe', label: 'Estepe', icon: '🛞' }
     ];
 
@@ -8953,13 +9191,13 @@
 
     // JANELA 3: Seleção da foto onde consta a alteração com ticks, títulos exatos e inserção de foto
     const AVARIA_SLOT_DEFS = [
-        { id: 'dianteira', label: 'dianteira', icon: '🚗' },
-        { id: 'traseira', label: 'traseira', icon: '🚗' },
+        { id: 'dianteira', label: 'Dianteira', icon: '🚗' },
+        { id: 'traseira', label: 'Traseira', icon: '🚗' },
         { id: 'lateral_dir', label: 'Lateral direita', icon: '🚙' },
         { id: 'lateral_esq', label: 'Lateral esquerda', icon: '🚙' },
         { id: 'motor', label: 'Motor', icon: '⚙️' },
-        { id: 'interna_vtr', label: 'interna da VTR', icon: '💺' },
-        { id: 'guarda_preso', label: 'Guarda "preso"', icon: '🔒' },
+        { id: 'interna_vtr', label: 'Interna da VTR', icon: '💺' },
+        { id: 'guarda_preso', label: 'Guarda preso', icon: '🔒' },
         { id: 'estepe', label: 'Estepe', icon: '🛞' }
     ];
 
@@ -9154,9 +9392,76 @@
         if (!currentAvariaVehicle) return;
 
         if (selectedAvariaSlots.length === 0) {
-            const confirmNoPhoto = confirm('Nenhuma foto foi selecionada com o tick. Deseja finalizar a observação de avaria mesmo assim?');
+            const confirmNoPhoto = confirm('Nenhuma foto foi selecionada com o tick. Deseja prosseguir com a observação de avaria mesmo assim?');
             if (!confirmNoPhoto) return;
         }
+
+        // Antes de terminar, abre a pergunta de posto/graduação e QRA do militar que verificou:
+        openAvariaMilitarModal();
+    }
+
+    function openAvariaMilitarModal() {
+        const modal = document.getElementById('avariaMilitarModal');
+        const vtrEl = document.getElementById('avariaMilitarVtrTitle');
+        const errEl = document.getElementById('avariaMilitarError');
+        const qraInput = document.getElementById('avariaQraInput');
+        const reInput = document.getElementById('avariaReInput');
+        const postoSelect = document.getElementById('avariaPostoGradInput');
+
+        if (vtrEl) vtrEl.textContent = currentAvariaVehicle || '--';
+        if (errEl) errEl.style.display = 'none';
+
+        const savedPosto = localStorage.getItem('oleo_vtr_last_posto') || 'Sd PM';
+        const savedQra = localStorage.getItem('oleo_vtr_last_qra') || '';
+        const savedRe = localStorage.getItem('oleo_vtr_last_re') || '';
+
+        if (postoSelect && savedPosto) postoSelect.value = savedPosto;
+        if (qraInput) qraInput.value = savedQra;
+        if (reInput) reInput.value = savedRe;
+
+        const photoModal = document.getElementById('avariaPhotoSelectModal');
+        if (photoModal) photoModal.style.display = 'none';
+
+        if (modal) modal.style.display = 'flex';
+        setTimeout(() => {
+            if (qraInput) qraInput.focus();
+        }, 120);
+    }
+
+    function closeAvariaMilitarModal() {
+        const modal = document.getElementById('avariaMilitarModal');
+        if (modal) modal.style.display = 'none';
+
+        const photoModal = document.getElementById('avariaPhotoSelectModal');
+        if (photoModal) photoModal.style.display = 'flex';
+    }
+
+    function confirmAvariaMilitarSubmit(event) {
+        if (event) event.preventDefault();
+
+        const postoSelect = document.getElementById('avariaPostoGradInput');
+        const qraInput = document.getElementById('avariaQraInput');
+        const reInput = document.getElementById('avariaReInput');
+        const errEl = document.getElementById('avariaMilitarError');
+
+        const posto = postoSelect ? postoSelect.value.trim() : 'Sd PM';
+        const qra = qraInput ? qraInput.value.trim().toUpperCase() : '';
+        const re = reInput ? reInput.value.trim() : '';
+
+        if (!qra) {
+            if (errEl) {
+                errEl.style.display = 'block';
+                errEl.textContent = '⚠️ Informe o QRA (Nome de Guerra) do policial militar.';
+            }
+            if (qraInput) qraInput.focus();
+            return;
+        }
+
+        localStorage.setItem('oleo_vtr_last_posto', posto);
+        localStorage.setItem('oleo_vtr_last_qra', qra);
+        if (re) localStorage.setItem('oleo_vtr_last_re', re);
+
+        const militarCompleto = `${posto} ${qra}${re ? ' (RE: ' + re + ')' : ''}`.trim();
 
         const now = new Date();
         const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -9166,6 +9471,10 @@
             vehicle: currentAvariaVehicle,
             description: currentAvariaDescription,
             slots: [...selectedAvariaSlots],
+            militar: militarCompleto,
+            postoGrad: posto,
+            qra: qra,
+            re: re || '',
             date: dateStr,
             timestamp: now.toISOString()
         };
@@ -9176,21 +9485,32 @@
         vehicleAvarias[currentAvariaVehicle].unshift(newAvaria);
         localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
 
+        const militarModal = document.getElementById('avariaMilitarModal');
+        if (militarModal) militarModal.style.display = 'none';
+
         const photoModal = document.getElementById('avariaPhotoSelectModal');
         if (photoModal) photoModal.style.display = 'none';
 
         syncAllDataToOnline();
 
         // 🚨 Abre a janela final de aviso da reserva:
-        // "informações inseridas, informe a reserva imediatamente!"
-        openAvariaAlertModal(currentAvariaVehicle);
+        openAvariaAlertModal(currentAvariaVehicle, militarCompleto);
     }
 
     // JANELA 4: Aviso da reserva com botão OK
-    function openAvariaAlertModal(vehicle) {
+    function openAvariaAlertModal(vehicle, militarCompleto = '') {
         const modal = document.getElementById('avariaAlertModal');
         const vtrEl = document.getElementById('avariaAlertVtr');
-        if (vtrEl) vtrEl.textContent = vehicle;
+        const milEl = document.getElementById('avariaAlertMilitar');
+        const milSpan = document.getElementById('avariaAlertMilitarSpan');
+
+        if (vtrEl) vtrEl.textContent = vehicle || '--';
+        if (milEl && militarCompleto) {
+            milEl.textContent = militarCompleto;
+        }
+        if (milSpan) {
+            milSpan.style.display = militarCompleto ? 'inline' : 'none';
+        }
         if (modal) modal.style.display = 'flex';
     }
 
@@ -9244,6 +9564,15 @@
                 openAdminAvariaNotificationModal();
             }, 300);
         }
+    }
+
+        function openAvariaRegistrationFromAdmin() {
+        const defaultVtr = currentInspectVehicle || (document.getElementById('vehicleSelect') ? document.getElementById('vehicleSelect').value : '');
+        const vtr = prompt('Informe a viatura para registrar a avaria (ex: T-01100):', defaultVtr);
+        if (!vtr || !vtr.trim()) return;
+        const cleanVtr = normalizeVehiclePrefix(vtr.trim());
+        closeAdminAvariaNotificationModal();
+        openAvariaTextModal(cleanVtr);
     }
 
     function openAdminAvariaNotificationModal() {
@@ -9481,6 +9810,11 @@
                         <span style="font-size: 0.74rem; font-weight: 700; color: #64748b;">🕒 ${av.date || '-'}</span>
                     </div>
 
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 10px;">
+                        <span style="font-size: 0.76rem; font-weight: 700; color: #1e40af;">👮 Militar que Verificou:</span>
+                        <strong style="font-size: 0.86rem; color: #1e3a8a;">${av.militar || 'Não informado'}</strong>
+                    </div>
+
                     <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 0.88rem; color: var(--text-main); font-weight: 600; line-height: 1.4;">
                         💬 "${av.description}"
                     </div>
@@ -9611,6 +9945,7 @@ Deseja também APAGAR as fotos correspondentes da viatura ${vehicle} do sistema 
                     "Viatura": av.vehicle,
                     "Modelo": model,
                     "Placa": placa,
+                    "Militar que Verificou": av.militar || '-',
                     "Data / Hora do Relato": av.date || '-',
                     "Descrição da Avaria Observada": av.description || '-',
                     "Posições / Fotos com Alteração": slotNames,
@@ -9627,6 +9962,7 @@ Deseja também APAGAR as fotos correspondentes da viatura ${vehicle} do sistema 
                 { wch: 14 }, // Viatura
                 { wch: 18 }, // Modelo
                 { wch: 14 }, // Placa
+                { wch: 26 }, // Militar que Verificou
                 { wch: 22 }, // Data/Hora
                 { wch: 45 }, // Descrição
                 { wch: 32 }, // Posições
@@ -9657,13 +9993,14 @@ function renderInspectionSlots() {
                         return found ? found.label : (s === 'painel' ? 'Painel' : s);
                     }).join(', ') 
                     : 'Geral';
+                const milText = latest.militar ? ` • <strong>Verificado por:</strong> ${latest.militar}` : '';
                 avariasBanner.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                         <span style="font-size: 0.86rem; font-weight: 800; color: #b91c1c;">⚠️ Avaria Registrada (${avariasList.length})</span>
                         <span style="font-size: 0.72rem; color: #7f1d1d; font-weight: 700;">${latest.date}</span>
                     </div>
                     <div style="font-size: 0.82rem; color: #991b1b; line-height: 1.4;">
-                        <strong>Relato:</strong> ${latest.description}
+                        <strong>Relato:</strong> ${latest.description}${milText}
                     </div>
                     <div style="font-size: 0.74rem; color: #7f1d1d; margin-top: 4px;">
                         <strong>Foto(s) apontada(s):</strong> ${slotsText}
@@ -10384,7 +10721,7 @@ function renderInspectionSlots() {
             <div class="modal-title"><span>☁️ Sincronização com Google Drive</span></div>
             <button type="button" class="modal-close" onclick="declineDriveImportOnLogin()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 14px; padding: 12px 0;">
+        <div class="modal-body">
             <div style="display: flex; align-items: center; gap: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px;">
                 <span style="font-size: 1.8rem;">📥</span>
                 <div>
@@ -10416,7 +10753,7 @@ function renderInspectionSlots() {
             <div class="modal-title"><span>🔐 Autorizar Conta Google</span></div>
             <button type="button" class="modal-close" onclick="closeGoogleUserLinkModal()" title="Fechar">✖</button>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 14px; padding: 10px 0;">
+        <div class="modal-body">
             <div style="background: rgba(66, 133, 244, 0.08); border: 1px solid rgba(66, 133, 244, 0.3); border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 10px;">
                 <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.8 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
                 <div style="overflow: hidden;">
