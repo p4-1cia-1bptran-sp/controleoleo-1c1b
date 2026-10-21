@@ -2775,6 +2775,10 @@
                     <span style="font-size: 0.95rem;">🔓</span>
                     <span style="font-weight: 700;">ADM Ativo</span>
                 </button>
+                <button type="button" id="adminAvariaBadge" class="theme-toggle-btn" style="display: none; background: #fee2e2; border-color: #ef4444; color: #b91c1c; font-weight: 700; gap: 6px; align-items: center;" onclick="openAdminAvariaNotificationModal()" title="Existem relatos de avarias observadas nas viaturas (Clique para ver)">
+                    <span style="font-size: 0.95rem;">🚨</span>
+                    <span id="adminAvariaBadgeText">Avarias (0)</span>
+                </button>
                 <button type="button" id="themeToggleBtn" class="theme-toggle-btn"  onclick="toggleTheme()" title="Alternar entre Modo Noturno e Modo Claro">
                     <span id="themeToggleIcon" class="theme-toggle-icon">🌙</span>
                     <span id="themeToggleText">Modo Noturno</span>
@@ -3709,6 +3713,45 @@
         </div>
     </div>
 </div>
+
+<!-- ========================================================================= -->
+<!-- 🚨 MODAL: NOTIFICAÇÃO DE AVARIAS OBSERVADAS PARA O ADMINISTRADOR           -->
+<!-- ========================================================================= -->
+<div id="adminAvariaNotificationModal" class="modal-overlay" style="z-index: 10070;" onclick="/* exclusivo pelos botões */">
+    <div class="modal-card" style="max-width: 660px; width: 95%; max-height: calc(100dvh - 80px); overflow-y: auto;" onclick="event.stopPropagation()">
+        <div class="modal-header" style="background: #fef2f2; border-bottom: 2px solid #fecaca; margin: -22px -20px 14px -20px; padding: 16px 20px; border-radius: 12px 12px 0 0;">
+            <div class="modal-title" style="color: #b91c1c; font-size: 1.16rem; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                <span>🚨 Avarias Observadas Relatadas na Frota</span>
+            </div>
+            <button type="button" class="modal-close" onclick="closeAdminAvariaNotificationModal()" title="Fechar">✖</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px; padding: 4px 0;">
+            <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px 14px; font-size: 0.88rem; color: #9f1239; line-height: 1.45;">
+                📢 <strong>Atenção Administrador:</strong> Foram enviadas mensagens relatando avarias observadas nas viaturas da frota. Verifique os relatos abaixo:
+            </div>
+
+            <!-- Lista de Avarias Relatadas -->
+            <div id="adminAvariasListContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; padding: 4px 2px;">
+                <!-- Preenchido via renderAdminAvariasList() -->
+            </div>
+        </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 14px;">
+            <button type="button" class="btn btn-outline btn-3d" onclick="exportAvariasExcel()" style="font-weight: 700; border-color: #cbd5e1; gap: 6px;">
+                📊 Exportar Relatório (.xlsx)
+            </button>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-outline btn-3d" onclick="markAllAvariasAsSeen()" style="font-weight: 700;">
+                    👁️ Ciente de Todas
+                </button>
+                <button type="button" class="btn btn-primary btn-3d" onclick="closeAdminAvariaNotificationModal()" style="font-weight: 800; min-width: 100px;">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- ========================================================================= -->
 <!-- 👁️ MODAL LIGHTBOX DE FOTO EM TELA CHEIA (COM ROTAÇÃO E FULLSCREEN NATIVO)   -->
 <!-- ========================================================================= -->
@@ -4077,6 +4120,9 @@
             <button type="button" class="btn btn-outline btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeDatabaseActionsModal(); exportJSON();">
                 📤 Exportar Backup do Banco de Dados (.json)
             </button>
+            <button type="button" class="btn btn-outline btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem; border-color: #fca5a5; color: #b91c1c; font-weight: 700;" onclick="closeDatabaseActionsModal(); exportAvariasExcel();">
+                ⚠️ Exportar Relatório de Avarias Observadas (.xlsx)
+            </button>
             <button type="button" class="btn btn-outline btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeDatabaseActionsModal(); setOriginalBaselinePrompt();">
                 📌 Definir como Banco de Dados Original (Requer Senha)
             </button>
@@ -4103,6 +4149,9 @@
             </button>
             <button type="button" class="btn btn-excel btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeTablesExportModal(); exportMileageExcel();">
                 📈 Exportar Relatório Mensal de Rodagem para Excel (.xlsx)
+            </button>
+            <button type="button" class="btn btn-danger-solid btn-3d" style="width: 100%; justify-content: flex-start; padding: 12px 16px; font-size: 0.92rem;" onclick="closeTablesExportModal(); exportAvariasExcel();">
+                ⚠️ Exportar Relatório de Avarias Observadas (.xlsx)
             </button>
         </div>
         <div class="modal-footer">
@@ -4195,9 +4244,21 @@
         const badge = document.getElementById('adminSessionBadge');
         const googleBtn = document.getElementById('googleDriveConnectBtn');
         const tabDrive = document.getElementById('tabBtnDrive');
+        const avariaBadge = document.getElementById('adminAvariaBadge');
+        const avariaBadgeText = document.getElementById('adminAvariaBadgeText');
 
         if (badge) {
             badge.style.display = isAdminAuthenticated ? 'inline-flex' : 'none';
+        }
+
+        const avariasList = typeof getAllAvarias === 'function' ? getAllAvarias() : [];
+        if (avariaBadge) {
+            if (isAdminAuthenticated && avariasList.length > 0) {
+                avariaBadge.style.display = 'inline-flex';
+                if (avariaBadgeText) avariaBadgeText.textContent = `Avarias (${avariasList.length})`;
+            } else {
+                avariaBadge.style.display = 'none';
+            }
         }
 
         // A opção de sincronizar com o Google só aparece para o Administrador!
@@ -4282,6 +4343,7 @@
             updateAdminBadgeUI();
             closeAdminPasswordModal(true);
             showToast('🔓 <strong>Senha de Administrador confirmada!</strong> Acesso liberado durante toda a navegação na página.');
+            checkAndShowAdminAvariaPopup(true);
         } else {
             if (err) err.style.display = 'block';
             if (input) {
@@ -8254,6 +8316,7 @@
         closeAdminPasswordModal(true);
         showToast('🔓 Conta Google autorizada com sucesso: <strong>' + cleanEmail + '</strong>!');
         checkPromptDriveImportOnLogin();
+        checkAndShowAdminAvariaPopup(true);
     }
 
     function onGoogleUserLoggedIn(email) {
@@ -8672,6 +8735,7 @@
             const ok = await requestAdminPassword("entrar como Administrador Geral");
             if (ok) {
                 showToast('🔓 <strong>Acesso de Administrador liberado com sucesso!</strong>');
+                checkAndShowAdminAvariaPopup(true);
             } else {
                 openBilaoModal();
             }
@@ -9010,7 +9074,216 @@
         }
     }
 
-    function renderInspectionSlots() {
+    
+    // =========================================================================
+    // 🚨 GESTÃO, NOTIFICAÇÃO E EXPORTAÇÃO DE AVARIAS OBSERVADAS
+    // =========================================================================
+    function getAllAvarias() {
+        const list = [];
+        if (!vehicleAvarias || typeof vehicleAvarias !== 'object') return list;
+
+        Object.keys(vehicleAvarias).forEach(vtr => {
+            const val = vehicleAvarias[vtr];
+            if (Array.isArray(val)) {
+                val.forEach(item => {
+                    if (item && typeof item === 'object') {
+                        list.push({ ...item, vehicle: item.vehicle || vtr });
+                    }
+                });
+            } else if (val && typeof val === 'object' && val.description) {
+                list.push({ ...val, vehicle: val.vehicle || vtr });
+            }
+        });
+
+        list.sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date));
+        return list;
+    }
+
+    function checkAndShowAdminAvariaPopup(force = false) {
+        if (!isAdminAuthenticated) return;
+        const avarias = getAllAvarias();
+        if (avarias.length === 0) return;
+
+        const lastSeenCount = parseInt(localStorage.getItem('oleo_vtr_seen_avarias_count') || '0', 10);
+        if (force || avarias.length > lastSeenCount) {
+            setTimeout(() => {
+                openAdminAvariaNotificationModal();
+            }, 300);
+        }
+    }
+
+    function openAdminAvariaNotificationModal() {
+        const modal = document.getElementById('adminAvariaNotificationModal');
+        if (!modal) return;
+        renderAdminAvariasList();
+        modal.style.display = 'flex';
+    }
+
+    function closeAdminAvariaNotificationModal() {
+        const modal = document.getElementById('adminAvariaNotificationModal');
+        if (modal) modal.style.display = 'none';
+        const avarias = getAllAvarias();
+        localStorage.setItem('oleo_vtr_seen_avarias_count', String(avarias.length));
+    }
+
+    function markAllAvariasAsSeen() {
+        const avarias = getAllAvarias();
+        localStorage.setItem('oleo_vtr_seen_avarias_count', String(avarias.length));
+        showToast('👁️ <strong>Todas as avarias marcadas como cientes!</strong>');
+        closeAdminAvariaNotificationModal();
+    }
+
+    function renderAdminAvariasList() {
+        const container = document.getElementById('adminAvariasListContainer');
+        if (!container) return;
+
+        const avarias = getAllAvarias();
+        if (avarias.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; color: var(--text-muted); padding: 24px; font-size: 0.9rem;">
+                    ✅ Nenhuma avaria observada registrada no momento.
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        avarias.forEach((av, idx) => {
+            const vInfo = VEHICLE_FLEET_INFO[av.vehicle] || {};
+            const vRec = records.find(r => r.vehicle === av.vehicle);
+            const modelText = vInfo.model || (vRec && vRec.model) || 'VIATURA';
+            const placaText = vInfo.placa || (vRec && vRec.placa) || '';
+
+            const slotBadges = (av.slots && av.slots.length > 0)
+                ? av.slots.map(s => {
+                    const def = AVARIA_SLOT_DEFS.find(d => d.id === s);
+                    const label = def ? def.label : s;
+                    return `<span style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">📍 ${label}</span>`;
+                }).join(' ')
+                : '<span style="color: var(--text-muted); font-size: 0.74rem;">(Sem fotos apontadas)</span>';
+
+            html += `
+                <div style="background: var(--card-bg, #ffffff); border: 1.5px solid #fca5a5; border-left: 5px solid #dc2626; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1rem; font-weight: 900; color: #b91c1c;">🚓 ${av.vehicle}</span>
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">${modelText} ${placaText ? '• ' + placaText : ''}</span>
+                        </div>
+                        <span style="font-size: 0.74rem; font-weight: 700; color: #64748b;">🕒 ${av.date || '-'}</span>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 0.88rem; color: var(--text-main); font-weight: 600; line-height: 1.4;">
+                        💬 "${av.description}"
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 2px;">
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">Foto(s):</span>
+                            ${slotBadges}
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="closeAdminAvariaNotificationModal(); openVehicleInspectionModal('${av.vehicle}');" style="padding: 4px 10px; font-size: 0.76rem; font-weight: 700; border-color: #3b82f6; color: #1d4ed8; background: #eff6ff;" title="Abrir fotos de inspeção desta viatura">
+                                🔍 Ver Fotos
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteAvariaRecord('${av.vehicle}', ${av.id})" style="padding: 4px 8px; font-size: 0.74rem;" title="Excluir ou marcar como resolvida">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    async function deleteAvariaRecord(vehicle, avariaId) {
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("excluir este registro de avaria");
+            if (!ok) return;
+        }
+
+        if (confirm(`Deseja remover este relato de avaria da viatura ${vehicle}?`)) {
+            if (vehicleAvarias[vehicle] && Array.isArray(vehicleAvarias[vehicle])) {
+                vehicleAvarias[vehicle] = vehicleAvarias[vehicle].filter(a => a.id !== avariaId);
+                if (vehicleAvarias[vehicle].length === 0) {
+                    delete vehicleAvarias[vehicle];
+                }
+                localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+                syncAllDataToOnline(true);
+                renderAdminAvariasList();
+                updateAdminBadgeUI();
+                if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+                    renderInspectionSlots();
+                }
+                showToast(`🗑️ Relato de avaria da viatura <strong>${vehicle}</strong> removido!`);
+            }
+        }
+    }
+
+    function exportAvariasExcel() {
+        const avarias = getAllAvarias();
+        if (avarias.length === 0) {
+            alert("Nenhuma avaria observada encontrada para exportar.");
+            return;
+        }
+
+        if (typeof XLSX !== 'undefined') {
+            const defaultName = `Relatorio_Avarias_Observadas_Frota_${new Date().toISOString().slice(0,10)}`;
+            const userName = prompt('Digite o nome do arquivo para o Relatório de Avarias (.xlsx):', defaultName);
+            if (userName === null) return;
+
+            let finalName = userName.trim() || defaultName;
+            if (!finalName.toLowerCase().endsWith('.xlsx')) finalName += '.xlsx';
+
+            const rows = avarias.map((av, idx) => {
+                const vInfo = VEHICLE_FLEET_INFO[av.vehicle] || {};
+                const vRec = records.find(r => r.vehicle === av.vehicle);
+                const model = vInfo.model || (vRec && vRec.model) || '-';
+                const placa = vInfo.placa || (vRec && vRec.placa) || '-';
+
+                const slotNames = (av.slots && av.slots.length > 0)
+                    ? av.slots.map(s => {
+                        const def = AVARIA_SLOT_DEFS.find(d => d.id === s);
+                        return def ? def.label : s;
+                    }).join(', ')
+                    : 'Geral / Não especificado';
+
+                return {
+                    "Item": idx + 1,
+                    "Viatura": av.vehicle,
+                    "Modelo": model,
+                    "Placa": placa,
+                    "Data / Hora do Relato": av.date || '-',
+                    "Descrição da Avaria Observada": av.description || '-',
+                    "Posições / Fotos com Alteração": slotNames,
+                    "Situação": av.status || 'Ativa / Informada à Reserva'
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(rows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Avarias Observadas");
+
+            worksheet['!cols'] = [
+                { wch: 8 },  // Item
+                { wch: 14 }, // Viatura
+                { wch: 18 }, // Modelo
+                { wch: 14 }, // Placa
+                { wch: 22 }, // Data/Hora
+                { wch: 45 }, // Descrição
+                { wch: 32 }, // Posições
+                { wch: 26 }  // Situação
+            ];
+
+            XLSX.writeFile(workbook, finalName);
+            showToast(`⚠️ Relatório de Avarias exportado como <strong>${finalName}</strong>!`);
+        } else {
+            alert('Biblioteca Excel não carregada.');
+        }
+    }
+
+function renderInspectionSlots() {
         const grid = document.getElementById('inspectionSlotsGrid');
         const badge = document.getElementById('inspectModalPhotoCountBadge');
         const avariasBanner = document.getElementById('inspectModalAvariasBanner');
@@ -9498,8 +9771,12 @@
     updateColumnVisibilityUI();
     switchVehicleSelectMode(currentVehicleSelectMode || 'cards');
 
-    loadDataFromOnline(false);
+        loadDataFromOnline(false);
     startAutoSync();
+
+    if (isAdminAuthenticated) {
+        checkAndShowAdminAvariaPopup(false);
+    }
 
     // 🛡️ SEGURANÇA: BLOQUEIO DE INSPEÇÃO E MENU DE CONTEXTO CUSTOMIZADO
     let targetContextMenuInput = null;
