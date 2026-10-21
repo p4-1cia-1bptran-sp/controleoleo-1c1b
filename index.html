@@ -2716,11 +2716,10 @@
             overflow: hidden !important;
             padding: 0 !important;
             gap: 0 !important;
-            height: 94dvh !important;
-            max-height: 94dvh !important;
-            height: 94vh !important;
-            max-height: 94vh !important;
-            max-width: 680px !important;
+            max-height: 86dvh !important;
+            max-height: 86vh !important;
+            height: auto !important;
+            max-width: 600px !important;
             width: 96% !important;
             border-radius: 14px !important;
             position: relative !important;
@@ -2762,11 +2761,10 @@
 
         @media (max-width: 768px) {
             #avariaPhotoSelectModal .modal-card {
-                height: calc(100dvh - 12px) !important;
-                max-height: calc(100dvh - 12px) !important;
-                height: calc(100vh - 12px) !important;
-                max-height: calc(100vh - 12px) !important;
-                width: 98% !important;
+                max-height: 85dvh !important;
+                max-height: 85vh !important;
+                height: auto !important;
+                width: 96% !important;
                 border-radius: 12px !important;
             }
             #avariaPhotoSelectModal .modal-footer, #avariaTextModal .modal-footer, #avariaMilitarModal .modal-footer {
@@ -2777,31 +2775,31 @@
 
         .avaria-photos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-            margin-bottom: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            margin-top: 6px;
+            margin-bottom: 8px;
         }
 
         @media (max-width: 600px) {
             .avaria-photos-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
+                gap: 6px;
             }
         }
 
         .avaria-slot-card {
             background: var(--card-bg, #ffffff);
             border: 1.5px solid var(--border, #cbd5e1);
-            border-radius: 10px;
-            padding: 8px;
+            border-radius: 8px;
+            padding: 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
             transition: all 0.2s ease;
             position: relative;
             box-sizing: border-box;
-            min-height: 170px;
+            min-height: 110px;
         }
 
         .avaria-slot-card.has-uploaded-photo {
@@ -3974,11 +3972,11 @@
                     Fotos anexadas aos relatos de avarias constatadas. Cada foto de avaria é independente e <strong>não altera</strong> as fotos fixas do Setor 1. Disponíveis para visualização com zoom em tela cheia pelo Administrador.
                 </p>
 
-                <!-- Botão Direto para Tirar Nova Foto de Avaria -->
+                <!-- Botão Direto para Tirar Foto de Avaria -->
                 <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-                    <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromInspection()" style="min-height: 48px; width: 100%; font-size: 1rem; font-weight: 800; gap: 8px; justify-content: center; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);">
-                        <span style="font-size: 1.25rem;">🚨</span>
-                        <span>Tirar Nova Foto de Avaria / Relatar Avaria</span>
+                    <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromInspection()" style="min-height: 48px; width: 100%; font-size: 1rem; font-weight: 800; gap: 8px; justify-content: center; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35); white-space: normal; text-align: center;">
+                        <span style="font-size: 1.2rem;">🚨</span>
+                        <span>Tirar Foto de Avaria</span>
                     </button>
                 </div>
 
@@ -4005,9 +4003,9 @@
                 <button type="button" id="btnCancelarInspecao" class="btn btn-outline btn-3d" onclick="cancelVehicleInspectionModal()" title="Cancelar e voltar para o odômetro">
                     ✖ Voltar
                 </button>
-                <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromInspection()" style="min-height: 50px; font-weight: 800; font-size: 1rem; gap: 6px; padding: 10px 18px;" title="Tirar nova foto de avaria desta viatura">
+                <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromInspection()" style="min-height: 48px; font-weight: 800; font-size: 0.96rem; gap: 6px; padding: 10px 16px; white-space: normal; text-align: center;" title="Tirar foto de avaria desta viatura">
                     <span>🚨</span>
-                    <span>Tirar Nova Foto / Avaria</span>
+                    <span>Tirar Foto de Avaria</span>
                 </button>
                 <button type="button" id="btnFinalizarInspecao" class="btn btn-success btn-3d" onclick="closeVehicleInspectionModal()" title="Finalizar inspeção da viatura e verificar avarias">
                     <span style="font-size: 1.25rem;">✅</span>
@@ -4082,29 +4080,30 @@
 <!-- 📸 3. MODAL: SELEÇÃO DA FOTO COM OS TICKS (Dianteira, Traseira, etc.)      -->
 <!-- ========================================================================= -->
 <div id="avariaPhotoSelectModal" class="modal-overlay" style="z-index: 10054;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 680px; width: 95%;" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <div class="modal-title" style="font-size: 1.08rem; font-weight: 900; color: #dc2626; line-height: 1.35;">
+    <div class="modal-card" style="max-width: 580px; width: 96%;" onclick="event.stopPropagation()">
+        <div class="modal-header" style="padding: 10px 14px;">
+            <div class="modal-title" style="font-size: 1.02rem; font-weight: 900; color: #dc2626; line-height: 1.3;">
                 <span>Selecione a foto onde consta a alteração</span>
             </div>
             <button type="button" class="modal-close" onclick="cancelAvariaPhotoSelectToPrevious()" title="Voltar para a janela anterior">✖</button>
         </div>
 
-        <div class="modal-body">
-            <div style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 10px 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
-                    <span style="font-size: 0.8rem; font-weight: 800; color: #991b1b; text-transform: uppercase;">Viatura: <strong id="avariaPhotoVtrBadge" style="color: #1e3a8a;">--</strong></span>
-                    <span class="badge badge-danger" style="font-size: 0.7rem; font-weight: 700;">🚨 Registro de Avaria</span>
+        <div class="modal-body" style="padding: 10px 14px;">
+            <div style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 6px 10px; margin-bottom: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                    <span style="font-size: 0.78rem; font-weight: 800; color: #991b1b; text-transform: uppercase;">Viatura: <strong id="avariaPhotoVtrBadge" style="color: #1e3a8a;">--</strong></span>
+                    <span class="badge badge-danger" style="font-size: 0.68rem; font-weight: 700; padding: 1px 6px;">🚨 Registro de Avaria</span>
                 </div>
-                <div style="font-size: 0.74rem; font-weight: 700; color: #991b1b; text-transform: uppercase; margin-top: 6px;">Descrição Registrada:</div>
-                <div id="avariaPhotoConfirmedDesc" style="font-size: 0.88rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">--</div>
+                <div style="font-size: 0.8rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">
+                    <strong>Avaria:</strong> <span id="avariaPhotoConfirmedDesc">--</span>
+                </div>
             </div>
 
-            <p style="font-size: 0.86rem; color: var(--text-main); font-weight: 700; margin: 2px 0 0 0;">
+            <p style="font-size: 0.78rem; color: var(--text-main); font-weight: 700; margin: 0 0 4px 0;">
                 Envie a nova foto no campo correspondente onde consta a alteração:
             </p>
 
-            <!-- Grid com os campos vazios para envio de nova foto -->
+            <!-- Grid compacto com os campos vazios para envio de nova foto -->
             <div id="avariaPhotosGrid" class="avaria-photos-grid"></div>
 
             <!-- Inputs para Câmera ou Galeria de Avaria -->
@@ -4113,12 +4112,12 @@
             <input type="file" id="avariaSlotFileInput" accept="image/*" style="display: none;" onchange="onAvariaSlotFileChosen(event)">
         </div>
 
-        <div class="modal-footer" style="flex-shrink: 0; display: flex; gap: 10px; width: 100%; justify-content: space-between; align-items: center;">
-            <button type="button" class="btn btn-outline btn-3d" style="min-height: 48px; font-weight: 700; font-size: 0.95rem; border-color: #cbd5e1; color: var(--text-muted); padding: 10px 20px;" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
+        <div class="modal-footer" style="flex-shrink: 0 !important; position: sticky !important; bottom: 0 !important; z-index: 100 !important; display: flex !important; gap: 8px !important; width: 100% !important; justify-content: space-between !important; align-items: center !important; background: var(--card-bg, #ffffff) !important; border-top: 2.5px solid #cbd5e1 !important; padding: 10px 14px !important; box-shadow: 0 -4px 14px rgba(0,0,0,0.18) !important;">
+            <button type="button" class="btn btn-outline btn-3d" style="min-height: 44px; font-weight: 700; font-size: 0.9rem; border-color: #cbd5e1; color: var(--text-muted); padding: 8px 14px;" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
                 ↩️ Cancelar
             </button>
-            <button type="button" class="btn btn-danger-solid btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 48px; font-weight: 800; font-size: 1.05rem; justify-content: center; gap: 8px;" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
-                <span>💾</span>
+            <button type="button" class="btn btn-success btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 46px; font-weight: 800; font-size: 1rem; justify-content: center; gap: 6px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
+                <span>✅</span>
                 <span>Finalizar Observação</span>
             </button>
         </div>
@@ -4269,16 +4268,17 @@
     <div class="photo-viewer-card" onclick="event.stopPropagation()">
         <!-- 🔴 BARRA FLUTUANTE SUPERIOR: COM ZOOM E ROTAÇÃO -->
         <div class="photo-viewer-floating-bar" id="photoViewerFloatingBar">
-            <button type="button" class="btn-floating-action" onclick="zoomViewer(0.35)" title="Aumentar Zoom (+)">
-                <span style="font-size: 1rem;">➕</span>
-                <span>Zoom</span>
-            </button>
-            <button type="button" class="btn-floating-action" onclick="zoomViewer(-0.35)" title="Diminuir Zoom (-)">
-                <span style="font-size: 1rem;">➖</span>
-            </button>
-            <button type="button" class="btn-floating-action" onclick="resetViewerZoom()" title="Redefinir Zoom para 100%">
-                <span class="viewer-zoom-badge" style="font-size: 0.82rem; font-weight: 800; color: #38bdf8;">100%</span>
-            </button>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.9); border: 1.5px solid rgba(255, 255, 255, 0.35); border-radius: 10px; padding: 2px 6px; backdrop-filter: blur(12px);">
+                <div style="display: inline-flex; gap: 4px; align-items: center;">
+                    <button type="button" class="btn-floating-action" onclick="zoomViewer(0.35)" title="Aumentar Zoom (🔍+)" style="min-height: 34px; padding: 3px 8px; font-size: 0.92rem; font-weight: 800; border-radius: 6px; border: none; background: transparent;">
+                        🔍+
+                    </button>
+                    <button type="button" class="btn-floating-action" onclick="zoomViewer(-0.35)" title="Diminuir Zoom (🔍-)" style="min-height: 34px; padding: 3px 8px; font-size: 0.92rem; font-weight: 800; border-radius: 6px; border: none; background: transparent;">
+                        🔍-
+                    </button>
+                </div>
+                <span class="viewer-zoom-badge" onclick="resetViewerZoom()" title="Toque para redefinir Zoom para 100%" style="font-size: 0.72rem; font-weight: 800; color: #38bdf8; cursor: pointer; margin-top: 1px;">100%</span>
+            </div>
             <button type="button" class="btn-floating-action btn-floating-rotate" onclick="rotateViewerPhoto()" title="Girar Foto 90°">
                 <span style="font-size: 1rem;">🔄</span>
                 <span>90°</span>
@@ -4298,17 +4298,17 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap;">
-
-                <button type="button" class="btn btn-outline btn-sm" onclick="zoomViewer(0.35)" title="Aumentar Zoom (+)" style="background: #1e293b; color: #f8fafc; border-color: #475569; padding: 6px 10px; font-size: 0.8rem; font-weight: 700; gap: 4px; min-height: 38px;">
-                    <span>➕</span>
-                    <span>Zoom</span>
-                </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="zoomViewer(-0.35)" title="Diminuir Zoom (-)" style="background: #1e293b; color: #f8fafc; border-color: #475569; padding: 6px 8px; font-size: 0.8rem; font-weight: 700; min-height: 38px;">
-                    <span>➖</span>
-                </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="resetViewerZoom()" title="Redefinir Zoom para 100%" style="background: #1e293b; color: #38bdf8; border-color: #0284c7; padding: 6px 8px; font-size: 0.78rem; font-weight: 800; min-height: 38px;">
-                    <span class="viewer-zoom-badge">100%</span>
-                </button>
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="display: inline-flex; gap: 3px; align-items: center;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="zoomViewer(0.35)" title="Aumentar Zoom (🔍+)" style="background: #1e293b; color: #f8fafc; border-color: #475569; padding: 4px 8px; font-size: 0.92rem; font-weight: 800; min-height: 34px; min-width: 36px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">
+                            🔍+
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="zoomViewer(-0.35)" title="Diminuir Zoom (🔍-)" style="background: #1e293b; color: #f8fafc; border-color: #475569; padding: 4px 8px; font-size: 0.92rem; font-weight: 800; min-height: 34px; min-width: 36px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">
+                            🔍-
+                        </button>
+                    </div>
+                    <span class="viewer-zoom-badge" onclick="resetViewerZoom()" title="Toque para redefinir Zoom para 100%" style="font-size: 0.72rem; font-weight: 800; color: #38bdf8; cursor: pointer; margin-top: 1px;">100%</span>
+                </div>
                 <button type="button" class="btn btn-outline btn-sm" id="btnViewerRotateHeader" onclick="rotateViewerPhoto()" title="Girar Foto 90 graus" style="background: #1e293b; color: #f8fafc; border-color: #475569; padding: 6px 9px; font-size: 0.8rem; font-weight: 700; gap: 4px; min-height: 38px;">
                     <span>🔄</span>
                     <span class="btn-rotate-text">Girar</span>
@@ -9666,7 +9666,7 @@
                     let width = img.width;
                     let height = img.height;
                     // Alta qualidade de imagem para visualização clara de detalhes e zoom
-                    const maxDim = 1600;
+                    const maxDim = 2560;
 
                     if (width > maxDim || height > maxDim) {
                         if (width > height) {
@@ -9681,10 +9681,12 @@
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Qualidade aprimorada (0.88)
-                    const compressedData = canvas.toDataURL('image/jpeg', 0.88);
+                    // Qualidade máxima (0.96)
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.96);
 
                     const slotInfo = AVARIA_SLOT_DEFS.find(s => s.id === currentAvariaUploadSlotId) || { label: 'Avaria' };
                     const now = new Date();
@@ -9779,7 +9781,7 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const maxDim = 1600;
+                    const maxDim = 2560;
 
                     if (width > maxDim || height > maxDim) {
                         if (width > height) {
@@ -9794,9 +9796,11 @@
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    const compressedData = canvas.toDataURL('image/jpeg', 0.88);
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.96);
 
                     const slotInfo = AVARIA_SLOT_DEFS.find(s => s.id === slotId) || { label: 'Avaria' };
                     const now = new Date();
@@ -9839,54 +9843,55 @@
         if (!grid || !currentAvariaVehicle) return;
 
         let html = '';
+        const countPhotos = Object.keys(currentAvariaPhotos).length;
 
         AVARIA_SLOT_DEFS.forEach(slot => {
             const photo = currentAvariaPhotos[slot.id];
             const hasPhoto = Boolean(photo && photo.data);
 
             if (!hasPhoto) {
-                // CAMPO VAZIO DIRETO: BOTÕES DIRETOS ROBUSTOS PARA IPHONE E ANDROID
+                // CAMPO VAZIO COMPACTO COM BOTÕES DIRETOS
                 html += `
                     <div class="avaria-slot-card" id="avariaSlotCard_${slot.id}">
-                        <div class="avaria-slot-header">
+                        <div class="avaria-slot-header" style="font-size: 0.75rem; margin-bottom: 4px;">
                             <span>${slot.icon}</span>
                             <span style="font-weight: 800;">${slot.label}</span>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; flex: 1; justify-content: center; padding: 6px 0;">
-                            <button type="button" class="btn btn-primary btn-3d" onclick="triggerDirectAvariaInput('avaria_camera_${slot.id}')" style="min-height: 44px; font-size: 0.82rem; font-weight: 800; gap: 6px; width: 100%; justify-content: center; margin: 0;">
-                                <span style="font-size: 1.15rem;">📸</span>
-                                <span>Tirar Foto (Câmera)</span>
+                        <div style="display: flex; flex-direction: column; gap: 4px; width: 100%; flex: 1; justify-content: center; padding: 2px 0;">
+                            <button type="button" class="btn btn-primary btn-3d" onclick="triggerDirectAvariaInput('avaria_camera_${slot.id}')" style="min-height: 35px; font-size: 0.76rem; font-weight: 800; gap: 4px; width: 100%; justify-content: center; margin: 0; padding: 4px 6px;">
+                                <span style="font-size: 0.95rem;">📸</span>
+                                <span>Câmera</span>
                             </button>
                             <input type="file" id="avaria_camera_${slot.id}" accept="image/*" capture="environment" style="opacity: 0; position: absolute; pointer-events: none; width: 1px; height: 1px;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
 
-                            <button type="button" class="btn btn-outline btn-3d" onclick="triggerDirectAvariaInput('avaria_gallery_${slot.id}')" style="min-height: 40px; font-size: 0.78rem; font-weight: 700; gap: 6px; width: 100%; border-color: #2563eb; color: #1d4ed8; background: #eff6ff; justify-content: center; margin: 0;">
-                                <span style="font-size: 1rem;">🖼️</span>
-                                <span>Galeria do Celular</span>
+                            <button type="button" class="btn btn-outline btn-3d" onclick="triggerDirectAvariaInput('avaria_gallery_${slot.id}')" style="min-height: 32px; font-size: 0.74rem; font-weight: 700; gap: 4px; width: 100%; border-color: #2563eb; color: #1d4ed8; background: #eff6ff; justify-content: center; margin: 0; padding: 4px 6px;">
+                                <span style="font-size: 0.9rem;">🖼️</span>
+                                <span>Galeria</span>
                             </button>
                             <input type="file" id="avaria_gallery_${slot.id}" accept="image/*" style="opacity: 0; position: absolute; pointer-events: none; width: 1px; height: 1px;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
                         </div>
                     </div>
                 `;
             } else {
-                // FOTO ENVIADA PELO POLICIAL (NOVA FOTO)
+                // FOTO ANEXADA COMPACTA
                 html += `
                     <div class="avaria-slot-card has-uploaded-photo" id="avariaSlotCard_${slot.id}">
-                        <div class="avaria-slot-header">
+                        <div class="avaria-slot-header" style="font-size: 0.75rem; margin-bottom: 4px;">
                             <span>${slot.icon}</span>
                             <span style="font-weight: 800; color: #b91c1c;">${slot.label}</span>
                         </div>
-                        <div class="avaria-uploaded-thumb" onclick="openPhotoViewerModal('${photo.data}', { title: 'Nova Foto da Avaria - ${slot.label}', filename: 'Avaria_${currentAvariaVehicle}_${slot.label}.jpg' })" title="Toque para ampliar foto em tela cheia com zoom">
+                        <div class="avaria-uploaded-thumb" onclick="openPhotoViewerModal('${photo.data}', { title: 'Foto da Avaria - ${slot.label}', filename: 'Avaria_${currentAvariaVehicle}_${slot.label}.jpg' })" title="Toque para ver a foto com zoom" style="height: 65px; border-radius: 6px;">
                             <img src="${photo.data}" alt="${slot.label}" class="avaria-thumb-img">
-                            <div class="avaria-thumb-overlay">
-                                <span>👁️ Ampliar Foto</span>
+                            <div class="avaria-thumb-overlay" style="padding: 2px; font-size: 0.65rem;">
+                                <span>👁️ Ampliar</span>
                             </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; width: 100%;">
-                            <span style="font-size: 0.72rem; font-weight: 800; color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac;">
-                                ✅ Foto Anexada
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; width: 100%; gap: 4px;">
+                            <span style="font-size: 0.68rem; font-weight: 800; color: #15803d; background: #dcfce7; padding: 1px 4px; border-radius: 4px; border: 1px solid #86efac; white-space: nowrap;">
+                                ✅ Anexada
                             </span>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation(); removeCurrentAvariaPhoto('${slot.id}')" style="padding: 2px 8px; font-size: 0.72rem; min-height: 28px;" title="Remover esta foto para tirar outra">
-                                🗑️ Remover
+                            <button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation(); removeCurrentAvariaPhoto('${slot.id}')" style="padding: 2px 6px; font-size: 0.68rem; min-height: 24px;" title="Remover esta foto para tirar outra">
+                                🗑️ Trocar
                             </button>
                         </div>
                     </div>
@@ -9895,6 +9900,16 @@
         });
 
         grid.innerHTML = html;
+
+        // Atualiza dinamicamente o botão Finalizar no rodapé fixo
+        const btnFinalizar = document.getElementById('btnFinalizarObservacao');
+        if (btnFinalizar) {
+            if (countPhotos > 0) {
+                btnFinalizar.innerHTML = `<span>✅</span> <span>Finalizar Observação (${countPhotos} foto${countPhotos > 1 ? 's' : ''})</span>`;
+            } else {
+                btnFinalizar.innerHTML = `<span>✅</span> <span>Finalizar Observação</span>`;
+            }
+        }
     }
 
     function finalizeAvariaReport() {
@@ -10043,15 +10058,28 @@
     function closeAvariaAlertModal() {
         const modal = document.getElementById('avariaAlertModal');
         if (modal) modal.style.display = 'none';
-        const vtr = currentAvariaVehicle || quickKmTargetVehicle;
+
+        // Garante fechamento de todos os modais anteriores de inspeção e avaria
+        const kmModal = document.getElementById('quickKmModal');
+        if (kmModal) kmModal.style.display = 'none';
+        const inspectModal = document.getElementById('vehicleInspectionModal');
+        if (inspectModal) inspectModal.style.display = 'none';
+        const photoModal = document.getElementById('avariaPhotoSelectModal');
+        if (photoModal) photoModal.style.display = 'none';
+        const textModal = document.getElementById('avariaTextModal');
+        if (textModal) textModal.style.display = 'none';
+        const militarModal = document.getElementById('avariaMilitarModal');
+        if (militarModal) militarModal.style.display = 'none';
+
         currentAvariaVehicle = null;
         currentAvariaDescription = '';
         selectedAvariaSlots = [];
+        currentAvariaPhotos = {};
 
-        // Volta para a janela inspecionar viatura e inserir km
-        if (vtr) {
-            openQuickKmModal(vtr);
-        }
+        // Retorna diretamente ao index inicial
+        renderDashboard();
+        renderVehicleMiniCards();
+        showToast('✅ Avaria registrada e comunicada. Retornado ao Painel Inicial!');
     }
     
 
@@ -10618,7 +10646,7 @@ function toggleAdminBaselineEditMode() {
                     let width = img.width;
                     let height = img.height;
                     // Alta resolução para visualização com zoom cristalino
-                    const maxDim = 1600;
+                    const maxDim = 2560;
 
                     if (width > maxDim || height > maxDim) {
                         if (width > height) {
@@ -10633,9 +10661,11 @@ function toggleAdminBaselineEditMode() {
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    const compressedData = canvas.toDataURL('image/jpeg', 0.88);
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.96);
 
                     if (!vehiclePhotos[currentInspectVehicle]) {
                         vehiclePhotos[currentInspectVehicle] = {};
@@ -10928,12 +10958,15 @@ function toggleAdminBaselineEditMode() {
             }
         });
 
-        // 📱 GESTOS DE TOQUE NO CELULAR: PINÇA DE 2 DEDOS (PINCH-TO-ZOOM SUAVE) E PAN FLUIDO
+        // 📱 GESTOS DE TOQUE NO CELULAR: PINÇA DE 2 DEDOS (MANTÉM O ZOOM AO SOLTAR!)
         let initialDistance = 0;
         let startZoom = 1.0;
         let isPinching = false;
         let initialMidX = 0, initialMidY = 0;
+        let lastPinchEndTime = 0;
         let lastTapTime = 0;
+        let touchStartPos = { x: 0, y: 0 };
+        let hasMovedSignificantly = false;
 
         function getTouchDistance(t1, t2) {
             return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
@@ -10951,6 +10984,7 @@ function toggleAdminBaselineEditMode() {
                 e.preventDefault();
                 isPinching = true;
                 isViewerDragging = false;
+                hasMovedSignificantly = true;
                 initialDistance = getTouchDistance(e.touches[0], e.touches[1]);
                 startZoom = viewerZoom;
                 const mid = getTouchMidpoint(e.touches[0], e.touches[1]);
@@ -10960,8 +10994,9 @@ function toggleAdminBaselineEditMode() {
                 viewerInitialPanY = viewerPanY;
                 img.style.transition = 'none';
             } else if (e.touches.length === 1) {
-                isPinching = false;
-                if (viewerZoom > 1.0) {
+                touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                hasMovedSignificantly = false;
+                if (!isPinching && viewerZoom > 1.0) {
                     isViewerDragging = true;
                     viewerStartX = e.touches[0].clientX;
                     viewerStartY = e.touches[0].clientY;
@@ -10975,12 +11010,12 @@ function toggleAdminBaselineEditMode() {
         container.addEventListener('touchmove', (e) => {
             if (e.touches.length === 2 && isPinching) {
                 e.preventDefault();
+                hasMovedSignificantly = true;
                 const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
                 const currentMid = getTouchMidpoint(e.touches[0], e.touches[1]);
                 if (initialDistance > 0) {
                     const ratio = currentDistance / initialDistance;
                     viewerZoom = Math.max(1.0, Math.min(6.0, startZoom * ratio));
-                    // Panning acompanha o movimento do ponto médio durante a pinça sem saltos
                     viewerPanX = viewerInitialPanX + (currentMid.x - initialMidX);
                     viewerPanY = viewerInitialPanY + (currentMid.y - initialMidY);
                     if (viewerZoom <= 1.0) {
@@ -10991,6 +11026,8 @@ function toggleAdminBaselineEditMode() {
                 }
             } else if (e.touches.length === 1 && isViewerDragging && viewerZoom > 1.0) {
                 e.preventDefault();
+                const dist = Math.hypot(e.touches[0].clientX - touchStartPos.x, e.touches[0].clientY - touchStartPos.y);
+                if (dist > 8) hasMovedSignificantly = true;
                 viewerPanX = viewerInitialPanX + (e.touches[0].clientX - viewerStartX);
                 viewerPanY = viewerInitialPanY + (e.touches[0].clientY - viewerStartY);
                 updateViewerTransform();
@@ -10998,46 +11035,54 @@ function toggleAdminBaselineEditMode() {
         }, { passive: false });
 
         container.addEventListener('touchend', (e) => {
-            if (e.touches.length === 1) {
-                // Transição suave de 2 dedos para 1 dedo: reancora o ponto inicial de arrasto sem saltos!
+            const now = Date.now();
+            if (e.touches.length === 1 && isPinching) {
+                // Ao levantar 1 dos dedos durante a pinça, mantém o zoom exatamente onde parou
                 isPinching = false;
-                isViewerDragging = true;
-                viewerStartX = e.touches[0].clientX;
-                viewerStartY = e.touches[0].clientY;
-                viewerInitialPanX = viewerPanX;
-                viewerInitialPanY = viewerPanY;
+                lastPinchEndTime = now;
+                hasMovedSignificantly = true;
+                if (viewerZoom > 1.0) {
+                    isViewerDragging = true;
+                    viewerStartX = e.touches[0].clientX;
+                    viewerStartY = e.touches[0].clientY;
+                    viewerInitialPanX = viewerPanX;
+                    viewerInitialPanY = viewerPanY;
+                }
             } else if (e.touches.length === 0) {
-                isPinching = false;
+                if (isPinching) {
+                    isPinching = false;
+                    lastPinchEndTime = now;
+                    hasMovedSignificantly = true;
+                }
                 isViewerDragging = false;
                 img.style.transition = 'transform 0.2s ease-out';
-                if (viewerZoom <= 1.05) {
-                    resetViewerZoom();
-                }
-                updateViewerTransform();
-            }
-        }, { passive: true });
 
-        // Toque duplo rápido para alternar zoom (1x <-> 2.8x) suavemente
-        container.addEventListener('touchend', (e) => {
-            if (e.changedTouches.length === 1 && !isPinching) {
-                const now = Date.now();
-                if (now - lastTapTime < 320) {
-                    e.preventDefault();
-                    img.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
-                    if (viewerZoom > 1.1) {
-                        resetViewerZoom();
-                    } else {
-                        viewerZoom = 2.8;
-                        viewerPanX = 0;
-                        viewerPanY = 0;
-                        updateViewerTransform();
-                    }
-                    lastTapTime = 0;
-                    return;
+                // MANTÉM O ZOOM PERMANENTEMENTE! Não reseta ao soltar os dedos!
+                if (viewerZoom < 1.02) {
+                    resetViewerZoom();
+                } else {
+                    updateViewerTransform();
                 }
-                lastTapTime = now;
+
+                // Toque duplo só ativa se o usuário NÃO tiver feito pinça nem arrastado
+                if (!hasMovedSignificantly && (now - lastPinchEndTime > 500)) {
+                    if (now - lastTapTime < 300) {
+                        img.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+                        if (viewerZoom > 1.1) {
+                            resetViewerZoom();
+                        } else {
+                            viewerZoom = 2.5;
+                            viewerPanX = 0;
+                            viewerPanY = 0;
+                            updateViewerTransform();
+                        }
+                        lastTapTime = 0;
+                        return;
+                    }
+                    lastTapTime = now;
+                }
             }
-        });
+        }, { passive: false });
     }
     
     // Inicialização Completa
