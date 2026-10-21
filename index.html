@@ -3477,6 +3477,26 @@
         </div>
     </div>
 
+    <!-- 🚨 BANNER DE ALERTA DE AVARIAS CONSTATADAS NA FROTA -->
+    <div id="avariaAlertBanner" style="display: none; background: #fff1f2; border: 1.5px solid #fecdd3; border-left: 6px solid #dc2626; border-radius: var(--radius); padding: 14px 18px; margin-bottom: 2px; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12); align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+            <span style="font-size: 1.8rem; flex-shrink: 0;">🚨</span>
+            <div>
+                <div style="font-size: 1rem; font-weight: 900; color: #991b1b; display: flex; align-items: center; gap: 8px;">
+                    <span>Atenção: Avarias Constatadas na Frota!</span>
+                    <span id="bannerAvariaCountBadge" class="badge badge-danger" style="font-size: 0.74rem; font-weight: 800;">0 avaria(s)</span>
+                </div>
+                <div id="bannerAvariaDetails" style="font-size: 0.82rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">
+                    Foram relatadas avarias nas viaturas pelos policiais militares. Verifique os detalhes e comunique à Reserva/P4.
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAdminAvariaNotificationModal()" style="font-weight: 800; padding: 10px 20px; font-size: 0.92rem; gap: 6px; white-space: nowrap;">
+            <span>🚨</span>
+            <span>Visualizar Avarias</span>
+        </button>
+    </div>
+
     <!-- SETOR 2: Indicadores da Frota (KPIs) -->
     <div>
         <div class="section-header-bar">
@@ -4128,7 +4148,7 @@
                     <label for="avariaQraInput" style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); margin-bottom: 4px;">
                         Nome / QRA do militar que constatou a avaria: *
                     </label>
-                    <input type="text" id="avariaQraInput" placeholder="Digite o QRA do policial (ex: SD PM SILVA)" required style="font-weight: 800; font-size: 1.05rem !important; padding: 12px 14px; text-transform: uppercase; border: 2px solid var(--primary); border-radius: 8px;" oninput="this.value = this.value.toUpperCase()">
+                    <input type="text" id="avariaQraInput" placeholder="Digite o QRA do policial (ex: SD PM VAGNER)" required style="font-weight: 800; font-size: 1.05rem !important; padding: 12px 14px; text-transform: uppercase; border: 2px solid var(--primary); border-radius: 8px;" oninput="this.value = this.value.toUpperCase()">
                 </div>
 
                 <div id="avariaMilitarError" style="display: none; color: #ef4444; font-size: 0.84rem; font-weight: 700;">
@@ -4797,11 +4817,28 @@
 
         const avariasList = typeof getAllAvarias === 'function' ? getAllAvarias() : [];
         if (avariaBadge) {
-            if (isAdminAuthenticated && avariasList.length > 0) {
+            if (avariasList.length > 0) {
                 avariaBadge.style.display = 'inline-flex';
-                if (avariaBadgeText) avariaBadgeText.textContent = `Avarias (${avariasList.length})`;
+                if (avariaBadgeText) avariaBadgeText.textContent = `🚨 Avarias (${avariasList.length})`;
             } else {
                 avariaBadge.style.display = 'none';
+            }
+        }
+
+        // Atualiza o Banner de Avarias no Topo do Painel
+        const banner = document.getElementById('avariaAlertBanner');
+        const bannerBadge = document.getElementById('bannerAvariaCountBadge');
+        const bannerDetails = document.getElementById('bannerAvariaDetails');
+        if (banner) {
+            if (avariasList.length > 0) {
+                banner.style.display = 'flex';
+                if (bannerBadge) bannerBadge.textContent = `${avariasList.length} avaria(s)`;
+                if (bannerDetails) {
+                    const vtrsWithAvarias = [...new Set(avariasList.map(a => a.vehicle))].join(', ');
+                    bannerDetails.textContent = `Viaturas com avaria relatada: ${vtrsWithAvarias}. Verifique as fotos e informe à Reserva/P4.`;
+                }
+            } else {
+                banner.style.display = 'none';
             }
         }
 
@@ -5482,12 +5519,30 @@
             vehicleTargetMap = data.targetMap;
             localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
         }
-        // Substituição completa para garantir que fotos e avarias apagadas no PC sumam no celular:
-        vehiclePhotos = (data && data.vehiclePhotos && typeof data.vehiclePhotos === 'object') ? data.vehiclePhotos : {};
-        localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
+        // Atualização não-destrutiva de fotos e avarias (evita apagar avarias locais se o servidor retornar vazio):
+        if (data && data.vehiclePhotos && typeof data.vehiclePhotos === 'object' && Object.keys(data.vehiclePhotos).length > 0) {
+            vehiclePhotos = data.vehiclePhotos;
+            localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
+        }
 
-        vehicleAvarias = (data && data.vehicleAvarias && typeof data.vehicleAvarias === 'object') ? data.vehicleAvarias : {};
-        localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+        if (data && data.vehicleAvarias && typeof data.vehicleAvarias === 'object' && Object.keys(data.vehicleAvarias).length > 0) {
+            // Mescla inteligente: mantém avarias locais e adiciona remotas
+            Object.keys(data.vehicleAvarias).forEach(vtr => {
+                const remoteList = Array.isArray(data.vehicleAvarias[vtr]) ? data.vehicleAvarias[vtr] : [data.vehicleAvarias[vtr]];
+                if (!vehicleAvarias[vtr]) {
+                    vehicleAvarias[vtr] = remoteList;
+                } else {
+                    const localIds = new Set(vehicleAvarias[vtr].map(a => a.id));
+                    remoteList.forEach(rAv => {
+                        if (!localIds.has(rAv.id)) {
+                            vehicleAvarias[vtr].push(rAv);
+                        }
+                    });
+                    vehicleAvarias[vtr].sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date));
+                }
+            });
+            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+        }
 
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
@@ -8156,7 +8211,10 @@
 
                 tr.innerHTML = `
                     <td class="col-td-prefixo ${isHidPrefix}" onclick="openQuickKmModal('${r.vehicle}')" title="Clique para atualizar KM rápido">
-                        <strong style="color: var(--primary); font-size: 0.95rem;">🚓 ${r.vehicle}</strong>
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <strong style="color: var(--primary); font-size: 0.95rem;">🚓 ${r.vehicle}</strong>
+                            ${(vehicleAvarias[r.vehicle] && vehicleAvarias[r.vehicle].length > 0) ? `<span class="badge badge-danger" style="font-size: 0.68rem; font-weight: 800; padding: 1px 5px;" title="Viatura possui relato de avaria">🚨 Avaria</span>` : ''}
+                        </div>
                     </td>
                     <td class="col-td-data ${isHidData}">${formattedDate}</td>
                     <td class="col-td-kmatual ${isHidKmAtual}" style="font-weight: 700;">${r.currentKm.toLocaleString('pt-BR')} km</td>
@@ -8236,7 +8294,10 @@
                         <span class="oil-card-title" onclick="openQuickKmModal('${r.vehicle}')" title="Clique para atualizar KM rápido">
                             🚓 ${r.vehicle}
                         </span>
-                        <span class="badge ${badgeClass}">${statusText}</span>
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            ${(vehicleAvarias[r.vehicle] && vehicleAvarias[r.vehicle].length > 0) ? `<span class="badge badge-danger" style="font-weight: 800; cursor: pointer;" onclick="openVehicleInspectionModal('${r.vehicle}')" title="Ver avarias desta viatura">🚨 ${vehicleAvarias[r.vehicle].length} Avaria(s)</span>` : ''}
+                            <span class="badge ${badgeClass}">${statusText}</span>
+                        </div>
                     </div>
 
                     <div class="oil-life-bar-box">
@@ -9179,19 +9240,26 @@
             }
 
             const isSelected = (v === currentSelected);
+            const vAvarias = vehicleAvarias[v] || [];
+            const hasAvaria = vAvarias.length > 0;
 
             const vInfo = VEHICLE_FLEET_INFO[v] || { model: (vRecord && vRecord.model) || '', placa: (vRecord && vRecord.placa) || '' };
             const modelText = vInfo.model || 'VIATURA';
             const placaText = vInfo.placa || '';
 
+            const avariaBadgeMini = hasAvaria 
+                ? `<div style="font-size: 0.64rem; font-weight: 800; color: #b91c1c; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; padding: 1px 4px; margin-top: 2px;">🚨 ${vAvarias.length} Avaria(s)</div>` 
+                : '';
+
             cardsHtml += `
-                <div class="vehicle-mini-card ${isSelected ? 'active' : ''} ${cardDangerClass}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${modelText} - ${placaText} (${statusText})">
-                    <div class="card-prefix">${v}</div>
+                <div class="vehicle-mini-card ${isSelected ? 'active' : ''} ${cardDangerClass} ${hasAvaria ? 'has-avaria-border' : ''}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${modelText} - ${placaText} (${statusText})${hasAvaria ? ' - 🚨 Possui avaria relatada!' : ''}" style="${hasAvaria ? 'border-color: #ef4444; box-shadow: 0 0 0 1px #ef4444;' : ''}">
+                    <div class="card-prefix" style="${hasAvaria ? 'color: #b91c1c;' : ''}">${v}</div>
                     <div class="card-meta">${modelText}<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">${placaText}</span></div>
                     <div class="card-km">
                         <span class="card-status-dot" style="background-color: ${statusColor};"></span>
                         <span style="color: ${statusColor}; font-size: 0.68rem; font-weight: 700;">${remainingText || statusText}</span>
                     </div>
+                    ${avariaBadgeMini}
                 </div>
             `;
         });
@@ -9927,6 +9995,7 @@
         vehicleAvarias[currentAvariaVehicle].unshift(newAvaria);
         localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
 
+        const savedVtr = currentAvariaVehicle;
         currentAvariaPhotos = {}; // Limpa fotos temporárias de avaria
 
         const militarModal = document.getElementById('avariaMilitarModal');
@@ -9935,11 +10004,24 @@
         const photoModal = document.getElementById('avariaPhotoSelectModal');
         if (photoModal) photoModal.style.display = 'none';
 
+        // Envio direto imediato para o Firebase (garante sincronização mesmo antes do sync completo)
+        if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+            const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+            fetch(`${baseUrl}/vehicleAvarias/${encodeURIComponent(savedVtr)}.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(vehicleAvarias[savedVtr]),
+                cache: 'no-store'
+            }).catch(err => console.warn('Erro ao sincronizar avaria direta no Firebase:', err));
+        }
+
         syncAllDataToOnline(true);
         updateAdminBadgeUI();
+        renderDashboard();
+        renderVehicleMiniCards();
 
         // Abre a janela final de aviso da reserva:
-        openAvariaAlertModal(currentAvariaVehicle, qra);
+        openAvariaAlertModal(savedVtr, qra);
     }
 
     function openAvariaAlertModal(vehicle, militarCompleto = '') {
@@ -10019,7 +10101,14 @@
         openAvariaTextModal(cleanVtr);
     }
 
-    function openAdminAvariaNotificationModal() {
+    async function openAdminAvariaNotificationModal() {
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("visualizar as avarias relatadas na frota");
+            if (!ok) {
+                openBilaoModal();
+                return;
+            }
+        }
         const modal = document.getElementById('adminAvariaNotificationModal');
         if (!modal) return;
         renderAdminAvariasList();
