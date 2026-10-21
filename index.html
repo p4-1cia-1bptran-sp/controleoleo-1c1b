@@ -9689,6 +9689,14 @@
         }
     }
 
+    function triggerDirectAvariaInput(inputId) {
+        const el = document.getElementById(inputId);
+        if (el) {
+            el.value = '';
+            el.click();
+        }
+    }
+
     function onDirectAvariaSlotFileChosen(event, slotId) {
         const file = event.target.files && event.target.files[0];
         if (!file || !currentAvariaVehicle) return;
@@ -9769,7 +9777,7 @@
             const hasPhoto = Boolean(photo && photo.data);
 
             if (!hasPhoto) {
-                // CAMPO VAZIO DIRETO COM BOTÕES NATIVOS (SEM POPUP INTERMEDIÁRIO QUE BLOQUEIA NO CELULAR)
+                // CAMPO VAZIO DIRETO: BOTÕES DIRETOS ROBUSTOS PARA IPHONE E ANDROID
                 html += `
                     <div class="avaria-slot-card" id="avariaSlotCard_${slot.id}">
                         <div class="avaria-slot-header">
@@ -9777,17 +9785,17 @@
                             <span style="font-weight: 800;">${slot.label}</span>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; flex: 1; justify-content: center; padding: 6px 0;">
-                            <label for="avaria_camera_${slot.id}" class="btn btn-primary btn-3d" style="min-height: 44px; font-size: 0.82rem; font-weight: 800; gap: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; margin: 0; user-select: none;">
+                            <button type="button" class="btn btn-primary btn-3d" onclick="triggerDirectAvariaInput('avaria_camera_${slot.id}')" style="min-height: 44px; font-size: 0.82rem; font-weight: 800; gap: 6px; width: 100%; justify-content: center; margin: 0;">
                                 <span style="font-size: 1.15rem;">📸</span>
                                 <span>Tirar Foto (Câmera)</span>
-                            </label>
-                            <input type="file" id="avaria_camera_${slot.id}" accept="image/*" capture="environment" style="display: none;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
+                            </button>
+                            <input type="file" id="avaria_camera_${slot.id}" accept="image/*" capture="environment" style="opacity: 0; position: absolute; pointer-events: none; width: 1px; height: 1px;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
 
-                            <label for="avaria_gallery_${slot.id}" class="btn btn-outline btn-3d" style="min-height: 40px; font-size: 0.78rem; font-weight: 700; gap: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; border-color: #2563eb; color: #1d4ed8; background: #eff6ff; margin: 0; user-select: none;">
+                            <button type="button" class="btn btn-outline btn-3d" onclick="triggerDirectAvariaInput('avaria_gallery_${slot.id}')" style="min-height: 40px; font-size: 0.78rem; font-weight: 700; gap: 6px; width: 100%; border-color: #2563eb; color: #1d4ed8; background: #eff6ff; justify-content: center; margin: 0;">
                                 <span style="font-size: 1rem;">🖼️</span>
                                 <span>Galeria do Celular</span>
-                            </label>
-                            <input type="file" id="avaria_gallery_${slot.id}" accept="image/*" style="display: none;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
+                            </button>
+                            <input type="file" id="avaria_gallery_${slot.id}" accept="image/*" style="opacity: 0; position: absolute; pointer-events: none; width: 1px; height: 1px;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
                         </div>
                     </div>
                 `;
@@ -10033,115 +10041,15 @@
     }
 
     // Helper universal para download de imagens no navegador
-    function downloadPhotoData(dataUrl, filename) {
-        if (!dataUrl) return;
-        const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = filename || 'foto_viatura.jpg';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-            if (a && a.parentNode) a.parentNode.removeChild(a);
-        }, 150);
-    }
+    
 
-    function downloadAvariaPhotoFromReport(avariaId, slotId) {
-        const avList = getAllAvarias();
-        const av = avList.find(a => a.id === avariaId);
-        if (!av) return;
-        const avPhotos = av.photos || {};
-        const photo = avPhotos[slotId] || (vehiclePhotos[av.vehicle] && vehiclePhotos[av.vehicle][slotId]);
-        if (!photo || !photo.data) {
-            alert('Foto não encontrada para download.');
-            return;
-        }
-        const def = AVARIA_SLOT_DEFS.find(d => d.id === slotId) || { label: slotId };
-        const filename = `Avaria_${av.vehicle}_${def.label.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
-        downloadPhotoData(photo.data, filename);
-        showToast(`📥 Foto da avaria em <strong>${def.label}</strong> baixada com sucesso!`);
-    }
+    
 
-    function downloadAvariaPhoto(vehicle, slotId) {
-        const avList = getAllAvarias().filter(a => a.vehicle === vehicle);
-        let foundPhoto = null;
-        for (const av of avList) {
-            if (av.photos && av.photos[slotId] && av.photos[slotId].data) {
-                foundPhoto = av.photos[slotId];
-                break;
-            }
-        }
-        if (!foundPhoto && vehiclePhotos[vehicle] && vehiclePhotos[vehicle][slotId]) {
-            foundPhoto = vehiclePhotos[vehicle][slotId];
-        }
-        if (!foundPhoto || !foundPhoto.data) {
-            alert('Foto da avaria não encontrada para download.');
-            return;
-        }
-        const def = AVARIA_SLOT_DEFS.find(d => d.id === slotId) || { label: slotId };
-        const filename = `Avaria_${vehicle}_${def.label.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
-        downloadPhotoData(foundPhoto.data, filename);
-        showToast(`📥 Foto <strong>${def.label}</strong> da viatura <strong>${vehicle}</strong> baixada!`);
-    }
+    
 
-    function downloadAllPhotosOfAvaria(vehicle, avariaId) {
-        const avList = getAllAvarias();
-        const av = avList.find(a => a.id === avariaId && a.vehicle === vehicle);
-        if (!av) return;
-        const slots = av.slots || [];
-        const avPhotos = av.photos || {};
-        const availablePhotos = [];
+    
 
-        slots.forEach(slotId => {
-            const photo = avPhotos[slotId] || (vehiclePhotos[vehicle] && vehiclePhotos[vehicle][slotId]);
-            if (photo && photo.data) {
-                availablePhotos.push({ slotId, photo });
-            }
-        });
-
-        if (availablePhotos.length === 0) {
-            alert('Nenhuma foto disponível para download nesta avaria.');
-            return;
-        }
-
-        availablePhotos.forEach((item, idx) => {
-            const def = AVARIA_SLOT_DEFS.find(d => d.id === item.slotId) || { label: item.slotId };
-            const filename = `Avaria_${vehicle}_${def.label.replace(/\s+/g, '_')}_${idx + 1}.jpg`;
-            setTimeout(() => {
-                downloadPhotoData(item.photo.data, filename);
-            }, idx * 220);
-        });
-
-        showToast(`📥 Baixando <strong>${availablePhotos.length} foto(s)</strong> de avaria da viatura <strong>${vehicle}</strong>...`);
-    }
-
-    function downloadAllAvariasPhotos() {
-        const avarias = getAllAvarias();
-        let delay = 0;
-        let count = 0;
-
-        avarias.forEach(av => {
-            const avPhotos = av.photos || {};
-            const slots = av.slots || [];
-            slots.forEach(slotId => {
-                const photo = avPhotos[slotId] || (vehiclePhotos[av.vehicle] && vehiclePhotos[av.vehicle][slotId]);
-                if (photo && photo.data) {
-                    count++;
-                    const def = AVARIA_SLOT_DEFS.find(d => d.id === slotId) || { label: slotId };
-                    const filename = `Avaria_${av.vehicle}_${def.label.replace(/\s+/g, '_')}_${count}.jpg`;
-                    setTimeout(() => {
-                        downloadPhotoData(photo.data, filename);
-                    }, delay);
-                    delay += 220;
-                }
-            });
-        });
-
-        if (count > 0) {
-            showToast(`📥 Iniciando download de <strong>${count} foto(s)</strong> de avarias...`);
-        } else {
-            alert('Nenhuma foto encontrada nas avarias relatadas.');
-        }
-    }
+    
 
     async function deleteAvariaPhotoDirect(vehicle, slotId, avariaId) {
         if (!isAdminAuthenticated) {
@@ -10806,18 +10714,7 @@ function toggleAdminBaselineEditMode() {
         if (textHeader) textHeader.textContent = isFs ? 'Janela' : 'Tela Cheia';
     }
 
-    function downloadCurrentViewerPhoto() {
-        if (!viewerAllowDownload) {
-            alert('O download das fotos fixas de referência da viatura não é necessário.');
-            return;
-        }
-        if (!viewerCurrentData) {
-            alert('Nenhuma foto aberta para download.');
-            return;
-        }
-        downloadPhotoData(viewerCurrentData, viewerCurrentFilename || 'foto_avaria.jpg');
-        showToast(`📥 Foto <strong>${viewerCurrentFilename || 'foto_avaria.jpg'}</strong> baixada com sucesso!`);
-    }
+    
 
     function openPhotoViewerModal(slotIdOrDataUrl, options = {}) {
         const modal = document.getElementById('photoViewerModal');
