@@ -3336,19 +3336,22 @@
 
     <!-- SETOR 4: Tabela Geral e Modo Cards de Status Atual -->
     <div class="card">
-        <div class="card-header" style="flex-direction: column; align-items: stretch; gap: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px;">
-                <div>
-                    <div class="card-title">📋 Relação Atual de Troca de Óleo das Viaturas</div>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
-                        💡 Exibe o status atual e último KM de cada viatura na frota com intervalo padrão de 5.000 km.
-                    </p>
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px; margin-bottom: 0;">
+            <div>
+                <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                    <span>📋 Relação Atual de Troca de Óleo das Viaturas</span>
+                    <span class="locked-tag adm-section-lock-tag" title="Setor disponível apenas para o Administrador">🔒 ADM</span>
                 </div>
-                <button type="button" class="btn-collapse" onclick="toggleSection('tableCardBodyContent', this)" title="Expandir Setor" aria-expanded="true">▲</button>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                    💡 Exibe o status atual e último KM de cada viatura na frota com intervalo padrão de 5.000 km.
+                </p>
             </div>
+            <button type="button" class="btn-collapse" onclick="toggleSection('tableCardBodyContent', this)" title="Expandir Setor (Requer Senha ADM)" aria-expanded="false">▼</button>
+        </div>
 
+        <div id="tableCardBodyContent" class="collapsible-content collapsed" style="margin-top: 14px;">
             <!-- Barra de Filtros -->
-            <div class="filters-toolbar">
+            <div class="filters-toolbar" style="margin-bottom: 12px;">
                 <div class="filter-group">
                     <label for="filterMonth" class="filter-label">📅 Mês/Ano:</label>
                     <select id="filterMonth" class="filter-select" onchange="renderDashboard()">
@@ -3374,7 +3377,7 @@
             </div>
 
             <!-- BARRA DE ALTERNÂNCIA: MODO CARDS (SMARTPHONE) X MODO TABELA -->
-            <div class="view-switch-bar">
+            <div class="view-switch-bar" style="margin-bottom: 12px;">
                 <div class="view-switch-group">
                     <button type="button" id="btnViewCards" class="btn-view-switch active" onclick="setViewDisplayMode('cards')">
                         📱 Modo Cards (Smartphone)
@@ -3387,9 +3390,6 @@
                     <span>↔️ <em>Deslize a tabela para o lado para ver todas as colunas</em></span>
                 </div>
             </div>
-        </div>
-
-        <div id="tableCardBodyContent" class="collapsible-content">
             <div id="hiddenColumnsBar" class="hidden-columns-bar" style="display: none;">
                 <span>👁️ <strong>Colunas ocultas:</strong></span>
                 <div id="hiddenColumnsPills" style="display: inline-flex; gap: 6px; flex-wrap: wrap;"></div>
@@ -3486,19 +3486,22 @@
 
     <!-- SETOR 5: CONTROLE MENSAL DE RODAGEM & HISTÓRICO DE TROCAS (KM RODADO POR MÊS) -->
     <div class="card" id="mileageControlSection">
-        <div class="card-header" style="flex-direction: column; align-items: stretch; gap: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px;">
-                <div>
-                    <div class="card-title">📅 Controle Mensal de Rodagem & Histórico de Trocas</div>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
-                        📊 Banco permanente que armazena a quilometragem rodada e trocas de óleo de cada viatura mês a mês.
-                    </p>
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px; margin-bottom: 0;">
+            <div>
+                <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                    <span>📅 Controle Mensal de Rodagem & Histórico de Trocas</span>
+                    <span class="locked-tag adm-section-lock-tag" title="Setor disponível apenas para o Administrador">🔒 ADM</span>
                 </div>
-                <button type="button" class="btn-collapse" onclick="toggleSection('mileageCardBodyContent', this)" title="Expandir Setor" aria-expanded="false">▼</button>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                    📊 Banco permanente que armazena a quilometragem rodada e trocas de óleo de cada viatura mês a mês.
+                </p>
             </div>
+            <button type="button" class="btn-collapse" onclick="toggleSection('mileageCardBodyContent', this)" title="Expandir Setor (Requer Senha ADM)" aria-expanded="false">▼</button>
+        </div>
 
+        <div id="mileageCardBodyContent" class="collapsible-content collapsed" style="margin-top: 14px;">
             <!-- Filtros de Rodagem -->
-            <div class="filters-toolbar">
+            <div class="filters-toolbar" style="margin-bottom: 12px;">
                 <div class="filter-group">
                     <label for="filterMileageMonth" class="filter-label">📅 Filtrar Mês/Ano:</label>
                     <select id="filterMileageMonth" class="filter-select" onchange="renderMileageTable()">
@@ -3517,9 +3520,6 @@
                     <button class="btn btn-edit-sector btn-3d btn-sm" onclick="openMileageTableAdminOptions()" title="Opções de Edição do Controle de Rodagem (Requer Senha ADM)">✏️ Editar</button>
                 </div>
             </div>
-        </div>
-
-        <div id="mileageCardBodyContent" class="collapsible-content collapsed">
             <div class="table-responsive">
                 <table>
                     <thead>
@@ -3542,11 +3542,14 @@
 
     <!-- SETOR 6: Comandos e Ações do Banco de Dados / Sincronização -->
     <div class="card" style="padding: 20px;">
-        <div class="card-header" style="margin-bottom: 12px;">
-            <div class="card-title">⚙️ Comandos & Ações do Banco de Dados</div>
+        <div class="card-header" style="margin-bottom: 0;">
+            <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <span>⚙️ Comandos & Ações do Banco de Dados</span>
+                <span class="locked-tag adm-section-lock-tag" title="Setor disponível apenas para o Administrador">🔒 ADM</span>
+            </div>
             <button type="button" class="btn-collapse" onclick="toggleSection('footerActionsContent', this)" title="Expandir Setor (Requer Senha ADM)" aria-expanded="false">▼</button>
         </div>
-        <div id="footerActionsContent" class="collapsible-content collapsed">
+        <div id="footerActionsContent" class="collapsible-content collapsed" style="margin-top: 14px;">
             <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: center; padding: 10px 0;">
                 <button class="btn btn-online btn-3d" title="Conexão e Sincronização do Banco de Dados Online" onclick="openServerConfigModal()">
                     🌐 Conexão Online
@@ -3718,7 +3721,10 @@
             <!-- Grid com as 8 Fotos da Viatura -->
             <div id="inspectionSlotsGrid" class="inspection-grid"></div>
 
-            <input type="file" id="inspectionFileInput" accept="image/*" capture="environment" style="display: none;" onchange="onInspectionFileChosen(event)">
+            <!-- Inputs para Câmera ou Galeria de Fotos da Viatura -->
+            <input type="file" id="inspectionFileInputCamera" accept="image/*" capture="environment" style="display: none;" onchange="onInspectionFileChosen(event)">
+            <input type="file" id="inspectionFileInputGallery" accept="image/*" style="display: none;" onchange="onInspectionFileChosen(event)">
+            <input type="file" id="inspectionFileInput" accept="image/*" style="display: none;" onchange="onInspectionFileChosen(event)">
         </div>
 
         <div class="modal-footer" id="inspectModalFooter" style="display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -3816,7 +3822,10 @@
 
             <!-- Grid com as 8 mini fotos e ticks abaixo -->
             <div id="avariaPhotosGrid" class="avaria-photos-grid"></div>
-            <input type="file" id="avariaSlotFileInput" accept="image/*" capture="environment" style="display: none;" onchange="onAvariaSlotFileChosen(event)">
+            <!-- Inputs para Câmera ou Galeria de Avaria -->
+            <input type="file" id="avariaSlotFileInputCamera" accept="image/*" capture="environment" style="display: none;" onchange="onAvariaSlotFileChosen(event)">
+            <input type="file" id="avariaSlotFileInputGallery" accept="image/*" style="display: none;" onchange="onAvariaSlotFileChosen(event)">
+            <input type="file" id="avariaSlotFileInput" accept="image/*" style="display: none;" onchange="onAvariaSlotFileChosen(event)">
         </div>
 
         <div class="modal-footer" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; width: 100%;">
@@ -3965,6 +3974,35 @@
         </div>
     </div>
 </div>
+
+<!-- ========================================================================= -->
+<!-- 📷 MODAL DE SELEÇÃO: CÂMERA OU GALERIA DO CELULAR                         -->
+<!-- ========================================================================= -->
+<div id="photoSourceModal" class="modal-overlay" style="z-index: 10095;" onclick="closePhotoSourceModal()">
+    <div class="modal-card modal-alert-card" style="max-width: 420px; width: 92%;" onclick="event.stopPropagation()">
+        <div style="font-size: 2.6rem; margin-bottom: 4px;">📷🖼️</div>
+        <h3 id="photoSourceTitle" style="font-size: 1.18rem; font-weight: 800; color: var(--primary); margin-bottom: 6px;">
+            Adicionar Foto da Viatura
+        </h3>
+        <p id="photoSourceSubtitle" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 20px;">
+            Escolha se deseja tirar uma foto agora ou selecionar da galeria do celular:
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+            <button type="button" class="btn btn-primary btn-3d" style="width: 100%; min-height: 48px; font-size: 0.95rem; font-weight: 800; gap: 8px; justify-content: center;" onclick="choosePhotoSource('camera')">
+                <span style="font-size: 1.25rem;">📸</span>
+                <span>Tirar com a Câmera</span>
+            </button>
+            <button type="button" class="btn btn-outline btn-3d" style="width: 100%; min-height: 48px; font-size: 0.95rem; font-weight: 800; border-color: #2563eb; color: #1d4ed8; background: #eff6ff; gap: 8px; justify-content: center;" onclick="choosePhotoSource('gallery')">
+                <span style="font-size: 1.25rem;">🖼️</span>
+                <span>Escolher da Galeria do Celular</span>
+            </button>
+            <button type="button" class="btn btn-outline btn-3d" style="width: 100%; min-height: 42px; font-size: 0.88rem; font-weight: 700; border-color: #cbd5e1; margin-top: 4px; justify-content: center;" onclick="closePhotoSourceModal()">
+                ✖ Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- ========================================================================= -->
 <!-- 👁️ MODAL LIGHTBOX DE FOTO EM TELA CHEIA (COM ROTAÇÃO E FULLSCREEN NATIVO)   -->
 <!-- ========================================================================= -->
@@ -4550,6 +4588,11 @@
             oilBrandInput.style.cursor = isAdminAuthenticated ? 'text' : 'not-allowed';
             oilBrandInput.style.backgroundColor = isAdminAuthenticated ? 'var(--input-bg, #ffffff)' : 'var(--input-bg-disabled, rgba(0,0,0,0.03))';
         }
+        document.querySelectorAll('.adm-section-lock-tag').forEach(tag => {
+            tag.textContent = isAdminAuthenticated ? '🔓 ADM' : '🔒 ADM';
+            tag.title = isAdminAuthenticated ? 'Modo Administrador Ativo (Acesso liberado)' : 'Setor disponível apenas para o Administrador';
+        });
+
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
         }
@@ -5781,8 +5824,14 @@
         const el = document.getElementById(contentId);
         if (!el) return;
 
-        if (contentId === 'footerActionsContent' && el.classList.contains('collapsed')) {
-            const ok = await requestAdminPassword("expandir o setor de Comandos & Ações do Banco de Dados");
+        const adminProtectedSections = {
+            'tableCardBodyContent': 'expandir o setor de Relação Atual de Troca de Óleo das Viaturas',
+            'mileageCardBodyContent': 'expandir o setor de Controle Mensal de Rodagem & Histórico de Trocas',
+            'footerActionsContent': 'expandir o setor de Comandos & Ações do Banco de Dados'
+        };
+
+        if (adminProtectedSections[contentId] && el.classList.contains('collapsed')) {
+            const ok = await requestAdminPassword(adminProtectedSections[contentId]);
             if (!ok) {
                 openBilaoModal();
                 return;
@@ -5792,8 +5841,19 @@
         const isCollapsed = el.classList.toggle('collapsed');
         if (btnEl) {
             btnEl.textContent = isCollapsed ? '▼' : '▲';
-            btnEl.title = isCollapsed ? 'Expandir Setor' : 'Ocultar Setor';
+            if (isCollapsed) {
+                btnEl.title = adminProtectedSections[contentId] ? 'Expandir Setor (Requer Senha ADM)' : 'Expandir Setor';
+            } else {
+                btnEl.title = 'Ocultar Setor';
+            }
             btnEl.setAttribute('aria-expanded', !isCollapsed);
+        }
+
+        if (contentId === 'chartsGridContent' && !isCollapsed) {
+            setTimeout(() => {
+                if (barChartInstance) barChartInstance.resize();
+                if (doughnutChartInstance) doughnutChartInstance.resize();
+            }, 60);
         }
     }
 
@@ -9203,14 +9263,56 @@
 
     let currentAvariaUploadSlotId = null;
 
+    let photoSourceTargetType = 'inspection';
+
+    function openPhotoSourceModal(targetType, slotId, label) {
+        photoSourceTargetType = targetType;
+        if (targetType === 'inspection') {
+            currentUploadSlotId = slotId;
+        } else {
+            currentAvariaUploadSlotId = slotId;
+        }
+        const modal = document.getElementById('photoSourceModal');
+        const titleEl = document.getElementById('photoSourceTitle');
+        const subEl = document.getElementById('photoSourceSubtitle');
+        if (titleEl) {
+            titleEl.textContent = label ? (`Foto: ` + label) : 'Adicionar Foto da Viatura';
+        }
+        if (subEl) {
+            subEl.textContent = 'Deseja tirar uma foto agora ou escolher uma imagem da galeria do celular?';
+        }
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closePhotoSourceModal() {
+        const modal = document.getElementById('photoSourceModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function choosePhotoSource(source) {
+        closePhotoSourceModal();
+        if (photoSourceTargetType === 'inspection') {
+            const inputId = source === 'camera' ? 'inspectionFileInputCamera' : 'inspectionFileInputGallery';
+            const fileInput = document.getElementById(inputId) || document.getElementById('inspectionFileInput');
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.click();
+            }
+        } else {
+            const inputId = source === 'camera' ? 'avariaSlotFileInputCamera' : 'avariaSlotFileInputGallery';
+            const fileInput = document.getElementById(inputId) || document.getElementById('avariaSlotFileInput');
+            if (fileInput) {
+                fileInput.value = '';
+                fileInput.click();
+            }
+        }
+    }
+
     function triggerAvariaPhotoUpload(slotId) {
         if (!currentAvariaVehicle) return;
         currentAvariaUploadSlotId = slotId;
-        const fileInput = document.getElementById('avariaSlotFileInput');
-        if (fileInput) {
-            fileInput.value = '';
-            fileInput.click();
-        }
+        const slotInfo = AVARIA_SLOT_DEFS.find(s => s.id === slotId) || { label: 'Avaria' };
+        openPhotoSourceModal('avaria', slotId, slotInfo.label);
     }
 
     function onAvariaSlotFileChosen(event) {
@@ -10122,11 +10224,8 @@ function renderInspectionSlots() {
             }
         }
         currentUploadSlotId = slotId;
-        const fileInput = document.getElementById('inspectionFileInput');
-        if (fileInput) {
-            fileInput.value = '';
-            fileInput.click();
-        }
+        const slotInfo = DEFAULT_INSPECTION_SLOTS.find(s => s.id === slotId) || { label: 'Foto' };
+        openPhotoSourceModal('inspection', slotId, slotInfo.label);
     }
 
     function onInspectionFileChosen(event) {
