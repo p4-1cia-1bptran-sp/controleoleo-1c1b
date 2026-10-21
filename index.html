@@ -2544,7 +2544,7 @@
             border-radius: 6px;
             display: block;
             user-select: none;
-            transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+            /* transition handled dynamically */
             cursor: zoom-in;
         }
 
@@ -3929,7 +3929,7 @@
                         <strong style="font-size: 0.96rem; color: var(--primary);">Setor 1: Fotos Fixas de Inspeção da Viatura</strong>
                         <span class="badge badge-info" style="font-size: 0.68rem; font-weight: 700;">🔒 Fixo / Referência</span>
                     </div>
-                    <span id="inspectBaselineAdminHint" style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Livre visualização (Sem download)</span>
+                    <span id="inspectBaselineAdminHint" style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Fotos Fixas de Referência</span>
                 </div>
                 <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 10px 0; line-height: 1.35;">
                     Fotos de cadastro e referência fixa do estado da viatura (não podem ser alteradas durante as inspeções de rotina).
@@ -3954,7 +3954,15 @@
                     Fotos anexadas aos relatos de avarias constatadas. Cada foto de avaria é independente e <strong>não altera</strong> as fotos fixas do Setor 1. Disponíveis para visualização com zoom em tela cheia pelo Administrador.
                 </p>
 
-                <!-- Lista de Avarias com Fotos de Avaria e Botões de Download -->
+                <!-- Botão Direto para Tirar Nova Foto de Avaria -->
+                <div style="margin-bottom: 12px; display: flex; justify-content: center;">
+                    <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromInspection()" style="min-height: 48px; width: 100%; font-size: 1rem; font-weight: 800; gap: 8px; justify-content: center; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);">
+                        <span style="font-size: 1.25rem;">🚨</span>
+                        <span>Tirar Nova Foto de Avaria / Relatar Avaria</span>
+                    </button>
+                </div>
+
+                <!-- Lista de Avarias Constatadas com Fotos -->
                 <div id="inspectModalAvariasList" style="display: flex; flex-direction: column; gap: 10px;"></div>
             </div>
 
@@ -3976,6 +3984,10 @@
             <div class="inspect-footer-actions" id="inspectFooterActions">
                 <button type="button" id="btnCancelarInspecao" class="btn btn-outline btn-3d" onclick="cancelVehicleInspectionModal()" title="Cancelar e voltar para o odômetro">
                     ✖ Voltar
+                </button>
+                <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromInspection()" style="min-height: 50px; font-weight: 800; font-size: 1rem; gap: 6px; padding: 10px 18px;" title="Tirar nova foto de avaria desta viatura">
+                    <span>🚨</span>
+                    <span>Tirar Nova Foto / Avaria</span>
                 </button>
                 <button type="button" id="btnFinalizarInspecao" class="btn btn-success btn-3d" onclick="closeVehicleInspectionModal()" title="Finalizar inspeção da viatura e verificar avarias">
                     <span style="font-size: 1.25rem;">✅</span>
@@ -4085,9 +4097,9 @@
             <button type="button" class="btn btn-outline btn-3d" style="min-height: 48px; font-weight: 700; font-size: 0.95rem; border-color: #cbd5e1; color: var(--text-muted); padding: 10px 20px;" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
                 ↩️ Cancelar
             </button>
-            <button type="button" class="btn btn-danger-solid btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 48px; font-weight: 800; font-size: 1.05rem; justify-content: center; gap: 8px;" onclick="finalizeAvariaReport()" title="Fechar fotos e informar QRA do militar">
+            <button type="button" class="btn btn-danger-solid btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 48px; font-weight: 800; font-size: 1.05rem; justify-content: center; gap: 8px;" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
                 <span>💾</span>
-                <span>Finalizar</span>
+                <span>Finalizar Observação</span>
             </button>
         </div>
     </div>
@@ -4235,7 +4247,7 @@
 <!-- ========================================================================= -->
 <div id="photoViewerModal" class="photo-viewer-overlay" onclick="/* Fechamento exclusivo pelo botão Fechar (evita fechar ao tocar na tela) */">
     <div class="photo-viewer-card" onclick="event.stopPropagation()">
-        <!-- 🔴 BARRA FLUTUANTE SUPERIOR: COM ZOOM, ROTAÇÃO E BAIXAR (CONDICIONAL) -->
+        <!-- 🔴 BARRA FLUTUANTE SUPERIOR: COM ZOOM E ROTAÇÃO -->
         <div class="photo-viewer-floating-bar" id="photoViewerFloatingBar">
             <button type="button" class="btn-floating-action" onclick="zoomViewer(0.35)" title="Aumentar Zoom (+)">
                 <span style="font-size: 1rem;">➕</span>
@@ -4293,7 +4305,7 @@
         </div>
 
         <div class="photo-viewer-img-container" id="photoViewerContainer" style="overflow: hidden; position: relative; touch-action: none; user-select: none;">
-            <img id="photoViewerImg" class="photo-viewer-img" src="" alt="Foto da Viatura" draggable="false" style="transform-origin: center center; transition: transform 0.08s ease-out;">
+            <img id="photoViewerImg" class="photo-viewer-img" src="" alt="Foto da Viatura" draggable="false" style="transform-origin: center center; touch-action: none;">
         </div>
 
         <div class="photo-viewer-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 8px; flex-wrap: wrap; gap: 8px;">
@@ -4455,7 +4467,7 @@
                         <div style="display: flex; gap: 8px;">
                             <input type="text" id="driveDirectFileIdInput" placeholder="Cole o link https://drive.google.com/file/d/... ou ID do arquivo" style="flex: 1; font-size: 0.82rem; padding: 8px 12px; border: 1px solid #f87171; border-radius: 6px; box-sizing: border-box;" oninput="onDriveDirectInputChanged()">
                             <button type="button" class="btn btn-primary btn-3d btn-sm" style="font-weight: 700; padding: 8px 14px; background: #ea4335;" onclick="importFromDriveDirectInput()">
-                                📥 Baixar e importar
+                                📥 Carregar do Drive
                             </button>
                         </div>
                     </div>
@@ -8308,6 +8320,9 @@
     }
 
     function updateCharts(vehicleList, okCount, warnCount, dangerCount) {
+        if (typeof Chart === 'undefined') {
+            return;
+        }
         const isDark = (typeof currentTheme !== 'undefined' ? currentTheme : localStorage.getItem('oleo_vtr_theme')) === 'dark';
         const labelColor = isDark ? '#f1f5f9' : '#0f172a';
         const tickColor = isDark ? '#94a3b8' : '#64748b';
@@ -8486,7 +8501,7 @@
             if (radio) radio.checked = true;
         }
 
-        showToast('📄 Arquivo selecionado: <strong>' + fileName + '</strong>. Clique em "Baixar e importar" para carregar.');
+        showToast('📄 Arquivo selecionado: <strong>' + fileName + '</strong>. Clique em "Carregar do Drive" para importar.');
     }
 
     async function loadGoogleDriveFilesList() {
@@ -9394,6 +9409,15 @@
         }
     }
 
+    
+    function openAvariaRegistrationFromInspection() {
+        const vtr = currentInspectVehicle || quickKmTargetVehicle;
+        if (!vtr) return;
+        const inspectModal = document.getElementById('vehicleInspectionModal');
+        if (inspectModal) inspectModal.style.display = 'none';
+        openAvariaTextModal(vtr);
+    }
+
     function cancelVehicleInspectionModal() {
         const modal = document.getElementById('vehicleInspectionModal');
         if (modal) modal.style.display = 'none';
@@ -9665,6 +9689,75 @@
         }
     }
 
+    function onDirectAvariaSlotFileChosen(event, slotId) {
+        const file = event.target.files && event.target.files[0];
+        if (!file || !currentAvariaVehicle) return;
+
+        showToast('⏳ <strong>Processando nova foto da avaria em alta resolução...</strong>');
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 1600;
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.88);
+
+                    const slotInfo = AVARIA_SLOT_DEFS.find(s => s.id === slotId) || { label: 'Avaria' };
+                    const now = new Date();
+                    const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                    // SETOR 2: Salva exclusivamente na nova avaria constatada (NUNCA altera nem substitui as fotos fixas do Setor 1!)
+                    currentAvariaPhotos[slotId] = {
+                        id: slotId,
+                        label: slotInfo.label,
+                        data: compressedData,
+                        date: dateStr
+                    };
+
+                    if (!selectedAvariaSlots.includes(slotId)) {
+                        selectedAvariaSlots.push(slotId);
+                    }
+
+                    renderAvariaPhotoSlots();
+                    showToast(`📷 Nova foto da avaria em <strong>${slotInfo.label}</strong> anexada com sucesso!`);
+                } catch (err) {
+                    alert('Erro ao processar imagem: ' + err.message);
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeCurrentAvariaPhoto(slotId) {
+        if (currentAvariaPhotos && currentAvariaPhotos[slotId]) {
+            delete currentAvariaPhotos[slotId];
+            selectedAvariaSlots = selectedAvariaSlots.filter(id => id !== slotId);
+            renderAvariaPhotoSlots();
+            showToast('Foto da avaria removida. Campo vazio.');
+        }
+    }
+
     function renderAvariaPhotoSlots() {
         const grid = document.getElementById('avariaPhotosGrid');
         if (!grid || !currentAvariaVehicle) return;
@@ -9676,29 +9769,37 @@
             const hasPhoto = Boolean(photo && photo.data);
 
             if (!hasPhoto) {
-                // CAMPO VAZIO onde o policial envia uma nova foto
+                // CAMPO VAZIO DIRETO COM BOTÕES NATIVOS (SEM POPUP INTERMEDIÁRIO QUE BLOQUEIA NO CELULAR)
                 html += `
                     <div class="avaria-slot-card" id="avariaSlotCard_${slot.id}">
                         <div class="avaria-slot-header">
                             <span>${slot.icon}</span>
                             <span style="font-weight: 800;">${slot.label}</span>
                         </div>
-                        <div class="avaria-empty-upload-box" onclick="triggerAvariaPhotoUpload('${slot.id}')" title="Toque para enviar nova foto da avaria em ${slot.label}">
-                            <span style="font-size: 2.2rem; color: #2563eb; line-height: 1;">📷</span>
-                            <span style="font-size: 0.86rem; font-weight: 800; color: #1d4ed8; margin-top: 4px;">+ Enviar nova foto</span>
-                            <span style="font-size: 0.72rem; color: var(--text-muted);">(Câmera / Galeria)</span>
+                        <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; flex: 1; justify-content: center; padding: 6px 0;">
+                            <label for="avaria_camera_${slot.id}" class="btn btn-primary btn-3d" style="min-height: 44px; font-size: 0.82rem; font-weight: 800; gap: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; margin: 0; user-select: none;">
+                                <span style="font-size: 1.15rem;">📸</span>
+                                <span>Tirar Foto (Câmera)</span>
+                            </label>
+                            <input type="file" id="avaria_camera_${slot.id}" accept="image/*" capture="environment" style="display: none;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
+
+                            <label for="avaria_gallery_${slot.id}" class="btn btn-outline btn-3d" style="min-height: 40px; font-size: 0.78rem; font-weight: 700; gap: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; border-color: #2563eb; color: #1d4ed8; background: #eff6ff; margin: 0; user-select: none;">
+                                <span style="font-size: 1rem;">🖼️</span>
+                                <span>Galeria do Celular</span>
+                            </label>
+                            <input type="file" id="avaria_gallery_${slot.id}" accept="image/*" style="display: none;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
                         </div>
                     </div>
                 `;
             } else {
-                // FOTO ENVIADA pelo policial
+                // FOTO ENVIADA PELO POLICIAL (NOVA FOTO)
                 html += `
                     <div class="avaria-slot-card has-uploaded-photo" id="avariaSlotCard_${slot.id}">
                         <div class="avaria-slot-header">
                             <span>${slot.icon}</span>
                             <span style="font-weight: 800; color: #b91c1c;">${slot.label}</span>
                         </div>
-                        <div class="avaria-uploaded-thumb" onclick="openPhotoViewerModal('${photo.data}', { allowDownload: true, isAvaria: true, title: 'Nova Foto da Avaria - ${slot.label}', filename: 'Avaria_${currentAvariaVehicle}_${slot.label}.jpg' })" title="Toque para ampliar foto em tela cheia com zoom">
+                        <div class="avaria-uploaded-thumb" onclick="openPhotoViewerModal('${photo.data}', { title: 'Nova Foto da Avaria - ${slot.label}', filename: 'Avaria_${currentAvariaVehicle}_${slot.label}.jpg' })" title="Toque para ampliar foto em tela cheia com zoom">
                             <img src="${photo.data}" alt="${slot.label}" class="avaria-thumb-img">
                             <div class="avaria-thumb-overlay">
                                 <span>👁️ Ampliar Foto</span>
@@ -9708,7 +9809,7 @@
                             <span style="font-size: 0.72rem; font-weight: 800; color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac;">
                                 ✅ Foto Anexada
                             </span>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation(); removeCurrentAvariaPhoto('${slot.id}')" style="padding: 2px 8px; font-size: 0.72rem; min-height: 28px;" title="Remover esta foto">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation(); removeCurrentAvariaPhoto('${slot.id}')" style="padding: 2px 8px; font-size: 0.72rem; min-height: 28px;" title="Remover esta foto para tirar outra">
                                 🗑️ Remover
                             </button>
                         </div>
@@ -9721,7 +9822,7 @@
     }
 
     function finalizeAvariaReport() {
-        // Fecha imediatamente a janela de seleção de fotos para dar continuidade
+        // Fecha imediatamente a janela de fotos de avarias para dar continuidade
         const photoModal = document.getElementById('avariaPhotoSelectModal');
         if (photoModal) photoModal.style.display = 'none';
 
@@ -9773,7 +9874,10 @@
     }
 
     function confirmAvariaMilitarSubmit(event) {
-        if (event) event.preventDefault();
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
 
         const qraInput = document.getElementById('avariaQraInput');
         const errEl = document.getElementById('avariaMilitarError');
@@ -9800,7 +9904,7 @@
         const newAvaria = {
             id: Date.now(),
             vehicle: currentAvariaVehicle,
-            description: currentAvariaDescription,
+            description: currentAvariaDescription || 'Avaria constatada em inspeção',
             slots: finalSlots,
             photos: { ...currentAvariaPhotos }, // Novas fotos enviadas pelo policial
             militar: qra,
@@ -9815,7 +9919,7 @@
         vehicleAvarias[currentAvariaVehicle].unshift(newAvaria);
         localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
 
-        currentAvariaPhotos = {}; // Limpa fotos temporárias
+        currentAvariaPhotos = {}; // Limpa fotos temporárias de avaria
 
         const militarModal = document.getElementById('avariaMilitarModal');
         if (militarModal) militarModal.style.display = 'none';
@@ -9824,6 +9928,7 @@
         if (photoModal) photoModal.style.display = 'none';
 
         syncAllDataToOnline(true);
+        updateAdminBadgeUI();
 
         // Abre a janela final de aviso da reserva:
         openAvariaAlertModal(currentAvariaVehicle, qra);
@@ -9858,8 +9963,8 @@
             openQuickKmModal(vtr);
         }
     }
-
     
+
     // =========================================================================
     // 🚨 GESTÃO, NOTIFICAÇÃO E EXPORTAÇÃO DE AVARIAS OBSERVADAS
     // =========================================================================
@@ -10328,7 +10433,7 @@ function toggleAdminBaselineEditMode() {
             if (isAdminBaselineEditMode) {
                 adminHint.innerHTML = '<span style="color:#d97706; font-weight:800;">⚠️ Modo Edição ADM Ativo: Toque para alterar fotos fixas</span>';
             } else {
-                adminHint.textContent = 'Fotos Fixas (Sem opção de baixar)';
+                adminHint.textContent = 'Fotos Fixas de Referência';
             }
         }
 
@@ -10352,19 +10457,16 @@ function toggleAdminBaselineEditMode() {
                 let actionHtml = '';
                 if (isAdminAuthenticated && isAdminBaselineEditMode) {
                     actionHtml = `
-                        <button type="button" class="btn-slot-action view" onclick="openPhotoViewerModal('${slot.id}', { allowDownload: false, isAvaria: false, vehicle: currentInspectVehicle })" title="Visualizar Foto Fixa">
-                            👁️ Ver
-                        </button>
-                        <button type="button" class="btn-slot-action" onclick="triggerPhotoUpload('${slot.id}')" title="Substituir Foto Fixa">
-                            📷 Trocar
+                        <button type="button" class="btn-slot-action view" onclick="openPhotoViewerModal('${slot.id}', { vehicle: currentInspectVehicle })" title="Visualizar Foto Fixa">
+                            👁️ Ver Foto Fixa
                         </button>
                         <button type="button" class="btn-slot-action delete" onclick="deleteInspectionPhoto('${slot.id}')" title="Remover Foto Fixa">
-                            🗑️
+                            🗑️ Remover
                         </button>
                     `;
                 } else {
                     actionHtml = `
-                        <button type="button" class="btn-slot-action view" onclick="openPhotoViewerModal('${slot.id}', { allowDownload: false, isAvaria: false, vehicle: currentInspectVehicle })" title="Visualizar Foto Fixa de Referência" style="width: 100%;">
+                        <button type="button" class="btn-slot-action view" onclick="openPhotoViewerModal('${slot.id}', { vehicle: currentInspectVehicle })" title="Visualizar Foto Fixa de Referência" style="width: 100%;">
                             👁️ Ver Foto Fixa
                         </button>
                     `;
@@ -10757,14 +10859,7 @@ function toggleAdminBaselineEditMode() {
         }
 
         viewerCurrentData = photoData;
-        viewerAllowDownload = allowDownload;
         viewerCurrentFilename = filename;
-
-        // Configura visibilidade do botão Baixar (APENAS para fotos de avaria!)
-        const dlBtnHeader = document.getElementById('btnViewerDownloadHeader');
-        const dlBtnFloating = document.getElementById('btnViewerDownloadFloating');
-        if (dlBtnHeader) dlBtnHeader.style.display = allowDownload ? 'inline-flex' : 'none';
-        if (dlBtnFloating) dlBtnFloating.style.display = allowDownload ? 'inline-flex' : 'none';
 
         if (typeIcon) {
             typeIcon.textContent = allowDownload ? '🚨' : '📸';
@@ -10847,26 +10942,37 @@ function toggleAdminBaselineEditMode() {
             }
         });
 
-        // 📱 GESTOS DE TOQUE NO CELULAR: PINÇA DE 2 DEDOS (PINCH-TO-ZOOM ULTRA FLUIDO) E PAN
+        // 📱 GESTOS DE TOQUE NO CELULAR: PINÇA DE 2 DEDOS (PINCH-TO-ZOOM SUAVE) E PAN FLUIDO
         let initialDistance = 0;
         let startZoom = 1.0;
         let isPinching = false;
-        let lastTap = 0;
+        let initialMidX = 0, initialMidY = 0;
+        let lastTapTime = 0;
 
         function getTouchDistance(t1, t2) {
-            const dx = t1.clientX - t2.clientX;
-            const dy = t1.clientY - t2.clientY;
-            return Math.hypot(dx, dy);
+            return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        }
+
+        function getTouchMidpoint(t1, t2) {
+            return {
+                x: (t1.clientX + t2.clientX) / 2,
+                y: (t1.clientY + t2.clientY) / 2
+            };
         }
 
         container.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
-                // Início de pinça com dois dedos
+                e.preventDefault();
                 isPinching = true;
                 isViewerDragging = false;
                 initialDistance = getTouchDistance(e.touches[0], e.touches[1]);
                 startZoom = viewerZoom;
-                img.style.transition = 'none'; // Sem atraso!
+                const mid = getTouchMidpoint(e.touches[0], e.touches[1]);
+                initialMidX = mid.x;
+                initialMidY = mid.y;
+                viewerInitialPanX = viewerPanX;
+                viewerInitialPanY = viewerPanY;
+                img.style.transition = 'none';
             } else if (e.touches.length === 1) {
                 isPinching = false;
                 if (viewerZoom > 1.0) {
@@ -10884,12 +10990,14 @@ function toggleAdminBaselineEditMode() {
             if (e.touches.length === 2 && isPinching) {
                 e.preventDefault();
                 const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
+                const currentMid = getTouchMidpoint(e.touches[0], e.touches[1]);
                 if (initialDistance > 0) {
                     const ratio = currentDistance / initialDistance;
-                    // Escala contínua suave entre 1.0x e 6.0x
-                    let newZoom = Math.max(1.0, Math.min(6.0, startZoom * ratio));
-                    viewerZoom = newZoom;
-                    if (viewerZoom === 1.0) {
+                    viewerZoom = Math.max(1.0, Math.min(6.0, startZoom * ratio));
+                    // Panning acompanha o movimento do ponto médio durante a pinça sem saltos
+                    viewerPanX = viewerInitialPanX + (currentMid.x - initialMidX);
+                    viewerPanY = viewerInitialPanY + (currentMid.y - initialMidY);
+                    if (viewerZoom <= 1.0) {
                         viewerPanX = 0;
                         viewerPanY = 0;
                     }
@@ -10904,41 +11012,48 @@ function toggleAdminBaselineEditMode() {
         }, { passive: false });
 
         container.addEventListener('touchend', (e) => {
-            if (e.touches.length < 2) {
+            if (e.touches.length === 1) {
+                // Transição suave de 2 dedos para 1 dedo: reancora o ponto inicial de arrasto sem saltos!
                 isPinching = false;
-                initialDistance = 0;
-            }
-            if (e.touches.length === 0) {
+                isViewerDragging = true;
+                viewerStartX = e.touches[0].clientX;
+                viewerStartY = e.touches[0].clientY;
+                viewerInitialPanX = viewerPanX;
+                viewerInitialPanY = viewerPanY;
+            } else if (e.touches.length === 0) {
+                isPinching = false;
                 isViewerDragging = false;
-                img.style.transition = 'transform 0.15s ease-out';
-                if (viewerZoom < 1.05) {
+                img.style.transition = 'transform 0.2s ease-out';
+                if (viewerZoom <= 1.05) {
                     resetViewerZoom();
                 }
                 updateViewerTransform();
             }
         }, { passive: true });
 
-        // Toque duplo para alternar zoom (1x <-> 2.8x)
+        // Toque duplo rápido para alternar zoom (1x <-> 2.8x) suavemente
         container.addEventListener('touchend', (e) => {
             if (e.changedTouches.length === 1 && !isPinching) {
                 const now = Date.now();
-                if (now - lastTap < 300) {
+                if (now - lastTapTime < 320) {
                     e.preventDefault();
                     img.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
                     if (viewerZoom > 1.1) {
                         resetViewerZoom();
                     } else {
                         viewerZoom = 2.8;
+                        viewerPanX = 0;
+                        viewerPanY = 0;
                         updateViewerTransform();
                     }
-                    lastTap = 0;
+                    lastTapTime = 0;
                     return;
                 }
-                lastTap = now;
+                lastTapTime = now;
             }
         });
     }
-
+    
     // Inicialização Completa
     applyTheme(currentTheme);
     updateAdminBadgeUI();
