@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- 🚫 METATAGS ANTI-CACHE TOTAL: IMPEDE O CELULAR DE GUARDAR VERSÕES ANTIGAS -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title id="pageTitle">🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN - Painel da Frota</title>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,7 +17,38 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>
+        // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
+            const APP_VERSION = "2026.10.21.v5";
+
+            // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(regs) {
+                    for (var i = 0; i < regs.length; i++) {
+                        regs[i].unregister();
+                    }
+                }).catch(function() {});
+            }
+
+            // 2. Limpa CacheStorage da Cache API se houver
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (var i = 0; i < names.length; i++) {
+                        caches.delete(names[i]);
+                    }
+                }).catch(function() {});
+            }
+
+            // 3. Atualização de versão do aplicativo
+            try {
+                const storedVer = localStorage.getItem('oleo_vtr_app_version');
+                if (storedVer !== APP_VERSION) {
+                    localStorage.setItem('oleo_vtr_app_version', APP_VERSION);
+                    sessionStorage.clear();
+                    localStorage.removeItem('oleo_vtr_active_endpoint');
+                }
+            } catch(e) {}
+
             const savedTheme = localStorage.getItem('oleo_vtr_theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
@@ -1687,39 +1724,88 @@
             .input-btn-group { flex-direction: row; width: 100%; }
             .input-btn-group select { flex: 1 1 140px; min-width: 0; }
             .btn { padding: 10px 14px; font-size: 0.85rem; min-height: 44px; }
+            /* 📱 POLÍTICA ANTI-VAZAMENTO: TODAS AS JANELAS 100% ENQUADRADAS NO CELULAR */
             .modal-overlay { 
-                padding: 6px !important; 
+                position: fixed !important;
+                top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                height: 100dvh !important;
+                max-width: 100vw !important;
+                max-height: 100dvh !important;
+                padding: 8px !important; 
                 padding-top: max(8px, env(safe-area-inset-top, 8px)) !important; 
-                padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important; 
-                align-items: flex-start !important; 
-                overflow-y: auto !important; 
-                overscroll-behavior: contain !important; 
+                padding-bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important; 
+                padding-left: max(8px, env(safe-area-inset-left, 8px)) !important; 
+                padding-right: max(8px, env(safe-area-inset-right, 8px)) !important; 
+                align-items: center !important; 
+                justify-content: center !important; 
+                overflow: hidden !important; 
+                box-sizing: border-box !important;
             }
             .modal-card { 
                 padding: 0 !important; 
                 margin: auto !important; 
-                margin-top: max(6px, env(safe-area-inset-top, 6px)) !important; 
-                margin-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important; 
-                max-height: calc(100dvh - 20px) !important; 
-                max-height: calc(100vh - 20px) !important; 
-                width: 98% !important; 
-                max-width: 98% !important; 
+                height: 88dvh !important; 
+                max-height: 88dvh !important; 
+                height: 88vh !important; 
+                max-height: 88vh !important; 
+                width: 96% !important; 
+                max-width: 560px !important; 
                 border-radius: 12px !important; 
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
+                position: relative !important;
+            }
+            .modal-card.modal-alert-card {
+                height: auto !important;
+                max-height: 85dvh !important;
+                overflow-y: auto !important;
+            }
+            .modal-card > form {
+                display: flex !important;
+                flex-direction: column !important;
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                height: 100% !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             .modal-header {
+                flex-shrink: 0 !important;
                 padding: 10px 14px !important;
+                background: var(--card-bg, #ffffff) !important;
+                border-bottom: 1.5px solid var(--border) !important;
+                z-index: 20 !important;
             }
             .modal-title {
-                font-size: 1.02rem !important;
+                font-size: 1rem !important;
             }
             .modal-body {
-                padding: 12px 14px !important;
-                gap: 10px !important;
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                overscroll-behavior: contain !important;
+                padding: 10px 12px 65px 12px !important;
+                gap: 8px !important;
+                box-sizing: border-box !important;
             }
             .modal-footer {
-                padding: 10px 14px !important;
-                padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+                flex-shrink: 0 !important;
+                position: sticky !important;
+                bottom: 0 !important;
+                background: var(--card-bg, #ffffff) !important;
+                border-top: 2px solid var(--border) !important;
+                padding: 10px 12px !important;
+                padding-bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
                 gap: 8px !important;
+                z-index: 20 !important;
+                box-shadow: 0 -3px 12px rgba(0,0,0,0.12) !important;
+                box-sizing: border-box !important;
             }
             .modal-footer .btn {
                 min-height: 46px !important;
@@ -2710,21 +2796,23 @@
             padding: 8px !important;
         }
 
-        #avariaPhotoSelectModal .modal-card {
+        #avariaPhotoSelectModal .modal-card, #avariaTextModal .modal-card, #avariaMilitarModal .modal-card {
             display: flex !important;
             flex-direction: column !important;
             overflow: hidden !important;
             padding: 0 !important;
             gap: 0 !important;
-            max-height: 86dvh !important;
-            max-height: 86vh !important;
-            height: auto !important;
-            max-width: 600px !important;
+            height: 88dvh !important;
+            max-height: 88dvh !important;
+            height: 88vh !important;
+            max-height: 88vh !important;
+            max-width: 560px !important;
             width: 96% !important;
-            border-radius: 14px !important;
+            border-radius: 12px !important;
             position: relative !important;
             margin: auto !important;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45) !important;
+            box-sizing: border-box !important;
         }
 
         #avariaPhotoSelectModal .modal-header, #avariaTextModal .modal-header, #avariaMilitarModal .modal-header {
@@ -2734,16 +2822,18 @@
             z-index: 50 !important;
             background: var(--card-bg, #ffffff) !important;
             border-bottom: 1.5px solid var(--border) !important;
-            padding: 12px 18px !important;
+            padding: 10px 14px !important;
+            box-sizing: border-box !important;
         }
 
-        #avariaPhotoSelectModal .modal-body {
+        #avariaPhotoSelectModal .modal-body, #avariaTextModal .modal-body, #avariaMilitarModal .modal-body {
             flex: 1 1 auto !important;
             min-height: 0 !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch !important;
             overscroll-behavior: contain !important;
-            padding: 14px 18px !important;
+            padding: 10px 12px 65px 12px !important;
+            box-sizing: border-box !important;
         }
 
         #avariaPhotoSelectModal .modal-footer, #avariaTextModal .modal-footer, #avariaMilitarModal .modal-footer {
@@ -2753,9 +2843,9 @@
             z-index: 50 !important;
             background: var(--card-bg, #ffffff) !important;
             border-top: 2px solid var(--border) !important;
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12) !important;
-            padding: 12px 18px !important;
-            padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.16) !important;
+            padding: 10px 14px !important;
+            padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
             box-sizing: border-box !important;
         }
 
@@ -4080,27 +4170,30 @@
 <!-- 📸 3. MODAL: SELEÇÃO DA FOTO COM OS TICKS (Dianteira, Traseira, etc.)      -->
 <!-- ========================================================================= -->
 <div id="avariaPhotoSelectModal" class="modal-overlay" style="z-index: 10054;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 580px; width: 96%;" onclick="event.stopPropagation()">
+    <div class="modal-card" style="max-width: 560px; width: 96%; height: 88dvh; max-height: 88dvh;" onclick="event.stopPropagation()">
         <div class="modal-header" style="padding: 10px 14px;">
             <div class="modal-title" style="font-size: 1.02rem; font-weight: 900; color: #dc2626; line-height: 1.3;">
-                <span>Selecione a foto onde consta a alteração</span>
+                <span>📸 Anexar Foto da Avaria Constatada</span>
             </div>
             <button type="button" class="modal-close" onclick="cancelAvariaPhotoSelectToPrevious()" title="Voltar para a janela anterior">✖</button>
         </div>
 
-        <div class="modal-body" style="padding: 10px 14px;">
+        <div class="modal-body" style="padding: 10px 12px 75px 12px;">
+            <!-- BANNER DINÂMICO DE SUCESSO AO ANEXAR FOTO (SEMPRE NO TOPO) -->
+            <div id="avariaPhotoTopBanner" style="display: none; background: #dcfce7; border: 1.5px solid #86efac; border-radius: 8px; padding: 8px 12px; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;"></div>
+
             <div style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 6px 10px; margin-bottom: 4px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
                     <span style="font-size: 0.78rem; font-weight: 800; color: #991b1b; text-transform: uppercase;">Viatura: <strong id="avariaPhotoVtrBadge" style="color: #1e3a8a;">--</strong></span>
                     <span class="badge badge-danger" style="font-size: 0.68rem; font-weight: 700; padding: 1px 6px;">🚨 Registro de Avaria</span>
                 </div>
                 <div style="font-size: 0.8rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">
-                    <strong>Avaria:</strong> <span id="avariaPhotoConfirmedDesc">--</span>
+                    <strong>Avaria relatada:</strong> <span id="avariaPhotoConfirmedDesc">--</span>
                 </div>
             </div>
 
             <p style="font-size: 0.78rem; color: var(--text-main); font-weight: 700; margin: 0 0 4px 0;">
-                Envie a nova foto no campo correspondente onde consta a alteração:
+                Toque em <strong>Câmera</strong> ou <strong>Galeria</strong> no campo correspondente para enviar a foto:
             </p>
 
             <!-- Grid compacto com os campos vazios para envio de nova foto -->
@@ -4112,11 +4205,12 @@
             <input type="file" id="avariaSlotFileInput" accept="image/*" style="display: none;" onchange="onAvariaSlotFileChosen(event)">
         </div>
 
-        <div class="modal-footer" style="flex-shrink: 0 !important; position: sticky !important; bottom: 0 !important; z-index: 100 !important; display: flex !important; gap: 8px !important; width: 100% !important; justify-content: space-between !important; align-items: center !important; background: var(--card-bg, #ffffff) !important; border-top: 2.5px solid #cbd5e1 !important; padding: 10px 14px !important; box-shadow: 0 -4px 14px rgba(0,0,0,0.18) !important;">
-            <button type="button" class="btn btn-outline btn-3d" style="min-height: 44px; font-weight: 700; font-size: 0.9rem; border-color: #cbd5e1; color: var(--text-muted); padding: 8px 14px;" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
+        <!-- RODAPÉ PERMANENTEMENTE VISÍVEL E FIXADO NA BASE DO MODAL -->
+        <div class="modal-footer" id="avariaPhotoSelectFooter" style="flex-shrink: 0 !important; position: sticky !important; bottom: 0 !important; z-index: 100 !important; display: flex !important; gap: 8px !important; width: 100% !important; justify-content: space-between !important; align-items: center !important; background: var(--card-bg, #ffffff) !important; border-top: 2.5px solid #cbd5e1 !important; padding: 10px 14px !important; box-shadow: 0 -4px 16px rgba(0,0,0,0.2) !important;">
+            <button type="button" class="btn btn-outline btn-3d" style="min-height: 48px; font-weight: 700; font-size: 0.92rem; border-color: #cbd5e1; color: var(--text-muted); padding: 8px 14px;" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
                 ↩️ Cancelar
             </button>
-            <button type="button" class="btn btn-success btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 46px; font-weight: 800; font-size: 1rem; justify-content: center; gap: 6px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
+            <button type="button" class="btn btn-success btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 48px; font-weight: 800; font-size: 1.02rem; justify-content: center; gap: 6px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
                 <span>✅</span>
                 <span>Finalizar Observação</span>
             </button>
@@ -4127,17 +4221,17 @@
 <!-- ========================================================================= -->
 <!-- 👮 MODAL: NOME QRA DO MILITAR QUE CONSTATOU A AVARIA                       -->
 <!-- ========================================================================= -->
-<div id="avariaMilitarModal" class="modal-overlay" style="z-index: 10058;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 460px; width: 95%;" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <div class="modal-title" style="font-size: 1.15rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+<div id="avariaMilitarModal" class="modal-overlay" style="z-index: 10099;" onclick="/* exclusivo pelos botões */">
+    <div class="modal-card" style="max-width: 480px; width: 95%; max-height: 85dvh;" onclick="event.stopPropagation()">
+        <div class="modal-header" style="padding: 10px 14px;">
+            <div class="modal-title" style="font-size: 1.08rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px;">
                 <span>👮 Militar que Constatou a Avaria</span>
             </div>
-            <button type="button" class="modal-close" onclick="closeAvariaMilitarModal()" title="Voltar">✖</button>
+            <button type="button" class="modal-close" onclick="closeAvariaMilitarModal()" title="Cancelar e Voltar">✖</button>
         </div>
 
         <form id="avariaMilitarForm" onsubmit="confirmAvariaMilitarSubmit(event)">
-            <div class="modal-body" style="gap: 14px;">
+            <div class="modal-body" style="gap: 12px; padding: 14px;">
                 <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Viatura Inspecionada:</span>
                     <span id="avariaMilitarVtrTitle" style="font-size: 1.15rem; font-weight: 900; color: #b91c1c;">--</span>
@@ -4155,12 +4249,13 @@
                 </div>
             </div>
 
-            <div class="modal-footer" style="display: flex; justify-content: space-between; gap: 10px;">
-                <button type="button" class="btn btn-outline btn-3d" style="min-height: 48px; font-weight: 700; padding: 10px 20px;" onclick="closeAvariaMilitarModal()">
-                    ↩️ Voltar
+            <div class="modal-footer" style="display: flex; justify-content: space-between; gap: 10px; width: 100%;">
+                <button type="button" class="btn btn-outline btn-3d" style="min-height: 48px; font-weight: 700; font-size: 0.95rem; padding: 10px 20px; border-color: #cbd5e1; color: var(--text-muted);" onclick="closeAvariaMilitarModal()">
+                    ✖ Cancelar
                 </button>
-                <button type="submit" class="btn btn-primary btn-3d" style="flex: 1; font-weight: 800; font-size: 1.05rem; min-height: 48px;">
-                    💾 Finalizar
+                <button type="submit" class="btn btn-success btn-3d" style="flex: 1; font-weight: 800; font-size: 1.05rem; min-height: 48px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; justify-content: center; gap: 8px;">
+                    <span>💾</span>
+                    <span>Finalizar</span>
                 </button>
             </div>
         </form>
@@ -4764,7 +4859,44 @@
     let adminPasswordResolveCallback = null;
     let isAdminAuthenticated = sessionStorage.getItem('oleo_vtr_admin_auth') === 'true';
     // State variables declared at the top of the script (avoiding TDZ ReferenceError)
-    let vehiclePhotos = JSON.parse(localStorage.getItem('oleo_vtr_vehicle_photos') || '{}');
+    // 🛡️ RECARREGAMENTO LIMPO E DESCARTE DE CACHE ANTIGO NO CELULAR
+    async function forceCleanReloadApp() {
+        if (typeof showToast === 'function') {
+            showToast('🧹 <strong>Limpando cache do celular e recarregando...</strong>');
+        }
+        try {
+            if ('serviceWorker' in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                for (const r of regs) {
+                    await r.unregister();
+                }
+            }
+            if ('caches' in window) {
+                const keys = await caches.keys();
+                for (const k of keys) {
+                    await caches.delete(k);
+                }
+            }
+            sessionStorage.clear();
+            localStorage.removeItem('oleo_vtr_active_endpoint');
+        } catch(e) {}
+
+        const baseUrl = window.location.href.split('#')[0].split('?')[0];
+        const nocacheUrl = baseUrl + '?_nocache=' + Date.now();
+        setTimeout(() => {
+            window.location.replace(nocacheUrl);
+        }, 300);
+    }
+
+    let vehiclePhotos = {};
+    try {
+        const rawP = localStorage.getItem('oleo_vtr_vehicle_photos');
+        vehiclePhotos = rawP ? JSON.parse(rawP) : {};
+        if (!vehiclePhotos || typeof vehiclePhotos !== 'object' || Array.isArray(vehiclePhotos)) {
+            vehiclePhotos = {};
+        }
+    } catch(e) { vehiclePhotos = {}; }
+
     (function normalizeStoredPhotoLabels() {
         try {
             if (vehiclePhotos && typeof vehiclePhotos === 'object') {
@@ -4796,7 +4928,46 @@
             }
         } catch(e) {}
     })();
-    let vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
+
+    let vehicleAvarias = {};
+    try {
+        const rawA = localStorage.getItem('oleo_vtr_avarias');
+        vehicleAvarias = rawA ? JSON.parse(rawA) : {};
+        if (!vehicleAvarias || typeof vehicleAvarias !== 'object' || Array.isArray(vehicleAvarias)) {
+            vehicleAvarias = {};
+        }
+    } catch(e) { vehicleAvarias = {}; }
+
+    // 🛡️ NORMALIZAÇÃO E SANITIZAÇÃO DE AVARIAS PARA PREVENIR ERROS DE FOREACH NO CELULAR
+    (function normalizeStoredAvarias() {
+        try {
+            let changed = false;
+            Object.keys(vehicleAvarias).forEach(vtr => {
+                const val = vehicleAvarias[vtr];
+                if (!val) {
+                    delete vehicleAvarias[vtr];
+                    changed = true;
+                } else if (!Array.isArray(val)) {
+                    if (typeof val === 'object' && (val.description || val.slots || val.photos)) {
+                        vehicleAvarias[vtr] = [val];
+                        changed = true;
+                    } else {
+                        delete vehicleAvarias[vtr];
+                        changed = true;
+                    }
+                } else {
+                    const valid = val.filter(item => item && typeof item === 'object');
+                    if (valid.length !== val.length) {
+                        vehicleAvarias[vtr] = valid;
+                        changed = true;
+                    }
+                }
+            });
+            if (changed) {
+                localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+            }
+        } catch(e) {}
+    })();
     // currentInspectVehicle and currentUploadSlotId declared at top of script
     let currentAvariaVehicle = null;
     let currentAvariaDescription = '';
@@ -5319,7 +5490,7 @@
                 let fetchUrl = endpoint;
                 if (method === 'GET') {
                     const sep = endpoint.includes('?') ? '&' : '?';
-                    fetchUrl = `${endpoint}${sep}_nocache=${Date.now()}`;
+                    fetchUrl = `${endpoint}${sep}_nocache=${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
                 }
 
                 const reqOpts = {
@@ -5328,7 +5499,8 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache'
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
                     },
                     cache: 'no-store',
                     signal: controller.signal
@@ -5367,7 +5539,9 @@
             targetMap: obj.targetMap || {},
             mileageHistory: obj.mileageHistory || [],
             vehiclePhotos: obj.vehiclePhotos || {},
-            vehicleAvarias: obj.vehicleAvarias || {}
+            vehicleAvarias: obj.vehicleAvarias || {},
+            updatedAt: obj.updatedAt || '',
+            lastStatusUpdate: obj.lastStatusUpdate || ''
         };
         return JSON.stringify(clean);
     }
@@ -5520,27 +5694,14 @@
             localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
         }
         // Atualização não-destrutiva de fotos e avarias (evita apagar avarias locais se o servidor retornar vazio):
-        if (data && data.vehiclePhotos && typeof data.vehiclePhotos === 'object' && Object.keys(data.vehiclePhotos).length > 0) {
-            vehiclePhotos = data.vehiclePhotos;
+        // Nuvem Online é a FONTE DA VERDADE ÚNICA: sincronização direta e fidedigna
+        if (data && data.vehiclePhotos !== undefined) {
+            vehiclePhotos = (data.vehiclePhotos && typeof data.vehiclePhotos === 'object') ? data.vehiclePhotos : {};
             localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
         }
 
-        if (data && data.vehicleAvarias && typeof data.vehicleAvarias === 'object' && Object.keys(data.vehicleAvarias).length > 0) {
-            // Mescla inteligente: mantém avarias locais e adiciona remotas
-            Object.keys(data.vehicleAvarias).forEach(vtr => {
-                const remoteList = Array.isArray(data.vehicleAvarias[vtr]) ? data.vehicleAvarias[vtr] : [data.vehicleAvarias[vtr]];
-                if (!vehicleAvarias[vtr]) {
-                    vehicleAvarias[vtr] = remoteList;
-                } else {
-                    const localIds = new Set(vehicleAvarias[vtr].map(a => a.id));
-                    remoteList.forEach(rAv => {
-                        if (!localIds.has(rAv.id)) {
-                            vehicleAvarias[vtr].push(rAv);
-                        }
-                    });
-                    vehicleAvarias[vtr].sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date));
-                }
-            });
+        if (data && data.vehicleAvarias !== undefined) {
+            vehicleAvarias = (data.vehicleAvarias && typeof data.vehicleAvarias === 'object') ? data.vehicleAvarias : {};
             localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
         }
 
@@ -5580,6 +5741,7 @@
             const res = await executeApiRequest('GET');
 
             if (!res.success) {
+                hasInitialCloudLoadCompleted = true;
                 setCloudStatusBadge('disconnected', 'Modo Local (Offline)');
                 if (!isBackground) {
                     showToast(`⚠️ <strong>Servidor Offline:</strong> ${res.error || 'Não foi possível carregar os dados online.'}`);
@@ -5588,6 +5750,7 @@
             }
 
             const data = res.data;
+            hasInitialCloudLoadCompleted = true;
             if (data && typeof data === 'object' && Object.keys(data).length > 0 && (Array.isArray(data.records) || data.vehicles || data.appTitle)) {
                 applyOnlineData(data, isBackground);
             } else {
@@ -5599,12 +5762,17 @@
                 }
             }
         } catch (err) {
+            hasInitialCloudLoadCompleted = true;
             setCloudStatusBadge('disconnected', 'Modo Local (Offline)');
         }
     }
 
+    let hasInitialCloudLoadCompleted = false;
+
     async function syncAllDataToOnline(force = false) {
         if (isRemoteUpdate && !force) return;
+        // 🛡️ Proteção anti-sobrescrita: não empurra dados locais antigos até que a nuvem seja consultada
+        if (!hasInitialCloudLoadCompleted && !force) return;
 
         const payload = {
             records: records || [],
@@ -5650,17 +5818,22 @@
 
         window.addEventListener('focus', () => { 
             initFirebaseRealtimeStream();
-            loadDataFromOnline(false); 
+            loadDataFromOnline(true); 
         });
         window.addEventListener('online', () => { 
             initFirebaseRealtimeStream();
-            loadDataFromOnline(false); 
+            loadDataFromOnline(true); 
         });
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 initFirebaseRealtimeStream();
-                loadDataFromOnline(false);
+                loadDataFromOnline(true);
             }
+        });
+        // 📱 Mobile bfcache (retorno de outra aba ou desbloqueio de tela do celular)
+        window.addEventListener('pageshow', () => {
+            initFirebaseRealtimeStream();
+            loadDataFromOnline(true);
         });
     }
 
@@ -6105,8 +6278,19 @@
     const todayStr = new Date().toISOString().slice(0,10);
     document.getElementById('date').value = todayStr;
 
-    let records = JSON.parse(localStorage.getItem('oleo_vtr_records') || '[]');
-    let mileageHistory = JSON.parse(localStorage.getItem('oleo_vtr_mileage_history') || '[]');
+    let records = [];
+    try {
+        const rawR = localStorage.getItem('oleo_vtr_records');
+        records = rawR ? JSON.parse(rawR) : [];
+        if (!Array.isArray(records)) records = [];
+    } catch(e) { records = []; }
+
+    let mileageHistory = [];
+    try {
+        const rawH = localStorage.getItem('oleo_vtr_mileage_history');
+        mileageHistory = rawH ? JSON.parse(rawH) : [];
+        if (!Array.isArray(mileageHistory)) mileageHistory = [];
+    } catch(e) { mileageHistory = []; }
 
     let barChartInstance = null;
     let doughnutChartInstance = null;
@@ -9384,18 +9568,18 @@
     }
 
     async function syncDatabaseNow() {
-        showToast('🔄 <strong>Sincronizando banco de dados...</strong>');
+        showToast('🔄 <strong>Sincronizando com a nuvem...</strong>');
         setCloudStatusBadge('syncing', 'Sincronizando...');
         try {
+            initFirebaseRealtimeStream();
             await loadDataFromOnline(false);
-            await syncAllDataToOnline(true);
             if (googleAccessToken && typeof autoSyncToGoogleDrive === 'function') {
                 await autoSyncToGoogleDrive(false);
             }
             renderDashboard();
             renderMileageTable();
             renderVehicleMiniCards();
-            showToast('✅ <strong>Banco de dados 100% sincronizado!</strong>');
+            showToast('✅ <strong>Banco de dados atualizado com a nuvem!</strong>');
         } catch (e) {
             console.error('Erro na sincronização:', e);
             showToast('⚠️ Erro na sincronização: ' + e.message);
@@ -9853,7 +10037,7 @@
                 // CAMPO VAZIO COMPACTO COM BOTÕES DIRETOS
                 html += `
                     <div class="avaria-slot-card" id="avariaSlotCard_${slot.id}">
-                        <div class="avaria-slot-header" style="font-size: 0.75rem; margin-bottom: 4px;">
+                        <div class="avaria-slot-header" style="font-size: 0.74rem; margin-bottom: 3px;">
                             <span>${slot.icon}</span>
                             <span style="font-weight: 800;">${slot.label}</span>
                         </div>
@@ -9873,14 +10057,14 @@
                     </div>
                 `;
             } else {
-                // FOTO ANEXADA COMPACTA
+                // FOTO ANEXADA: INCLUI BOTÃO "FINALIZAR" DIRETO NO CARD PARA NUNCA SUMIR NO CELULAR
                 html += `
                     <div class="avaria-slot-card has-uploaded-photo" id="avariaSlotCard_${slot.id}">
-                        <div class="avaria-slot-header" style="font-size: 0.75rem; margin-bottom: 4px;">
+                        <div class="avaria-slot-header" style="font-size: 0.74rem; margin-bottom: 3px;">
                             <span>${slot.icon}</span>
                             <span style="font-weight: 800; color: #b91c1c;">${slot.label}</span>
                         </div>
-                        <div class="avaria-uploaded-thumb" onclick="openPhotoViewerModal('${photo.data}', { title: 'Foto da Avaria - ${slot.label}', filename: 'Avaria_${currentAvariaVehicle}_${slot.label}.jpg' })" title="Toque para ver a foto com zoom" style="height: 65px; border-radius: 6px;">
+                        <div class="avaria-uploaded-thumb" onclick="openPhotoViewerModal('${photo.data}', { title: 'Foto da Avaria - ${slot.label}', filename: 'Avaria_${currentAvariaVehicle}_${slot.label}.jpg' })" title="Toque para ver a foto com zoom" style="height: 60px; border-radius: 6px;">
                             <img src="${photo.data}" alt="${slot.label}" class="avaria-thumb-img">
                             <div class="avaria-thumb-overlay" style="padding: 2px; font-size: 0.65rem;">
                                 <span>👁️ Ampliar</span>
@@ -9894,6 +10078,10 @@
                                 🗑️ Trocar
                             </button>
                         </div>
+                        <!-- BOTÃO FINALIZAR DIRETO NO CARD ONDE A FOTO FOI COLOCADA -->
+                        <button type="button" class="btn btn-success btn-3d" onclick="finalizeAvariaReport()" style="width: 100%; min-height: 38px; font-size: 0.8rem; font-weight: 800; margin-top: 5px; padding: 4px 6px; justify-content: center; gap: 4px; background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(22, 163, 74, 0.35);">
+                            <span>✅</span> <span>Finalizar e Seguir ➔</span>
+                        </button>
                     </div>
                 `;
             }
@@ -9901,11 +10089,29 @@
 
         grid.innerHTML = html;
 
+        // Atualiza dinamicamente o banner de aviso no topo da lista
+        const topBanner = document.getElementById('avariaPhotoTopBanner');
+        if (topBanner) {
+            if (countPhotos > 0) {
+                topBanner.style.display = 'flex';
+                topBanner.innerHTML = `
+                    <div style="font-size: 0.82rem; font-weight: 800; color: #166534; display: flex; align-items: center; gap: 6px;">
+                        <span>📸</span> <span>${countPhotos} foto${countPhotos > 1 ? 's' : ''} anexada${countPhotos > 1 ? 's' : ''}!</span>
+                    </div>
+                    <button type="button" class="btn btn-success btn-3d" onclick="finalizeAvariaReport()" style="min-height: 36px; padding: 4px 12px; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; border-radius: 6px; white-space: nowrap;">
+                        ✅ Finalizar ➔
+                    </button>
+                `;
+            } else {
+                topBanner.style.display = 'none';
+            }
+        }
+
         // Atualiza dinamicamente o botão Finalizar no rodapé fixo
         const btnFinalizar = document.getElementById('btnFinalizarObservacao');
         if (btnFinalizar) {
             if (countPhotos > 0) {
-                btnFinalizar.innerHTML = `<span>✅</span> <span>Finalizar Observação (${countPhotos} foto${countPhotos > 1 ? 's' : ''})</span>`;
+                btnFinalizar.innerHTML = `<span>✅</span> <span>Finalizar Observação (${countPhotos} foto${countPhotos > 1 ? 's' : ''}) ➔</span>`;
             } else {
                 btnFinalizar.innerHTML = `<span>✅</span> <span>Finalizar Observação</span>`;
             }
@@ -9913,27 +10119,43 @@
     }
 
     function finalizeAvariaReport() {
-        // Fecha imediatamente a janela de fotos de avarias para dar continuidade
+        // 1. Esconde IMEDIATAMENTE e FORÇADAMENTE a janela de fotos de avarias
         const photoModal = document.getElementById('avariaPhotoSelectModal');
-        if (photoModal) photoModal.style.display = 'none';
+        if (photoModal) {
+            photoModal.style.setProperty('display', 'none', 'important');
+        }
 
-        // Abre diretamente o modal que solicita o QRA do militar
+        // 2. Esconde todas as outras janelas anteriores
+        const inspectModal = document.getElementById('vehicleInspectionModal');
+        if (inspectModal) {
+            inspectModal.style.setProperty('display', 'none', 'important');
+        }
+        const textModal = document.getElementById('avariaTextModal');
+        if (textModal) {
+            textModal.style.setProperty('display', 'none', 'important');
+        }
+        const promptModal = document.getElementById('avariaPromptModal');
+        if (promptModal) {
+            promptModal.style.setProperty('display', 'none', 'important');
+        }
+
+        // 3. Abre diretamente a janela para perguntar o QRA do militar
         openAvariaMilitarModal();
     }
 
     function openAvariaMilitarModal() {
-        // Garante que todas as janelas de fotos e inspeção fiquem fechadas
+        // Garante que TODAS as outras janelas de fotos e inspeção fiquem 100% fechadas
         const photoModal = document.getElementById('avariaPhotoSelectModal');
-        if (photoModal) photoModal.style.display = 'none';
+        if (photoModal) photoModal.style.setProperty('display', 'none', 'important');
 
         const inspectModal = document.getElementById('vehicleInspectionModal');
-        if (inspectModal) inspectModal.style.display = 'none';
+        if (inspectModal) inspectModal.style.setProperty('display', 'none', 'important');
 
         const textModal = document.getElementById('avariaTextModal');
-        if (textModal) textModal.style.display = 'none';
+        if (textModal) textModal.style.setProperty('display', 'none', 'important');
 
         const promptModal = document.getElementById('avariaPromptModal');
-        if (promptModal) promptModal.style.display = 'none';
+        if (promptModal) promptModal.style.setProperty('display', 'none', 'important');
 
         const modal = document.getElementById('avariaMilitarModal');
         const vtrEl = document.getElementById('avariaMilitarVtrTitle');
@@ -9950,18 +10172,25 @@
             qraInput.value = savedQra;
         }
 
-        if (modal) modal.style.display = 'flex';
-        setTimeout(() => {
-            if (qraInput) qraInput.focus();
-        }, 120);
+        if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.style.zIndex = '10099';
+            const card = modal.querySelector('.modal-card');
+            if (card) {
+                card.scrollTop = 0;
+            }
+        }
     }
 
     function closeAvariaMilitarModal() {
         const modal = document.getElementById('avariaMilitarModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) modal.style.setProperty('display', 'none', 'important');
 
+        // Retorna para a tela de seleção de fotos da avaria caso queira adicionar mais fotos
         const photoModal = document.getElementById('avariaPhotoSelectModal');
-        if (photoModal) photoModal.style.display = 'flex';
+        if (photoModal) {
+            photoModal.style.setProperty('display', 'flex', 'important');
+        }
     }
 
     function confirmAvariaMilitarSubmit(event) {
@@ -10539,7 +10768,8 @@ function toggleAdminBaselineEditMode() {
         // 🚨 RENDERIZAÇÃO DO SETOR 2: FOTOS DE AVARIAS CONSTATADAS NESTA VIATURA
         // =========================================================================
         if (avariasListEl) {
-            const vAvarias = vehicleAvarias[currentInspectVehicle] || [];
+            const rawAvarias = vehicleAvarias[currentInspectVehicle] || [];
+            const vAvarias = Array.isArray(rawAvarias) ? rawAvarias : (typeof rawAvarias === 'object' && rawAvarias !== null ? [rawAvarias] : []);
             if (avariasBadge) {
                 avariasBadge.textContent = `${vAvarias.length} avaria(s)`;
             }
