@@ -2515,6 +2515,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            cursor: pointer;
         }
 
         .avaria-thumb-img {
@@ -3578,15 +3580,15 @@
                     <div id="inspectModalVehicleKm" style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">KM Atual: --</div>
                 </div>
                 <div id="inspectModalPhotoCountBadge" class="badge badge-info" style="font-size: 0.82rem; font-weight: 700;">
-                    0 de 6 fotos salvas
+                    0 de 8 fotos salvas
                 </div>
             </div>
 
             <p id="inspectModalDesc" style="font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
-                📷 <strong>Fotos da viatura (6 posições):</strong> Toque em qualquer foto salva para visualizar em tela cheia (livre para todos).
+                📷 <strong>Fotos da viatura (8 posições):</strong> Toque em qualquer foto salva para visualizar em tela cheia (livre para todos).
             </p>
 
-            <!-- Grid com as 6 Fotos da Viatura -->
+            <!-- Grid com as 8 Fotos da Viatura -->
             <div id="inspectionSlotsGrid" class="inspection-grid"></div>
 
             <input type="file" id="inspectionFileInput" accept="image/*" capture="environment" style="display: none;" onchange="onInspectionFileChosen(event)">
@@ -3651,7 +3653,10 @@
                 <textarea id="avariaDescriptionInput" rows="4" placeholder="Descreva aqui os detalhes da avaria observada..." style="width: 100%; font-size: 1rem; padding: 12px; border: 2px solid var(--border); border-radius: 8px; resize: vertical; box-sizing: border-box;"></textarea>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; gap: 10px;">
+                <button type="button" class="btn btn-outline btn-3d" style="min-height: 44px; padding: 8px 20px; font-weight: 700; border-color: #cbd5e1;" onclick="closeAvariaTextModal()">
+                    ↩️ Cancelar
+                </button>
                 <button type="button" id="btnSubmitAvariaText" class="btn btn-primary btn-3d" style="min-height: 46px; padding: 10px 28px; font-weight: 800; font-size: 1rem;" onclick="submitAvariaText()">
                     ✉️ Enviar
                 </button>
@@ -3669,7 +3674,6 @@
             <div class="modal-title" style="font-size: 1.12rem; font-weight: 900; color: #dc2626; line-height: 1.35;">
                 <span>selecione a foto onde onde consta a alteração</span>
             </div>
-            <button type="button" class="modal-close" onclick="closeAvariaPhotoSelectModal()" title="Fechar">✖</button>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 12px; padding: 10px 0;">
@@ -3679,15 +3683,19 @@
             </div>
 
             <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0;">
-                Marque o tick abaixo de cada foto onde a alteração pode ser observada (selecione uma ou quantas quiser):
+                Toque em <strong>Inserir Foto</strong> para anexar a foto da avaria no local correspondente e/ou marque o tick onde consta a alteração:
             </p>
 
-            <!-- Grid com as 6 mini fotos e ticks abaixo -->
+            <!-- Grid com as 8 mini fotos e ticks abaixo -->
             <div id="avariaPhotosGrid" class="avaria-photos-grid"></div>
+            <input type="file" id="avariaSlotFileInput" accept="image/*" capture="environment" style="display: none;" onchange="onAvariaSlotFileChosen(event)">
 
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 14px;">
                 <button type="button" class="btn btn-danger-solid btn-3d" style="width: 100%; min-height: 48px; font-weight: 800; font-size: 1rem; justify-content: center;" onclick="finalizeAvariaReport()">
                     Finalizar observação
+                </button>
+                <button type="button" class="btn btn-outline btn-3d" style="width: 100%; min-height: 44px; font-weight: 700; font-size: 0.95rem; justify-content: center; border-color: #cbd5e1; color: var(--text-muted);" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
+                    ↩️ Cancelar
                 </button>
             </div>
         </div>
@@ -3704,7 +3712,7 @@
             informações inseridas, informe a reserva imediatamente!
         </h3>
         <p style="font-size: 0.92rem; color: var(--text-main); font-weight: 600; line-height: 1.5; margin-bottom: 24px; background: #fef2f2; border: 1px dashed #fca5a5; padding: 12px; border-radius: 8px;">
-            A avaria da viatura <strong id="avariaAlertVtr" style="color: #b91c1c;">--</strong> foi registrada com sucesso no sistema. Comunique o fato ao Encarregado da Reserva de Armas imediatamente.
+            A avaria da viatura <strong id="avariaAlertVtr" style="color: #b91c1c;">--</strong> foi registrada com sucesso no sistema. Comunique o fato ao encarregado da reserva de material e ao P4 imediatamente.
         </p>
         <div style="display: flex; justify-content: center;">
             <button type="button" class="btn btn-danger-solid btn-3d" style="padding: 12px 52px; font-size: 1.1rem; font-weight: 900; border-radius: 8px;" onclick="closeAvariaAlertModal()">
@@ -3738,9 +3746,14 @@
         </div>
 
         <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 14px;">
-            <button type="button" class="btn btn-outline btn-3d" onclick="exportAvariasExcel()" style="font-weight: 700; border-color: #cbd5e1; gap: 6px;">
-                📊 Exportar Relatório (.xlsx)
-            </button>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-outline btn-3d" onclick="exportAvariasExcel()" style="font-weight: 700; border-color: #cbd5e1; gap: 6px;" title="Exportar planilha Excel de avarias">
+                    📊 Exportar Relatório (.xlsx)
+                </button>
+                <button type="button" class="btn btn-outline btn-3d" onclick="downloadAllAvariasPhotos()" style="font-weight: 700; border-color: #059669; color: #059669; background: #f0fdf4; gap: 6px;" title="Baixar todas as fotos das avarias">
+                    📥 Baixar Todas as Fotos (.jpg)
+                </button>
+            </div>
             <div style="display: flex; gap: 8px;">
                 <button type="button" class="btn btn-outline btn-3d" onclick="markAllAvariasAsSeen()" style="font-weight: 700;">
                     👁️ Ciente de Todas
@@ -3759,6 +3772,10 @@
     <div class="photo-viewer-card" onclick="event.stopPropagation()">
         <!-- 🔴 BARRA FLUTUANTE SUPERIOR: POSICIONADA ACIMA, UM POUCO ABAIXO DA LATERAL DA TELA -->
         <div class="photo-viewer-floating-bar" id="photoViewerFloatingBar">
+            <button type="button" class="btn-floating-action" onclick="downloadCurrentViewerPhoto()" title="Baixar esta foto" style="background: rgba(5, 150, 105, 0.9) !important; color: #ffffff !important; border-color: rgba(110, 231, 183, 0.7) !important;">
+                <span style="font-size: 1rem;">📥</span>
+                <span>Baixar</span>
+            </button>
             <button type="button" class="btn-floating-action btn-floating-rotate" onclick="rotateViewerPhoto()" title="Girar Foto 90°">
                 <span style="font-size: 1rem;">🔄</span>
                 <span>Girar 90°</span>
@@ -3782,6 +3799,14 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="downloadCurrentViewerPhoto()" title="Baixar esta foto" style="background: #059669; color: #ffffff; border-color: #10b981; padding: 6px 10px; font-size: 0.8rem; font-weight: 700; gap: 4px; min-height: 38px;">
+                    <span>📥</span>
+                    <span>Baixar</span>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" id="btnViewerDeletePhoto" onclick="deleteCurrentViewerPhoto()" title="Apagar esta foto (Requer Senha ADM)" style="display: none; padding: 6px 10px; font-size: 0.8rem; font-weight: 700; gap: 4px; min-height: 38px;">
+                    <span>🗑️</span>
+                    <span>Apagar</span>
+                </button>
                 <button type="button" class="btn btn-outline btn-sm" id="btnViewerRotateHeader" onclick="rotateViewerPhoto()" title="Girar Foto 90 graus" style="background: #1e293b; color: #f8fafc; border-color: #475569; padding: 6px 9px; font-size: 0.8rem; font-weight: 700; gap: 4px; min-height: 38px;">
                     <span>🔄</span>
                     <span class="btn-rotate-text">Girar</span>
@@ -8771,12 +8796,14 @@
     vehicleAvarias = JSON.parse(localStorage.getItem('oleo_vtr_avarias') || '{}');
 
     const DEFAULT_INSPECTION_SLOTS = [
-        { id: 'dianteira', label: 'Dianteira (Frente)', icon: '🚗' },
-        { id: 'traseira', label: 'Traseira', icon: '🚗' },
-        { id: 'lateral_dir', label: 'Lateral Direita', icon: '🚙' },
-        { id: 'lateral_esq', label: 'Lateral Esquerda', icon: '🚙' },
-        { id: 'painel', label: 'Painel / Odômetro', icon: '🧭' },
-        { id: 'motor', label: 'Motor / Pneus', icon: '⚙️' }
+        { id: 'dianteira', label: 'dianteira', icon: '🚗' },
+        { id: 'traseira', label: 'traseira', icon: '🚗' },
+        { id: 'lateral_dir', label: 'Lateral direita', icon: '🚙' },
+        { id: 'lateral_esq', label: 'Lateral esquerda', icon: '🚙' },
+        { id: 'motor', label: 'Motor', icon: '⚙️' },
+        { id: 'interna_vtr', label: 'interna da VTR', icon: '💺' },
+        { id: 'guarda_preso', label: 'Guarda "preso"', icon: '🔒' },
+        { id: 'estepe', label: 'Estepe', icon: '🛞' }
     ];
 
     let currentInspectVehicle = null;
@@ -8924,15 +8951,110 @@
         openAvariaPhotoSelectModal(currentAvariaVehicle);
     }
 
-    // JANELA 3: Seleção da foto onde consta a alteração com ticks e títulos exatos
+    // JANELA 3: Seleção da foto onde consta a alteração com ticks, títulos exatos e inserção de foto
     const AVARIA_SLOT_DEFS = [
-        { id: 'dianteira', label: 'Dianteira', icon: '🚗' },
-        { id: 'traseira', label: 'Traseira', icon: '🚗' },
+        { id: 'dianteira', label: 'dianteira', icon: '🚗' },
+        { id: 'traseira', label: 'traseira', icon: '🚗' },
         { id: 'lateral_dir', label: 'Lateral direita', icon: '🚙' },
         { id: 'lateral_esq', label: 'Lateral esquerda', icon: '🚙' },
-        { id: 'painel', label: 'Painel', icon: '🧭' },
-        { id: 'motor', label: 'Motor', icon: '⚙️' }
+        { id: 'motor', label: 'Motor', icon: '⚙️' },
+        { id: 'interna_vtr', label: 'interna da VTR', icon: '💺' },
+        { id: 'guarda_preso', label: 'Guarda "preso"', icon: '🔒' },
+        { id: 'estepe', label: 'Estepe', icon: '🛞' }
     ];
+
+    let currentAvariaUploadSlotId = null;
+
+    function triggerAvariaPhotoUpload(slotId) {
+        if (!currentAvariaVehicle) return;
+        currentAvariaUploadSlotId = slotId;
+        const fileInput = document.getElementById('avariaSlotFileInput');
+        if (fileInput) {
+            fileInput.value = '';
+            fileInput.click();
+        }
+    }
+
+    function onAvariaSlotFileChosen(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file || !currentAvariaVehicle || !currentAvariaUploadSlotId) return;
+
+        showToast('⏳ <strong>Processando foto da avaria...</strong>');
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 900;
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.72);
+
+                    if (!vehiclePhotos[currentAvariaVehicle]) {
+                        vehiclePhotos[currentAvariaVehicle] = {};
+                    }
+
+                    const slotInfo = AVARIA_SLOT_DEFS.find(s => s.id === currentAvariaUploadSlotId) || { label: 'Avaria' };
+
+                    const now = new Date();
+                    const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                    vehiclePhotos[currentAvariaVehicle][currentAvariaUploadSlotId] = {
+                        id: currentAvariaUploadSlotId,
+                        label: slotInfo.label,
+                        data: compressedData,
+                        date: dateStr
+                    };
+
+                    const photoObj = vehiclePhotos[currentAvariaVehicle][currentAvariaUploadSlotId];
+                    saveVehiclePhotos();
+
+                    // Marca automaticamente o tick desta posição como avaria
+                    if (!selectedAvariaSlots.includes(currentAvariaUploadSlotId)) {
+                        selectedAvariaSlots.push(currentAvariaUploadSlotId);
+                    }
+
+                    renderAvariaPhotoSlots();
+
+                    // Dispara gravação pontual direta no Firebase para atualização instantânea
+                    if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+                        const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+                        fetch(`${baseUrl}/vehiclePhotos/${encodeURIComponent(currentAvariaVehicle)}/${encodeURIComponent(currentAvariaUploadSlotId)}.json`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(photoObj),
+                            cache: 'no-store'
+                        }).catch(err => console.warn('Erro ao enviar foto direta:', err));
+                    }
+
+                    syncAllDataToOnline(true);
+                    showToast(`📷 Foto da avaria em <strong>${slotInfo.label}</strong> inserida com sucesso!`);
+                } catch (err) {
+                    alert('Erro ao processar imagem: ' + err.message);
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
 
     function openAvariaPhotoSelectModal(vehicle) {
         currentAvariaVehicle = vehicle;
@@ -8947,14 +9069,22 @@
         if (modal) modal.style.display = 'flex';
     }
 
-    function closeAvariaPhotoSelectModal() {
-        const modal = document.getElementById('avariaPhotoSelectModal');
-        if (modal) modal.style.display = 'none';
+    function cancelAvariaPhotoSelectToPrevious() {
+        const photoModal = document.getElementById('avariaPhotoSelectModal');
+        if (photoModal) photoModal.style.display = 'none';
+
         const vtr = currentAvariaVehicle || quickKmTargetVehicle;
-        currentAvariaVehicle = null;
         if (vtr) {
-            openQuickKmModal(vtr);
+            openAvariaTextModal(vtr);
+            const descInput = document.getElementById('avariaDescriptionInput');
+            if (descInput && currentAvariaDescription) {
+                descInput.value = currentAvariaDescription;
+            }
         }
+    }
+
+    function closeAvariaPhotoSelectModal() {
+        cancelAvariaPhotoSelectToPrevious();
     }
 
     function renderAvariaPhotoSlots() {
@@ -8975,17 +9105,21 @@
                         <span>${slot.icon}</span>
                         <span style="font-weight: 800;">${slot.label}</span>
                     </div>
-                    <div class="avaria-slot-thumb">
+                    <div class="avaria-slot-thumb" ${hasPhoto ? `onclick="event.stopPropagation(); currentInspectVehicle = currentAvariaVehicle; openPhotoViewerModal('${slot.id}');" title="Toque para ampliar foto"` : `onclick="event.stopPropagation(); triggerAvariaPhotoUpload('${slot.id}');" title="Toque para inserir foto da avaria"`}>
                         ${hasPhoto 
-                            ? `<img src="${photo.data}" alt="${slot.label}" class="avaria-thumb-img">`
-                            : `<div class="avaria-no-photo"><span>📷</span><span>Sem foto</span></div>`
+                            ? `<img src="${photo.data}" alt="${slot.label}" class="avaria-thumb-img"><div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.75)); color: #fff; font-size: 0.68rem; padding: 2px; text-align: center; font-weight: 600;">👁️ Ampliar</div>`
+                            : `<div class="avaria-no-photo"><span>📷</span><span style="color: #2563eb; font-weight: 700;">+ Inserir foto</span></div>`
                         }
                     </div>
-                    <div class="avaria-slot-footer">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); triggerAvariaPhotoUpload('${slot.id}')" style="width: 100%; margin-top: 6px; padding: 4px 6px; font-size: 0.74rem; font-weight: 700; border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; border-radius: 6px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Inserir ou alterar foto da avaria em ${slot.label}">
+                        <span>📷</span>
+                        <span>${hasPhoto ? 'Trocar Foto' : 'Inserir Foto'}</span>
+                    </button>
+                    <div class="avaria-slot-footer" style="margin-top: 6px;">
                         <label class="avaria-tick-label" onclick="event.stopPropagation()">
                             <input type="checkbox" id="avariaChk_${slot.id}" class="avaria-tick-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleAvariaSlotSelect('${slot.id}')">
                             <span class="avaria-tick-icon">✔</span>
-                            <span>Selecionar</span>
+                            <span>${isChecked ? 'Consta avaria' : 'Selecionar'}</span>
                         </label>
                     </div>
                 </div>
@@ -9133,6 +9267,132 @@
         closeAdminAvariaNotificationModal();
     }
 
+    // Helper universal para download de imagens no navegador
+    function downloadPhotoData(dataUrl, filename) {
+        if (!dataUrl) return;
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = filename || 'foto_viatura.jpg';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            if (a && a.parentNode) a.parentNode.removeChild(a);
+        }, 150);
+    }
+
+    function downloadAvariaPhoto(vehicle, slotId) {
+        const vPhotos = vehiclePhotos[vehicle] || {};
+        const photo = vPhotos[slotId];
+        if (!photo || !photo.data) {
+            alert('Foto não encontrada para download.');
+            return;
+        }
+        const def = AVARIA_SLOT_DEFS.find(d => d.id === slotId) || { label: slotId };
+        const dateClean = (photo.date || '').replace(/[^0-9]/g, '_') || Date.now();
+        const filename = `Avaria_${vehicle}_${def.label.replace(/\s+/g, '_')}_${dateClean}.jpg`;
+
+        downloadPhotoData(photo.data, filename);
+        showToast(`📥 Foto <strong>${def.label}</strong> da viatura <strong>${vehicle}</strong> baixada!`);
+    }
+
+    function downloadAllPhotosOfAvaria(vehicle, avariaId) {
+        const avList = getAllAvarias();
+        const av = avList.find(a => a.id === avariaId && a.vehicle === vehicle);
+        if (!av) return;
+        const slots = av.slots || [];
+        const vPhotos = vehiclePhotos[vehicle] || {};
+        const availablePhotos = slots.filter(s => vPhotos[s] && vPhotos[s].data);
+
+        if (availablePhotos.length === 0) {
+            alert('Nenhuma foto disponível para download nesta avaria.');
+            return;
+        }
+
+        availablePhotos.forEach((slotId, idx) => {
+            const photo = vPhotos[slotId];
+            const def = AVARIA_SLOT_DEFS.find(d => d.id === slotId) || { label: slotId };
+            const filename = `Avaria_${vehicle}_${def.label.replace(/\s+/g, '_')}_${idx + 1}.jpg`;
+            setTimeout(() => {
+                downloadPhotoData(photo.data, filename);
+            }, idx * 250);
+        });
+
+        showToast(`📥 Baixando <strong>${availablePhotos.length} foto(s)</strong> da viatura <strong>${vehicle}</strong>...`);
+    }
+
+    function downloadAllAvariasPhotos() {
+        const avarias = getAllAvarias();
+        let delay = 0;
+        let count = 0;
+
+        avarias.forEach(av => {
+            const vPhotos = vehiclePhotos[av.vehicle] || {};
+            const slots = av.slots || [];
+            slots.forEach(slotId => {
+                const photo = vPhotos[slotId];
+                if (photo && photo.data) {
+                    count++;
+                    const def = AVARIA_SLOT_DEFS.find(d => d.id === slotId) || { label: slotId };
+                    const filename = `Avaria_${av.vehicle}_${def.label.replace(/\s+/g, '_')}.jpg`;
+                    setTimeout(() => {
+                        downloadPhotoData(photo.data, filename);
+                    }, delay);
+                    delay += 250;
+                }
+            });
+        });
+
+        if (count > 0) {
+            showToast(`📥 Iniciando download de <strong>${count} foto(s)</strong> de avarias...`);
+        } else {
+            alert('Nenhuma foto encontrada nas avarias relatadas.');
+        }
+    }
+
+    async function deleteAvariaPhotoDirect(vehicle, slotId, avariaId) {
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("apagar esta foto de avaria");
+            if (!ok) return;
+        }
+
+        const def = AVARIA_SLOT_DEFS.find(d => d.id === slotId) || { label: slotId };
+        if (!confirm(`Deseja realmente apagar a foto "${def.label}" da viatura ${vehicle}?`)) {
+            return;
+        }
+
+        if (vehiclePhotos[vehicle] && vehiclePhotos[vehicle][slotId]) {
+            delete vehiclePhotos[vehicle][slotId];
+            if (Object.keys(vehiclePhotos[vehicle]).length === 0) {
+                delete vehiclePhotos[vehicle];
+            }
+            saveVehiclePhotos();
+
+            // Deleta pontual no Firebase
+            if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+                const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+                fetch(`${baseUrl}/vehiclePhotos/${encodeURIComponent(vehicle)}/${encodeURIComponent(slotId)}.json`, {
+                    method: 'DELETE',
+                    cache: 'no-store'
+                }).catch(err => console.warn('Erro ao deletar foto Firebase:', err));
+            }
+
+            // Deleta no Express se aplicável
+            if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                fetch(`/api/oleo/photos/${encodeURIComponent(vehicle)}/${encodeURIComponent(slotId)}`, {
+                    method: 'DELETE',
+                    cache: 'no-store'
+                }).catch(() => {});
+            }
+
+            await syncAllDataToOnline(true);
+            renderAdminAvariasList();
+            if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+                renderInspectionSlots();
+            }
+            showToast(`🗑️ Foto <strong>${def.label}</strong> da viatura <strong>${vehicle}</strong> apagada com sucesso!`);
+        }
+    }
+
     function renderAdminAvariasList() {
         const container = document.getElementById('adminAvariasListContainer');
         if (!container) return;
@@ -9154,11 +9414,60 @@
             const modelText = vInfo.model || (vRec && vRec.model) || 'VIATURA';
             const placaText = vInfo.placa || (vRec && vRec.placa) || '';
 
+            const vPhotos = vehiclePhotos[av.vehicle] || {};
+            const slotsWithPhotos = (av.slots || []).map(s => {
+                const def = AVARIA_SLOT_DEFS.find(d => d.id === s) || { id: s, label: (s === 'painel' ? 'Painel' : s), icon: '📍' };
+                const photo = vPhotos[s];
+                return {
+                    id: s,
+                    label: def.label,
+                    icon: def.icon,
+                    photo: photo,
+                    hasPhoto: Boolean(photo && photo.data)
+                };
+            });
+
+            const actualPhotos = slotsWithPhotos.filter(item => item.hasPhoto);
+
+            let photosGalleryHtml = '';
+            if (actualPhotos.length > 0) {
+                photosGalleryHtml = `
+                    <div style="margin-top: 6px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 8px;">
+                        <div style="font-size: 0.74rem; font-weight: 800; color: #991b1b; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                            <span>📷 Fotos Anexadas pelo Policial (${actualPhotos.length}):</span>
+                            <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 600;">Toque na miniatura para ampliar em tela cheia</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px;">
+                            ${actualPhotos.map(item => `
+                                <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; text-align: center;">
+                                    <div style="font-size: 0.72rem; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        ${item.icon} ${item.label}
+                                    </div>
+                                    <div style="width: 100%; height: 75px; border-radius: 6px; overflow: hidden; position: relative; cursor: pointer; background: #000;" onclick="currentInspectVehicle='${av.vehicle}'; openPhotoViewerModal('${item.id}');" title="Toque para ampliar foto em tela cheia">
+                                        <img src="${item.photo.data}" alt="${item.label}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: #fff; font-size: 0.64rem; padding: 2px; font-weight: 600;">👁️ Ampliar</div>
+                                    </div>
+                                    <div style="display: flex; gap: 4px; margin-top: 2px;">
+                                        <button type="button" class="btn btn-outline btn-sm" onclick="downloadAvariaPhoto('${av.vehicle}', '${item.id}')" style="flex: 1; padding: 3px 4px; font-size: 0.68rem; font-weight: 700; background: #059669; color: #fff; border-color: #059669; min-height: 28px;" title="Baixar esta foto no dispositivo">
+                                            📥 Baixar
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAvariaPhotoDirect('${av.vehicle}', '${item.id}', ${av.id})" style="padding: 3px 6px; font-size: 0.68rem; min-height: 28px;" title="Apagar esta foto">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
             const slotBadges = (av.slots && av.slots.length > 0)
                 ? av.slots.map(s => {
                     const def = AVARIA_SLOT_DEFS.find(d => d.id === s);
-                    const label = def ? def.label : s;
-                    return `<span style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">📍 ${label}</span>`;
+                    const label = def ? def.label : (s === 'painel' ? 'Painel' : s);
+                    const hasP = Boolean(vPhotos[s] && vPhotos[s].data);
+                    return `<span style="background: ${hasP ? '#dcfce7' : '#fee2e2'}; color: ${hasP ? '#15803d' : '#991b1b'}; border: 1px solid ${hasP ? '#86efac' : '#fca5a5'}; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">📍 ${label} ${hasP ? '📷' : ''}</span>`;
                 }).join(' ')
                 : '<span style="color: var(--text-muted); font-size: 0.74rem;">(Sem fotos apontadas)</span>';
 
@@ -9176,17 +9485,27 @@
                         💬 "${av.description}"
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 2px;">
-                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">Foto(s):</span>
-                            ${slotBadges}
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">Posições apontadas:</span>
+                        ${slotBadges}
+                    </div>
+
+                    ${photosGalleryHtml}
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 8px;">
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            ${actualPhotos.length > 0 ? `
+                                <button type="button" class="btn btn-outline btn-sm" onclick="downloadAllPhotosOfAvaria('${av.vehicle}', ${av.id})" style="padding: 4px 10px; font-size: 0.76rem; font-weight: 700; border-color: #059669; color: #059669; background: #f0fdf4;" title="Baixar todas as fotos desta viatura">
+                                    📥 Baixar Fotos (${actualPhotos.length})
+                                </button>
+                            ` : ''}
+                            <button type="button" class="btn btn-outline btn-sm" onclick="closeAdminAvariaNotificationModal(); openVehicleInspectionModal('${av.vehicle}');" style="padding: 4px 10px; font-size: 0.76rem; font-weight: 700; border-color: #3b82f6; color: #1d4ed8; background: #eff6ff;" title="Abrir fotos de inspeção desta viatura">
+                                🔍 Inspecionar VTR
+                            </button>
                         </div>
                         <div style="display: flex; gap: 6px;">
-                            <button type="button" class="btn btn-outline btn-sm" onclick="closeAdminAvariaNotificationModal(); openVehicleInspectionModal('${av.vehicle}');" style="padding: 4px 10px; font-size: 0.76rem; font-weight: 700; border-color: #3b82f6; color: #1d4ed8; background: #eff6ff;" title="Abrir fotos de inspeção desta viatura">
-                                🔍 Ver Fotos
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteAvariaRecord('${av.vehicle}', ${av.id})" style="padding: 4px 8px; font-size: 0.74rem;" title="Excluir ou marcar como resolvida">
-                                🗑️ Excluir
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteAvariaRecord('${av.vehicle}', ${av.id})" style="padding: 4px 10px; font-size: 0.74rem; font-weight: 700;" title="Excluir relato de avaria">
+                                🗑️ Excluir Relato
                             </button>
                         </div>
                     </div>
@@ -9203,22 +9522,60 @@
             if (!ok) return;
         }
 
-        if (confirm(`Deseja remover este relato de avaria da viatura ${vehicle}?`)) {
-            if (vehicleAvarias[vehicle] && Array.isArray(vehicleAvarias[vehicle])) {
-                vehicleAvarias[vehicle] = vehicleAvarias[vehicle].filter(a => a.id !== avariaId);
-                if (vehicleAvarias[vehicle].length === 0) {
-                    delete vehicleAvarias[vehicle];
-                }
-                localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
-                syncAllDataToOnline(true);
-                renderAdminAvariasList();
-                updateAdminBadgeUI();
-                if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
-                    renderInspectionSlots();
-                }
-                showToast(`🗑️ Relato de avaria da viatura <strong>${vehicle}</strong> removido!`);
+        const avList = vehicleAvarias[vehicle] || [];
+        const targetAvaria = avList.find(a => a.id === avariaId);
+        const slots = targetAvaria ? (targetAvaria.slots || []) : [];
+        const vPhotos = vehiclePhotos[vehicle] || {};
+        const attachedPhotosCount = slots.filter(s => vPhotos[s] && vPhotos[s].data).length;
+
+        let deletePhotos = false;
+        if (attachedPhotosCount > 0) {
+            const confirmDelete = confirm(`Deseja remover este relato de avaria da viatura ${vehicle}?`);
+            if (!confirmDelete) return;
+
+            deletePhotos = confirm(`Esta avaria possui ${attachedPhotosCount} foto(s) anexada(s).
+
+Deseja também APAGAR as fotos correspondentes da viatura ${vehicle} do sistema e da nuvem?`);
+        } else {
+            if (!confirm(`Deseja remover este relato de avaria da viatura ${vehicle}?`)) {
+                return;
             }
         }
+
+        if (deletePhotos && slots.length > 0 && vehiclePhotos[vehicle]) {
+            slots.forEach(s => {
+                if (vehiclePhotos[vehicle][s]) {
+                    delete vehiclePhotos[vehicle][s];
+                    if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+                        const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+                        fetch(`${baseUrl}/vehiclePhotos/${encodeURIComponent(vehicle)}/${encodeURIComponent(s)}.json`, {
+                            method: 'DELETE',
+                            cache: 'no-store'
+                        }).catch(() => {});
+                    }
+                }
+            });
+            if (Object.keys(vehiclePhotos[vehicle]).length === 0) {
+                delete vehiclePhotos[vehicle];
+            }
+            saveVehiclePhotos();
+        }
+
+        if (vehicleAvarias[vehicle] && Array.isArray(vehicleAvarias[vehicle])) {
+            vehicleAvarias[vehicle] = vehicleAvarias[vehicle].filter(a => a.id !== avariaId);
+            if (vehicleAvarias[vehicle].length === 0) {
+                delete vehicleAvarias[vehicle];
+            }
+            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+        }
+
+        await syncAllDataToOnline(true);
+        renderAdminAvariasList();
+        updateAdminBadgeUI();
+        if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+            renderInspectionSlots();
+        }
+        showToast(`🗑️ Relato de avaria da viatura <strong>${vehicle}</strong> removido com sucesso!`);
     }
 
     function exportAvariasExcel() {
@@ -9245,7 +9602,7 @@
                 const slotNames = (av.slots && av.slots.length > 0)
                     ? av.slots.map(s => {
                         const def = AVARIA_SLOT_DEFS.find(d => d.id === s);
-                        return def ? def.label : s;
+                        return def ? def.label : (s === 'painel' ? 'Painel' : s);
                     }).join(', ')
                     : 'Geral / Não especificado';
 
@@ -9257,7 +9614,7 @@
                     "Data / Hora do Relato": av.date || '-',
                     "Descrição da Avaria Observada": av.description || '-',
                     "Posições / Fotos com Alteração": slotNames,
-                    "Situação": av.status || 'Ativa / Informada à Reserva'
+                    "Situação": av.status || 'Ativa / Informada à Reserva de Material e P4'
                 };
             });
 
@@ -9297,7 +9654,7 @@ function renderInspectionSlots() {
                 const slotsText = latest.slots && latest.slots.length > 0 
                     ? latest.slots.map(s => {
                         const found = DEFAULT_INSPECTION_SLOTS.find(sl => sl.id === s);
-                        return found ? found.label : s;
+                        return found ? found.label : (s === 'painel' ? 'Painel' : s);
                     }).join(', ') 
                     : 'Geral';
                 avariasBanner.innerHTML = `
@@ -9324,8 +9681,8 @@ function renderInspectionSlots() {
         const savedCount = Object.keys(vPhotos).filter(k => vPhotos[k] && vPhotos[k].data).length;
 
         if (badge) {
-            badge.textContent = `${savedCount} de 6 fotos salvas`;
-            badge.className = savedCount === 6 ? 'badge badge-ok' : (savedCount > 0 ? 'badge badge-warning' : 'badge badge-info');
+            badge.textContent = `${savedCount} de 8 fotos salvas`;
+            badge.className = savedCount === 8 ? 'badge badge-ok' : (savedCount > 0 ? 'badge badge-warning' : 'badge badge-info');
         }
 
         const saveBtn = document.getElementById('btnSaveInspectionPhotos');
@@ -9342,7 +9699,7 @@ function renderInspectionSlots() {
             if (isAdminAuthenticated) {
                 descEl.innerHTML = '📷 <strong>Modo Administrador Ativo:</strong> Toque para adicionar, trocar ou excluir fotos da viatura. Toque na imagem para ampliar.';
             } else {
-                descEl.innerHTML = '📷 <strong>Fotos da viatura (6 posições):</strong> Toque em qualquer foto salva para visualizar em tela cheia (livre para todos).';
+                descEl.innerHTML = '📷 <strong>Fotos da viatura (8 posições):</strong> Toque em qualquer foto salva para visualizar em tela cheia (livre para todos).';
             }
         }
 
@@ -9687,14 +10044,54 @@ function renderInspectionSlots() {
         }
     });
 
+    let currentViewerSlotId = null;
+
+    function downloadCurrentViewerPhoto() {
+        const img = document.getElementById('photoViewerImg');
+        if (!img || !img.src) {
+            alert('Nenhuma foto aberta para download.');
+            return;
+        }
+        const titleEl = document.getElementById('photoViewerTitle');
+        const safeTitle = (titleEl ? titleEl.textContent : 'foto_viatura')
+            .replace(/[^a-zA-Z0-9_\-\.]/g, '_')
+            .replace(/_+/g, '_');
+        const filename = `${safeTitle}.jpg`;
+
+        downloadPhotoData(img.src, filename);
+        showToast(`📥 Foto <strong>${filename}</strong> baixada com sucesso!`);
+    }
+
+    async function deleteCurrentViewerPhoto() {
+        if (!currentInspectVehicle || !currentViewerSlotId) {
+            alert('Não é possível apagar esta imagem.');
+            return;
+        }
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("apagar esta foto");
+            if (!ok) return;
+        }
+        const slotInfo = DEFAULT_INSPECTION_SLOTS.find(s => s.id === currentViewerSlotId) || { label: currentViewerSlotId };
+        if (confirm(`Deseja realmente apagar a foto "${slotInfo.label}" da viatura ${currentInspectVehicle}?`)) {
+            closePhotoViewerModal();
+            await deleteInspectionPhoto(currentViewerSlotId);
+            if (document.getElementById('adminAvariaNotificationModal')?.style.display === 'flex') {
+                renderAdminAvariasList();
+            }
+        }
+    }
+
     function openPhotoViewerModal(slotIdOrDataUrl) {
         const modal = document.getElementById('photoViewerModal');
         const imgEl = document.getElementById('photoViewerImg');
         const titleEl = document.getElementById('photoViewerTitle');
         const dateEl = document.getElementById('photoViewerDate');
+        const delBtn = document.getElementById('btnViewerDeletePhoto');
 
         currentPhotoRotation = 0;
         isPhotoZoomed = false;
+        currentViewerSlotId = (typeof slotIdOrDataUrl === 'string' && slotIdOrDataUrl.length < 50) ? slotIdOrDataUrl : null;
+
         const zoomText = document.getElementById('floatingZoomText');
         if (zoomText) zoomText.textContent = 'Preencher';
         const zoomIcon = document.getElementById('floatingZoomIcon');
@@ -9719,6 +10116,10 @@ function renderInspectionSlots() {
             photoDate = photoObj.date ? `Registrada em: ${photoObj.date}` : '';
         } else {
             photoData = slotIdOrDataUrl;
+        }
+
+        if (delBtn) {
+            delBtn.style.display = (isAdminAuthenticated && currentInspectVehicle && currentViewerSlotId && vehiclePhotos[currentInspectVehicle]?.[currentViewerSlotId]) ? 'inline-flex' : 'none';
         }
 
         if (imgEl) imgEl.src = photoData;
