@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.22.v3";
+            const APP_VERSION = "2026.10.22.v4";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -1724,7 +1724,7 @@
             .input-btn-group { flex-direction: row; width: 100%; }
             .input-btn-group select { flex: 1 1 140px; min-width: 0; }
             .btn { padding: 10px 14px; font-size: 0.85rem; min-height: 44px; }
-            /* 📱 POLÍTICA ANTI-VAZAMENTO: TODAS AS JANELAS 100% ENQUADRADAS NO CELULAR */
+            /* 📱 POLÍTICA ANTI-VAZAMENTO: TODAS AS JANELAS 100% ENQUADRADAS NO CELULAR ACIMA DO SAFARI */
             .modal-overlay { 
                 position: fixed !important;
                 top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
@@ -1735,21 +1735,19 @@
                 max-height: 100dvh !important;
                 padding: 8px !important; 
                 padding-top: max(8px, env(safe-area-inset-top, 8px)) !important; 
-                padding-bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important; 
+                padding-bottom: max(95px, calc(env(safe-area-inset-bottom, 0px) + 85px)) !important; 
                 padding-left: max(8px, env(safe-area-inset-left, 8px)) !important; 
                 padding-right: max(8px, env(safe-area-inset-right, 8px)) !important; 
                 align-items: center !important; 
-                justify-content: center !important; 
+                justify-content: flex-start !important; 
                 overflow: hidden !important; 
                 box-sizing: border-box !important;
             }
             .modal-card { 
                 padding: 0 !important; 
-                margin: auto !important; 
-                height: 88dvh !important; 
-                max-height: 88dvh !important; 
-                height: 88vh !important; 
-                max-height: 88vh !important; 
+                margin: 0 auto !important; 
+                height: 100% !important; 
+                max-height: 100% !important; 
                 width: 96% !important; 
                 max-width: 560px !important; 
                 border-radius: 12px !important; 
@@ -1761,8 +1759,9 @@
             }
             .modal-card.modal-alert-card {
                 height: auto !important;
-                max-height: 85dvh !important;
+                max-height: 85% !important;
                 overflow-y: auto !important;
+                margin: auto !important;
             }
             .modal-card > form {
                 display: flex !important;
@@ -1785,12 +1784,12 @@
                 font-size: 1rem !important;
             }
             .modal-body {
-                flex: 1 1 auto !important;
+                flex: 1 1 0 !important;
                 min-height: 0 !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch !important;
                 overscroll-behavior: contain !important;
-                padding: 10px 12px 65px 12px !important;
+                padding: 10px 12px 14px 12px !important;
                 gap: 8px !important;
                 box-sizing: border-box !important;
             }
@@ -1799,12 +1798,12 @@
                 position: sticky !important;
                 bottom: 0 !important;
                 background: var(--card-bg, #ffffff) !important;
-                border-top: 2px solid var(--border) !important;
+                border-top: 2.5px solid #cbd5e1 !important;
                 padding: 10px 12px !important;
                 padding-bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
                 gap: 8px !important;
-                z-index: 20 !important;
-                box-shadow: 0 -3px 12px rgba(0,0,0,0.12) !important;
+                z-index: 30 !important;
+                box-shadow: 0 -4px 16px rgba(0,0,0,0.2) !important;
                 box-sizing: border-box !important;
             }
             .modal-footer .btn {
@@ -2253,7 +2252,7 @@
         }
 
         @media (max-width: 768px) {
-            #vehicleInspectionModal {
+            #vehicleInspectionModal, #quickKmModal {
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
@@ -2264,13 +2263,13 @@
                 height: 100dvh !important;
                 padding: 6px !important;
                 padding-top: max(6px, env(safe-area-inset-top, 6px)) !important;
-                padding-bottom: max(85px, calc(env(safe-area-inset-bottom, 0px) + 75px)) !important;
+                padding-bottom: max(95px, calc(env(safe-area-inset-bottom, 0px) + 85px)) !important;
                 align-items: center !important;
                 justify-content: flex-start !important;
                 overflow: hidden !important;
                 box-sizing: border-box !important;
             }
-            #vehicleInspectionModal .modal-card {
+            #vehicleInspectionModal .modal-card, #quickKmModal .modal-card {
                 padding: 0 !important;
                 margin: 0 auto !important;
                 height: 100% !important;
@@ -2284,7 +2283,12 @@
                 position: relative !important;
                 box-sizing: border-box !important;
             }
-            #vehicleInspectionModal .modal-header {
+            #quickKmModal .modal-card {
+                height: auto !important;
+                max-height: 100% !important;
+                margin: auto auto !important;
+            }
+            #vehicleInspectionModal .modal-header, #quickKmModal .modal-header {
                 padding: 10px 14px !important;
                 flex-shrink: 0 !important;
                 position: sticky !important;
@@ -2310,7 +2314,7 @@
                 overscroll-behavior: contain !important;
                 box-sizing: border-box !important;
             }
-            #vehicleInspectionModal .modal-footer {
+            #vehicleInspectionModal .modal-footer, #quickKmModal .modal-footer {
                 padding: 10px 12px !important;
                 gap: 8px !important;
                 flex-shrink: 0 !important;
@@ -2321,9 +2325,11 @@
                 box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2) !important;
                 border-top: 2.5px solid #cbd5e1 !important;
                 width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            #vehicleInspectionModal .modal-footer {
                 display: flex !important;
                 flex-direction: column !important;
-                box-sizing: border-box !important;
             }
             #vehicleInspectionModal .inspect-footer-actions {
                 width: 100% !important;
@@ -5391,7 +5397,12 @@
                 setTimeout(() => card.classList.remove('tv-on-active'), 500);
             }
             modal.classList.remove('tv-off-overlay');
-            modal.style.display = 'flex';
+            modal.style.setProperty('display', 'flex', 'important');
+            if (window.visualViewport && window.innerWidth <= 768) {
+                modal.style.height = `${window.visualViewport.height}px`;
+            } else {
+                modal.style.height = '100%';
+            }
         }
 
         // No celular, não força o teclado a abrir automaticamente para evitar oscilações de tela (piscadas)
@@ -10152,14 +10163,14 @@
 
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
-            const modalAvaria = document.getElementById('avariaPhotoSelectModal');
-            if (modalAvaria && modalAvaria.style.display !== 'none' && window.innerWidth <= 768) {
-                modalAvaria.style.height = `${window.visualViewport.height}px`;
-            }
-            const modalInspect = document.getElementById('vehicleInspectionModal');
-            if (modalInspect && modalInspect.style.display !== 'none' && window.innerWidth <= 768) {
-                modalInspect.style.height = `${window.visualViewport.height}px`;
-            }
+            if (window.innerWidth > 768) return;
+            const h = `${window.visualViewport.height}px`;
+            ['avariaPhotoSelectModal', 'vehicleInspectionModal', 'quickKmModal', 'avariaTextModal', 'avariaMilitarModal', 'adminPasswordModal', 'adminAvariaNotificationModal'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.style.display !== 'none') {
+                    el.style.height = h;
+                }
+            });
         });
     }
 
@@ -11003,7 +11014,7 @@ function toggleAdminBaselineEditMode() {
         // =========================================================================
         const avariasSectionEl = document.getElementById('inspectModalAvariasSection');
         if (avariasSectionEl) {
-            avariasSectionEl.style.display = isAdminAuthenticated ? 'block' : 'none';
+            avariasSectionEl.style.setProperty('display', isAdminAuthenticated ? 'block' : 'none', 'important');
         }
 
         if (avariasListEl) {
