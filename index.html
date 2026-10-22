@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.21.v5";
+            const APP_VERSION = "2026.10.22.v2";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -2789,11 +2789,55 @@
                 /* =========================================================================
            ⚠️ MODAIS DE RELATO DE AVARIAS DA VIATURA (FIXOS E STICKY)
            ========================================================================= */
-        #avariaPhotoSelectModal, #avariaTextModal, #avariaMilitarModal {
+        /* 🚨 BANNER DE ALERTA DE AVARIAS RESPONSIVO (SEM SOBREPOSIÇÃO NO CELULAR) */
+        .avaria-alert-banner {
+            background: #fff1f2;
+            border: 1.5px solid #fecdd3;
+            border-left: 6px solid #dc2626;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin-bottom: 2px;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .avaria-alert-banner .banner-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .avaria-alert-banner .banner-btn-wrapper {
+            flex-shrink: 0;
+        }
+
+        #avariaPhotoSelectModal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            height: 100dvh !important;
+            display: none;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
             align-items: center !important;
-            justify-content: center !important;
-            overflow: hidden !important;
             padding: 8px !important;
+            padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
+            padding-bottom: max(95px, calc(env(safe-area-inset-bottom, 0px) + 85px)) !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+            overscroll-behavior: contain !important;
+            z-index: 10054 !important;
         }
 
         #avariaPhotoSelectModal .modal-card {
@@ -2802,17 +2846,22 @@
             overflow: hidden !important;
             padding: 0 !important;
             gap: 0 !important;
-            height: 88dvh !important;
-            max-height: 88dvh !important;
-            height: 88vh !important;
-            max-height: 88vh !important;
-            max-width: 560px !important;
             width: 96% !important;
-            border-radius: 12px !important;
+            max-width: 560px !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            border-radius: 14px !important;
             position: relative !important;
-            margin: auto !important;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45) !important;
+            margin: 0 auto !important;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
             box-sizing: border-box !important;
+        }
+
+        #avariaTextModal, #avariaMilitarModal {
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+            padding: 8px !important;
         }
 
         #avariaTextModal .modal-card, #avariaMilitarModal .modal-card {
@@ -2844,7 +2893,17 @@
             box-sizing: border-box !important;
         }
 
-        #avariaPhotoSelectModal .modal-body, #avariaTextModal .modal-body, #avariaMilitarModal .modal-body {
+        #avariaPhotoSelectModal .modal-body {
+            flex: 1 1 0 !important;
+            min-height: 0 !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: contain !important;
+            padding: 10px 12px 16px 12px !important;
+            box-sizing: border-box !important;
+        }
+
+        #avariaTextModal .modal-body, #avariaMilitarModal .modal-body {
             flex: 1 1 auto !important;
             min-height: 0 !important;
             overflow-y: auto !important;
@@ -2854,7 +2913,23 @@
             box-sizing: border-box !important;
         }
 
-        #avariaPhotoSelectModal .modal-footer, #avariaTextModal .modal-footer, #avariaMilitarModal .modal-footer {
+        #avariaPhotoSelectModal .modal-footer {
+            flex-shrink: 0 !important;
+            position: sticky !important;
+            bottom: 0 !important;
+            z-index: 50 !important;
+            background: var(--card-bg, #ffffff) !important;
+            border-top: 2px solid var(--border) !important;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.16) !important;
+            padding: 10px 14px !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+
+        #avariaTextModal .modal-footer, #avariaMilitarModal .modal-footer {
             flex-shrink: 0 !important;
             position: sticky !important;
             bottom: 0 !important;
@@ -2868,13 +2943,34 @@
         }
 
         @media (max-width: 768px) {
+            .avaria-alert-banner {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                padding: 12px 14px !important;
+                gap: 10px !important;
+            }
+            .avaria-alert-banner .banner-content-wrapper {
+                width: 100% !important;
+                align-items: flex-start !important;
+            }
+            .avaria-alert-banner .banner-btn-wrapper {
+                width: 100% !important;
+            }
+            .avaria-alert-banner .banner-btn-wrapper button {
+                width: 100% !important;
+                min-height: 46px !important;
+                justify-content: center !important;
+            }
+            #avariaPhotoSelectModal {
+                padding-bottom: max(95px, calc(env(safe-area-inset-bottom, 0px) + 85px)) !important;
+                justify-content: flex-start !important;
+            }
             #avariaPhotoSelectModal .modal-card {
-                height: 88dvh !important;
-                max-height: 88dvh !important;
-                height: 88vh !important;
-                max-height: 88vh !important;
+                height: 100% !important;
+                max-height: 100% !important;
                 width: 96% !important;
                 max-width: 560px !important;
+                margin: 0 auto !important;
                 display: flex !important;
                 flex-direction: column !important;
                 overflow: hidden !important;
@@ -2892,7 +2988,8 @@
                 min-height: 0 !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch !important;
-                padding: 10px 12px 20px 12px !important;
+                overscroll-behavior: contain !important;
+                padding: 10px 12px 14px 12px !important;
                 box-sizing: border-box !important;
             }
             #avariaPhotoSelectModal .modal-footer {
@@ -2904,7 +3001,6 @@
                 border-top: 2.5px solid #cbd5e1 !important;
                 box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2) !important;
                 padding: 10px 14px !important;
-                padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
                 box-sizing: border-box !important;
                 display: flex !important;
                 justify-content: space-between !important;
@@ -3618,24 +3714,26 @@
         </div>
     </div>
 
-    <!-- 🚨 BANNER DE ALERTA DE AVARIAS CONSTATADAS NA FROTA -->
-    <div id="avariaAlertBanner" style="display: none; background: #fff1f2; border: 1.5px solid #fecdd3; border-left: 6px solid #dc2626; border-radius: var(--radius); padding: 14px 18px; margin-bottom: 2px; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12); align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-        <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+    <!-- 🚨 BANNER DE ALERTA DE AVARIAS CONSTATADAS NA FROTA (EXCLUSIVO PARA O ADMINISTRADOR) -->
+    <div id="avariaAlertBanner" class="avaria-alert-banner" style="display: none;">
+        <div class="banner-content-wrapper">
             <span style="font-size: 1.8rem; flex-shrink: 0;">🚨</span>
-            <div>
-                <div style="font-size: 1rem; font-weight: 900; color: #991b1b; display: flex; align-items: center; gap: 8px;">
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 1rem; font-weight: 900; color: #991b1b; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <span>Atenção: Avarias Constatadas na Frota!</span>
                     <span id="bannerAvariaCountBadge" class="badge badge-danger" style="font-size: 0.74rem; font-weight: 800;">0 avaria(s)</span>
                 </div>
-                <div id="bannerAvariaDetails" style="font-size: 0.82rem; color: #7f1d1d; font-weight: 600; margin-top: 2px;">
+                <div id="bannerAvariaDetails" style="font-size: 0.82rem; color: #7f1d1d; font-weight: 600; margin-top: 2px; word-break: break-word;">
                     Foram relatadas avarias nas viaturas pelos policiais militares. Verifique os detalhes e comunique à Reserva/P4.
                 </div>
             </div>
         </div>
-        <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAdminAvariaNotificationModal()" style="font-weight: 800; padding: 10px 20px; font-size: 0.92rem; gap: 6px; white-space: nowrap;">
-            <span>🚨</span>
-            <span>Visualizar Avarias</span>
-        </button>
+        <div class="banner-btn-wrapper">
+            <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAdminAvariaNotificationModal()" style="font-weight: 800; padding: 10px 20px; font-size: 0.92rem; gap: 6px; white-space: nowrap;">
+                <span>🚨</span>
+                <span>Visualizar Avarias</span>
+            </button>
+        </div>
     </div>
 
     <!-- SETOR 2: Indicadores da Frota (KPIs) -->
@@ -4223,7 +4321,7 @@
 <!-- 📸 3. MODAL: SELEÇÃO DA FOTO COM OS TICKS (Dianteira, Traseira, etc.)      -->
 <!-- ========================================================================= -->
 <div id="avariaPhotoSelectModal" class="modal-overlay" style="z-index: 10054;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 560px; width: 96%; height: 88dvh; max-height: 88dvh; display: flex; flex-direction: column; overflow: hidden;" onclick="event.stopPropagation()">
+    <div class="modal-card" style="max-width: 560px; width: 96%; display: flex; flex-direction: column; overflow: hidden;" onclick="event.stopPropagation()">
         <div class="modal-header" style="padding: 10px 14px;">
             <div class="modal-title" style="font-size: 1.02rem; font-weight: 900; color: #dc2626; line-height: 1.3;">
                 <span>📸 Selecione a Foto Onde Consta a Alteração</span>
@@ -4260,7 +4358,7 @@
             <button type="button" class="btn btn-outline btn-3d" style="min-height: 48px; font-weight: 700; font-size: 0.92rem; border-color: #cbd5e1; color: var(--text-muted); padding: 8px 14px;" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
                 ↩️ Cancelar
             </button>
-            <button type="button" class="btn btn-success btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 48px; font-weight: 800; font-size: 1.02rem; justify-content: center; gap: 6px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4); display: none;" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
+            <button type="button" class="btn btn-success btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 48px; font-weight: 800; font-size: 1.02rem; justify-content: center; gap: 6px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4); display: inline-flex;" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
                 <span>✅</span>
                 <span>Finalizar Observação</span>
             </button>
@@ -5038,7 +5136,8 @@
 
         const avariasList = typeof getAllAvarias === 'function' ? getAllAvarias() : [];
         if (avariaBadge) {
-            if (avariasList.length > 0) {
+            // Avarias visíveis exclusivamente para o Administrador! Visitante não vê
+            if (isAdminAuthenticated && avariasList.length > 0) {
                 avariaBadge.style.display = 'inline-flex';
                 if (avariaBadgeText) avariaBadgeText.textContent = `🚨 Avarias (${avariasList.length})`;
             } else {
@@ -5046,12 +5145,12 @@
             }
         }
 
-        // Atualiza o Banner de Avarias no Topo do Painel
+        // Atualiza o Banner de Avarias no Topo do Painel - SOMENTE PARA O ADMINISTRADOR (Visitante não precisa ver)
         const banner = document.getElementById('avariaAlertBanner');
         const bannerBadge = document.getElementById('bannerAvariaCountBadge');
         const bannerDetails = document.getElementById('bannerAvariaDetails');
         if (banner) {
-            if (avariasList.length > 0) {
+            if (isAdminAuthenticated && avariasList.length > 0) {
                 banner.style.display = 'flex';
                 if (bannerBadge) bannerBadge.textContent = `${avariasList.length} avaria(s)`;
                 if (bannerDetails) {
@@ -5100,6 +5199,12 @@
 
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
+        }
+        if (typeof renderVehicleMiniCards === 'function') {
+            renderVehicleMiniCards();
+        }
+        if (typeof renderDashboard === 'function') {
+            renderDashboard();
         }
     }
 
@@ -8447,7 +8552,7 @@
                     <td class="col-td-prefixo ${isHidPrefix}" onclick="openQuickKmModal('${r.vehicle}')" title="Clique para atualizar KM rápido">
                         <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                             <strong style="color: var(--primary); font-size: 0.95rem;">🚓 ${r.vehicle}</strong>
-                            ${(vehicleAvarias[r.vehicle] && vehicleAvarias[r.vehicle].length > 0) ? `<span class="badge badge-danger" style="font-size: 0.68rem; font-weight: 800; padding: 1px 5px;" title="Viatura possui relato de avaria">🚨 Avaria</span>` : ''}
+                            ${(isAdminAuthenticated && vehicleAvarias[r.vehicle] && vehicleAvarias[r.vehicle].length > 0) ? `<span class="badge badge-danger" style="font-size: 0.68rem; font-weight: 800; padding: 1px 5px;" title="Viatura possui relato de avaria">🚨 Avaria</span>` : ''}
                         </div>
                     </td>
                     <td class="col-td-data ${isHidData}">${formattedDate}</td>
@@ -8529,7 +8634,7 @@
                             🚓 ${r.vehicle}
                         </span>
                         <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            ${(vehicleAvarias[r.vehicle] && vehicleAvarias[r.vehicle].length > 0) ? `<span class="badge badge-danger" style="font-weight: 800; cursor: pointer;" onclick="openVehicleInspectionModal('${r.vehicle}')" title="Ver avarias desta viatura">🚨 ${vehicleAvarias[r.vehicle].length} Avaria(s)</span>` : ''}
+                            ${(isAdminAuthenticated && vehicleAvarias[r.vehicle] && vehicleAvarias[r.vehicle].length > 0) ? `<span class="badge badge-danger" style="font-weight: 800; cursor: pointer;" onclick="openVehicleInspectionModal('${r.vehicle}')" title="Ver avarias desta viatura">🚨 ${vehicleAvarias[r.vehicle].length} Avaria(s)</span>` : ''}
                             <span class="badge ${badgeClass}">${statusText}</span>
                         </div>
                     </div>
@@ -9476,18 +9581,20 @@
             const isSelected = (v === currentSelected);
             const vAvarias = vehicleAvarias[v] || [];
             const hasAvaria = vAvarias.length > 0;
+            // Mini alerta no card: visível exclusivamente para o Administrador!
+            const showAvariaToUser = isAdminAuthenticated && hasAvaria;
 
             const vInfo = VEHICLE_FLEET_INFO[v] || { model: (vRecord && vRecord.model) || '', placa: (vRecord && vRecord.placa) || '' };
             const modelText = vInfo.model || 'VIATURA';
             const placaText = vInfo.placa || '';
 
-            const avariaBadgeMini = hasAvaria 
+            const avariaBadgeMini = showAvariaToUser 
                 ? `<div style="font-size: 0.64rem; font-weight: 800; color: #b91c1c; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 4px; padding: 1px 4px; margin-top: 2px;">🚨 ${vAvarias.length} Avaria(s)</div>` 
                 : '';
 
             cardsHtml += `
-                <div class="vehicle-mini-card ${isSelected ? 'active' : ''} ${cardDangerClass} ${hasAvaria ? 'has-avaria-border' : ''}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${modelText} - ${placaText} (${statusText})${hasAvaria ? ' - 🚨 Possui avaria relatada!' : ''}" style="${hasAvaria ? 'border-color: #ef4444; box-shadow: 0 0 0 1px #ef4444;' : ''}">
-                    <div class="card-prefix" style="${hasAvaria ? 'color: #b91c1c;' : ''}">${v}</div>
+                <div class="vehicle-mini-card ${isSelected ? 'active' : ''} ${cardDangerClass} ${showAvariaToUser ? 'has-avaria-border' : ''}" data-prefix="${v}" onclick="selectVehicleFromMiniCard('${v}')" title="Viatura ${v} - ${modelText} - ${placaText} (${statusText})${showAvariaToUser ? ' - 🚨 Possui avaria relatada!' : ''}" style="${showAvariaToUser ? 'border-color: #ef4444; box-shadow: 0 0 0 1px #ef4444;' : ''}">
+                    <div class="card-prefix" style="${showAvariaToUser ? 'color: #b91c1c;' : ''}">${v}</div>
                     <div class="card-meta">${modelText}<br><span style="font-size: 0.64rem; font-weight: 600; opacity: 0.85;">${placaText}</span></div>
                     <div class="card-km">
                         <span class="card-status-dot" style="background-color: ${statusColor};"></span>
@@ -9980,7 +10087,22 @@
             modal.style.zIndex = '10054';
             const body = modal.querySelector('.modal-body');
             if (body) body.scrollTop = 0;
+            // 📱 Ajuste dinâmico de altura para o Safari iOS (evita que a barra de ferramentas inferior cubra o rodapé)
+            if (window.visualViewport && window.innerWidth <= 768) {
+                modal.style.height = `${window.visualViewport.height}px`;
+            } else {
+                modal.style.height = '100%';
+            }
         }
+    }
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const modal = document.getElementById('avariaPhotoSelectModal');
+            if (modal && modal.style.display !== 'none' && window.innerWidth <= 768) {
+                modal.style.height = `${window.visualViewport.height}px`;
+            }
+        });
     }
 
     function cancelAvariaPhotoSelectToPrevious() {
@@ -10145,10 +10267,7 @@
                                 🗑️ Trocar
                             </button>
                         </div>
-                        <!-- BOTÃO FINALIZAR APÓS ANEXAR A FOTO -->
-                        <button type="button" class="btn btn-success btn-3d" onclick="finalizeAvariaReport()" style="width: 100%; min-height: 38px; font-size: 0.82rem; font-weight: 800; margin-top: 5px; padding: 4px 6px; justify-content: center; gap: 4px; background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(22, 163, 74, 0.35);">
-                            <span>✅ Finalizar Observação</span>
-                        </button>
+
                     </div>
                 `;
             }
@@ -10156,19 +10275,25 @@
 
         grid.innerHTML = html;
 
-        // Atualiza dinamicamente o botão Finalizar no rodapé fixo: APARECE APÓS TIRAR A FOTO
+        // Atualiza dinamicamente o botão Finalizar no rodapé fixo (sempre visível e fixo como o título)
         const btnFinalizar = document.getElementById('btnFinalizarObservacao');
         if (btnFinalizar) {
+            btnFinalizar.style.display = 'inline-flex';
             if (countPhotos > 0) {
-                btnFinalizar.style.display = 'inline-flex';
                 btnFinalizar.innerHTML = `<span>✅</span> <span>Finalizar Observação (${countPhotos} foto${countPhotos > 1 ? 's' : ''})</span>`;
             } else {
-                btnFinalizar.style.display = 'none';
+                btnFinalizar.innerHTML = `<span>✅</span> <span>Finalizar Observação</span>`;
             }
         }
     }
 
     function finalizeAvariaReport() {
+        const countPhotos = Object.keys(currentAvariaPhotos).length;
+        if (countPhotos === 0) {
+            const prosseguir = confirm('Nenhuma foto foi anexada nesta observação de avaria.\n\nDeseja prosseguir e registrar a avaria mesmo sem foto?');
+            if (!prosseguir) return;
+        }
+
         // 1. Esconde IMEDIATAMENTE e FORÇADAMENTE a janela de fotos de avarias
         const photoModal = document.getElementById('avariaPhotoSelectModal');
         if (photoModal) {
@@ -10355,9 +10480,10 @@
         selectedAvariaSlots = [];
         currentAvariaPhotos = {};
 
-        // Retorna diretamente ao index inicial
+        // Retorna diretamente à página inicial
         renderDashboard();
         renderVehicleMiniCards();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         showToast('✅ Avaria registrada e comunicada. Retornado ao Painel Inicial!');
     }
     
