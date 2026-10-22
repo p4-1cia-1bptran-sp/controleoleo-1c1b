@@ -2851,13 +2851,48 @@
 
         @media (max-width: 768px) {
             #avariaPhotoSelectModal .modal-card {
-                max-height: 85dvh !important;
-                max-height: 85vh !important;
-                height: auto !important;
+                height: 88dvh !important;
+                max-height: 88dvh !important;
+                height: 88vh !important;
+                max-height: 88vh !important;
                 width: 96% !important;
+                max-width: 560px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
                 border-radius: 12px !important;
+                box-sizing: border-box !important;
             }
-            #avariaPhotoSelectModal .modal-footer, #avariaTextModal .modal-footer, #avariaMilitarModal .modal-footer {
+            #avariaPhotoSelectModal .modal-header {
+                flex-shrink: 0 !important;
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 60 !important;
+            }
+            #avariaPhotoSelectModal .modal-body {
+                flex: 1 1 0 !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding: 10px 12px 20px 12px !important;
+                box-sizing: border-box !important;
+            }
+            #avariaPhotoSelectModal .modal-footer {
+                flex-shrink: 0 !important;
+                position: sticky !important;
+                bottom: 0 !important;
+                z-index: 60 !important;
+                background: var(--card-bg, #ffffff) !important;
+                border-top: 2.5px solid #cbd5e1 !important;
+                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2) !important;
+                padding: 10px 14px !important;
+                padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+            #avariaTextModal .modal-footer, #avariaMilitarModal .modal-footer {
                 padding: 10px 12px !important;
                 padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
             }
@@ -4170,17 +4205,31 @@
 <!-- 📸 3. MODAL: SELEÇÃO DA FOTO COM OS TICKS (Dianteira, Traseira, etc.)      -->
 <!-- ========================================================================= -->
 <div id="avariaPhotoSelectModal" class="modal-overlay" style="z-index: 10054;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 560px; width: 96%; height: 88dvh; max-height: 88dvh;" onclick="event.stopPropagation()">
-        <div class="modal-header" style="padding: 10px 14px;">
-            <div class="modal-title" style="font-size: 1.02rem; font-weight: 900; color: #dc2626; line-height: 1.3;">
-                <span>📸 Anexar Foto da Avaria Constatada</span>
+    <div class="modal-card" style="max-width: 560px; width: 96%; height: 88dvh; max-height: 88dvh; display: flex; flex-direction: column; overflow: hidden;" onclick="event.stopPropagation()">
+        <!-- CABEÇALHO COM BOTÃO FINALIZAR DIRETO NO TOPO (NUNCA SOME NO CELULAR) -->
+        <div class="modal-header" style="padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div class="modal-title" style="font-size: 1rem; font-weight: 900; color: #dc2626; line-height: 1.25; flex: 1;">
+                <span>📸 Selecione a Foto da Alteração</span>
             </div>
-            <button type="button" class="modal-close" onclick="cancelAvariaPhotoSelectToPrevious()" title="Voltar para a janela anterior">✖</button>
+            <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn btn-success btn-3d" onclick="finalizeAvariaReport()" style="min-height: 40px; padding: 6px 14px; font-size: 0.92rem; font-weight: 800; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);" title="Finalizar e seguir para o próximo passo">
+                    <span>✅ Finalizar</span>
+                </button>
+                <button type="button" class="modal-close" onclick="cancelAvariaPhotoSelectToPrevious()" title="Voltar para a janela anterior">✖</button>
+            </div>
         </div>
 
-        <div class="modal-body" style="padding: 10px 12px 75px 12px;">
-            <!-- BANNER DINÂMICO DE SUCESSO AO ANEXAR FOTO (SEMPRE NO TOPO) -->
-            <div id="avariaPhotoTopBanner" style="display: none; background: #dcfce7; border: 1.5px solid #86efac; border-radius: 8px; padding: 8px 12px; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;"></div>
+        <div class="modal-body" style="padding: 10px 12px 20px 12px; flex: 1 1 0; min-height: 0; overflow-y: auto;">
+            <!-- BARRA DE FINALIZAÇÃO SEMPRE VISÍVEL NO TOPO DO CORPO -->
+            <div id="avariaAlwaysTopFinalizarBar" style="background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size: 1.2rem;">✅</span>
+                    <span style="font-size: 0.86rem; font-weight: 800; color: #166534;" id="avariaTopStatusText">Pronto para finalizar?</span>
+                </div>
+                <button type="button" class="btn btn-success btn-3d" onclick="finalizeAvariaReport()" id="btnFinalizarTopo" style="min-height: 42px; padding: 6px 16px; font-size: 0.95rem; font-weight: 900; background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; border-radius: 8px; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.4); white-space: nowrap;">
+                    <span>✅ Finalizar e Seguir ➔</span>
+                </button>
+            </div>
 
             <div style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 6px 10px; margin-bottom: 4px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
@@ -4210,7 +4259,7 @@
             <button type="button" class="btn btn-outline btn-3d" style="min-height: 48px; font-weight: 700; font-size: 0.92rem; border-color: #cbd5e1; color: var(--text-muted); padding: 8px 14px;" onclick="cancelAvariaPhotoSelectToPrevious()" title="Cancelar e voltar para a janela de descrição da avaria">
                 ↩️ Cancelar
             </button>
-            <button type="button" class="btn btn-success btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 48px; font-weight: 800; font-size: 1.02rem; justify-content: center; gap: 6px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
+            <button type="button" class="btn btn-success btn-3d" id="btnFinalizarObservacao" style="flex: 1; min-height: 48px; font-weight: 800; font-size: 1.05rem; justify-content: center; gap: 6px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);" onclick="finalizeAvariaReport()" title="Avançar para informar o QRA do militar">
                 <span>✅</span>
                 <span>Finalizar Observação</span>
             </button>
@@ -9913,7 +9962,12 @@
 
         renderAvariaPhotoSlots();
 
-        if (modal) modal.style.display = 'flex';
+        if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.style.zIndex = '10054';
+            const body = modal.querySelector('.modal-body');
+            if (body) body.scrollTop = 0;
+        }
     }
 
     function cancelAvariaPhotoSelectToPrevious() {
@@ -10053,16 +10107,21 @@
                                 <span>Galeria</span>
                             </button>
                             <input type="file" id="avaria_gallery_${slot.id}" accept="image/*" style="opacity: 0; position: absolute; pointer-events: none; width: 1px; height: 1px;" onchange="onDirectAvariaSlotFileChosen(event, '${slot.id}')">
+
+                            <!-- BOTÃO FINALIZAR DIRETO NO CARD VAZIO (CASO O USUÁRIO QUEIRA SEGUIR SEM FOTO NESTA POSIÇÃO) -->
+                            <button type="button" class="btn btn-outline btn-3d" onclick="finalizeAvariaReport()" style="min-height: 30px; font-size: 0.72rem; font-weight: 700; gap: 4px; width: 100%; border-color: #16a34a; color: #15803d; background: #f0fdf4; justify-content: center; margin-top: 2px; padding: 2px 4px;">
+                                <span>✅ Finalizar</span>
+                            </button>
                         </div>
                     </div>
                 `;
             } else {
-                // FOTO ANEXADA: INCLUI BOTÃO "FINALIZAR" DIRETO NO CARD PARA NUNCA SUMIR NO CELULAR
+                // FOTO ANEXADA: INCLUI BOTÃO "FINALIZAR" GRANDE E VERDE DIRETO NO CARD
                 html += `
-                    <div class="avaria-slot-card has-uploaded-photo" id="avariaSlotCard_${slot.id}">
+                    <div class="avaria-slot-card has-uploaded-photo" id="avariaSlotCard_${slot.id}" style="border: 2px solid #16a34a !important; background: #f0fdf4 !important;">
                         <div class="avaria-slot-header" style="font-size: 0.74rem; margin-bottom: 3px;">
                             <span>${slot.icon}</span>
-                            <span style="font-weight: 800; color: #b91c1c;">${slot.label}</span>
+                            <span style="font-weight: 800; color: #166534;">${slot.label}</span>
                         </div>
                         <div class="avaria-uploaded-thumb" onclick="openPhotoViewerModal('${photo.data}', { title: 'Foto da Avaria - ${slot.label}', filename: 'Avaria_${currentAvariaVehicle}_${slot.label}.jpg' })" title="Toque para ver a foto com zoom" style="height: 60px; border-radius: 6px;">
                             <img src="${photo.data}" alt="${slot.label}" class="avaria-thumb-img">
@@ -10078,8 +10137,8 @@
                                 🗑️ Trocar
                             </button>
                         </div>
-                        <!-- BOTÃO FINALIZAR DIRETO NO CARD ONDE A FOTO FOI COLOCADA -->
-                        <button type="button" class="btn btn-success btn-3d" onclick="finalizeAvariaReport()" style="width: 100%; min-height: 38px; font-size: 0.8rem; font-weight: 800; margin-top: 5px; padding: 4px 6px; justify-content: center; gap: 4px; background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(22, 163, 74, 0.35);">
+                        <!-- BOTÃO FINALIZAR PROEMINENTE DIRETO NO CARD DA FOTO -->
+                        <button type="button" class="btn btn-success btn-3d" onclick="finalizeAvariaReport()" style="width: 100%; min-height: 40px; font-size: 0.85rem; font-weight: 900; margin-top: 6px; padding: 6px; justify-content: center; gap: 4px; background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; border-radius: 8px; box-shadow: 0 4px 10px rgba(22, 163, 74, 0.4);">
                             <span>✅</span> <span>Finalizar e Seguir ➔</span>
                         </button>
                     </div>
@@ -10089,21 +10148,16 @@
 
         grid.innerHTML = html;
 
-        // Atualiza dinamicamente o banner de aviso no topo da lista
-        const topBanner = document.getElementById('avariaPhotoTopBanner');
-        if (topBanner) {
+        // Atualiza a barra permanente no topo do modal
+        const topStatus = document.getElementById('avariaTopStatusText');
+        const btnTopo = document.getElementById('btnFinalizarTopo');
+        if (topStatus && btnTopo) {
             if (countPhotos > 0) {
-                topBanner.style.display = 'flex';
-                topBanner.innerHTML = `
-                    <div style="font-size: 0.82rem; font-weight: 800; color: #166534; display: flex; align-items: center; gap: 6px;">
-                        <span>📸</span> <span>${countPhotos} foto${countPhotos > 1 ? 's' : ''} anexada${countPhotos > 1 ? 's' : ''}!</span>
-                    </div>
-                    <button type="button" class="btn btn-success btn-3d" onclick="finalizeAvariaReport()" style="min-height: 36px; padding: 4px 12px; font-size: 0.82rem; font-weight: 800; background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; border-radius: 6px; white-space: nowrap;">
-                        ✅ Finalizar ➔
-                    </button>
-                `;
+                topStatus.innerHTML = `📸 <strong>${countPhotos} foto${countPhotos > 1 ? 's' : ''} anexada${countPhotos > 1 ? 's' : ''}!</strong>`;
+                btnTopo.innerHTML = `<span>✅ Finalizar (${countPhotos}) ➔</span>`;
             } else {
-                topBanner.style.display = 'none';
+                topStatus.textContent = 'Pronto para finalizar?';
+                btnTopo.innerHTML = '<span>✅ Finalizar e Seguir ➔</span>';
             }
         }
 
