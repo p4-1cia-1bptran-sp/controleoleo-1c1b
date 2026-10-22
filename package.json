@@ -1,16 +1,20 @@
 {
-  "name": "controle-frota-oleo-bptran",
+  "name": "controle-oleo-frota-1cia-1bptran",
   "version": "1.0.0",
-  "description": "Sistema de Controle de Óleo e Rodagem de Viaturas - Servidor Online",
-  "main": "server.js",
+  "description": "Sistema de Controle de Óleo, Odômetro, Inspeção e Avarias da Frota da 1ª Cia do 1º BPTran",
+  "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "npx serve ."
   },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.19.2"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "keywords": [
+    "frota",
+    "viaturas",
+    "oleo",
+    "policia-militar",
+    "bptran",
+    "firebase",
+    "vercel"
+  ],
+  "author": "Telemática - 1ª Cia do 1º BPTran",
+  "license": "UNLICENSED"
 }
