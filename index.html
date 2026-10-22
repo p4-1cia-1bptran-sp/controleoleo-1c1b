@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.22.v2";
+            const APP_VERSION = "2026.10.22.v3";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -2106,10 +2106,23 @@
            🔒 MODAL DE INSPEÇÃO: CABEÇALHO E RODAPÉ 100% FIXOS COM CORPO ROLÁVEL
            ========================================================================= */
         #vehicleInspectionModal {
-            align-items: center !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            height: 100dvh !important;
+            display: none;
+            flex-direction: column !important;
             justify-content: center !important;
+            align-items: center !important;
             overflow: hidden !important;
             padding: 8px !important;
+            box-sizing: border-box !important;
+            overscroll-behavior: contain !important;
+            z-index: 10040 !important;
         }
 
         #vehicleInspectionModal .modal-card {
@@ -2128,19 +2141,37 @@
             position: relative !important;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
             margin: auto !important;
+            box-sizing: border-box !important;
         }
 
         #vehicleInspectionModal .modal-header {
             flex-shrink: 0 !important;
-            padding: 14px 18px !important;
+            padding: 12px 18px !important;
             border-bottom: 1.5px solid var(--border) !important;
             background: var(--card-bg, #ffffff) !important;
             margin: 0 !important;
             border-radius: 14px 14px 0 0 !important;
-            z-index: 40 !important;
+            z-index: 50 !important;
             position: sticky !important;
             top: 0 !important;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+            box-sizing: border-box !important;
+        }
+
+        /* BARRA FIXA SUB-HEADER: INFORMAÇÕES E BOTÃO FIXO TIRAR FOTO DE AVARIA */
+        #vehicleInspectionModal .modal-fixed-subbar {
+            flex-shrink: 0 !important;
+            background: var(--bg) !important;
+            border-bottom: 2px solid var(--border) !important;
+            padding: 10px 16px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+            z-index: 45 !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
         }
 
         #vehicleInspectionModal .modal-inspection-body {
@@ -2149,7 +2180,7 @@
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch !important;
             overscroll-behavior: contain !important;
-            padding: 16px 20px !important;
+            padding: 14px 18px !important;
             display: flex !important;
             flex-direction: column !important;
             gap: 12px !important;
@@ -2164,7 +2195,7 @@
             background: var(--card-bg, #ffffff) !important;
             margin: 0 !important;
             border-radius: 0 0 14px 14px !important;
-            z-index: 40 !important;
+            z-index: 50 !important;
             position: sticky !important;
             bottom: 0 !important;
             box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12) !important;
@@ -2173,6 +2204,7 @@
             justify-content: space-between !important;
             gap: 10px !important;
             flex-wrap: wrap !important;
+            box-sizing: border-box !important;
         }
 
         #vehicleInspectionModal .inspect-footer-actions {
@@ -2222,27 +2254,35 @@
 
         @media (max-width: 768px) {
             #vehicleInspectionModal {
-                padding: 4px !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                height: 100dvh !important;
+                padding: 6px !important;
                 padding-top: max(6px, env(safe-area-inset-top, 6px)) !important;
-                padding-bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+                padding-bottom: max(85px, calc(env(safe-area-inset-bottom, 0px) + 75px)) !important;
                 align-items: center !important;
-                justify-content: center !important;
+                justify-content: flex-start !important;
                 overflow: hidden !important;
+                box-sizing: border-box !important;
             }
             #vehicleInspectionModal .modal-card {
                 padding: 0 !important;
-                margin: auto !important;
-                height: calc(100dvh - 12px) !important;
-                max-height: calc(100dvh - 12px) !important;
-                height: calc(100vh - 12px) !important;
-                max-height: calc(100vh - 12px) !important;
+                margin: 0 auto !important;
+                height: 100% !important;
+                max-height: 100% !important;
                 width: 98% !important;
-                max-width: 98% !important;
+                max-width: 580px !important;
                 border-radius: 12px !important;
                 display: flex !important;
                 flex-direction: column !important;
                 overflow: hidden !important;
                 position: relative !important;
+                box-sizing: border-box !important;
             }
             #vehicleInspectionModal .modal-header {
                 padding: 10px 14px !important;
@@ -2251,28 +2291,39 @@
                 top: 0 !important;
                 z-index: 50 !important;
             }
+            #vehicleInspectionModal .modal-fixed-subbar {
+                padding: 8px 12px !important;
+                flex-shrink: 0 !important;
+                gap: 8px !important;
+            }
+            #vehicleInspectionModal .modal-fixed-subbar .btn-subbar-avaria {
+                width: 100% !important;
+                min-height: 46px !important;
+                font-size: 0.95rem !important;
+            }
             #vehicleInspectionModal .modal-inspection-body {
-                padding: 10px 12px !important;
-                flex: 1 1 auto !important;
+                padding: 8px 10px 20px 10px !important;
+                flex: 1 1 0 !important;
                 min-height: 0 !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch !important;
                 overscroll-behavior: contain !important;
+                box-sizing: border-box !important;
             }
             #vehicleInspectionModal .modal-footer {
                 padding: 10px 12px !important;
-                padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
                 gap: 8px !important;
                 flex-shrink: 0 !important;
                 position: sticky !important;
                 bottom: 0 !important;
                 z-index: 50 !important;
                 background: var(--card-bg, #ffffff) !important;
-                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15) !important;
-                border-top: 2px solid var(--border) !important;
+                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2) !important;
+                border-top: 2.5px solid #cbd5e1 !important;
                 width: 100% !important;
                 display: flex !important;
                 flex-direction: column !important;
+                box-sizing: border-box !important;
             }
             #vehicleInspectionModal .inspect-footer-actions {
                 width: 100% !important;
@@ -2283,15 +2334,15 @@
             #vehicleInspectionModal #btnFinalizarInspecao {
                 flex: 1 1 auto !important;
                 width: auto !important;
-                min-height: 50px !important;
-                font-size: 1.05rem !important;
-                padding: 10px 14px !important;
+                min-height: 48px !important;
+                font-size: 1.02rem !important;
+                padding: 8px 14px !important;
             }
             #vehicleInspectionModal #btnCancelarInspecao {
-                min-height: 50px !important;
+                min-height: 48px !important;
                 min-width: 80px !important;
                 font-size: 0.92rem !important;
-                padding: 10px 12px !important;
+                padding: 8px 12px !important;
             }
             #vehicleInspectionModal #adminBaselineControls {
                 width: 100% !important;
@@ -4166,26 +4217,32 @@
             <button type="button" class="modal-close" onclick="cancelVehicleInspectionModal()" title="Fechar Inspeção e Voltar">✖</button>
         </div>
 
-        <div class="modal-inspection-body">
-            <!-- Header Informativo da Viatura -->
-            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                <div>
-                    <div id="inspectModalVehicleMeta" style="font-size: 0.9rem; font-weight: 800; color: var(--text-main);">--</div>
-                    <div id="inspectModalVehicleKm" style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">KM Atual: --</div>
-                </div>
-                <div id="inspectModalPhotoCountBadge" class="badge badge-info" style="font-size: 0.82rem; font-weight: 700;">
-                    0 de 8 fotos fixas
-                </div>
+        <!-- BARRA FIXA SUB-HEADER: INFORMAÇÕES E BOTÃO FIXO TIRAR FOTO DE AVARIA -->
+        <div class="modal-fixed-subbar" id="inspectModalSubbar">
+            <div style="display: flex; flex-direction: column; min-width: 0;">
+                <div id="inspectModalVehicleMeta" style="font-size: 0.92rem; font-weight: 800; color: var(--text-main); line-height: 1.2;">--</div>
+                <div id="inspectModalVehicleKm" style="font-size: 0.76rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;">KM Atual: --</div>
             </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span id="inspectModalPhotoCountBadge" class="badge badge-info" style="font-size: 0.78rem; font-weight: 700;">
+                    0 de 8 fotos fixas
+                </span>
+                <button type="button" class="btn btn-danger-solid btn-3d btn-subbar-avaria" onclick="openAvariaRegistrationFromInspection()" style="min-height: 44px; padding: 8px 16px; font-size: 0.92rem; font-weight: 800; gap: 6px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35); white-space: nowrap;" title="Tirar foto de avaria observada nesta viatura">
+                    <span>🚨</span>
+                    <span>Tirar Foto de Avaria</span>
+                </button>
+            </div>
+        </div>
 
+        <div class="modal-inspection-body">
             <!-- ========================================================================= -->
             <!-- 📸 SETOR 1: FOTOS FIXAS DE INSPEÇÃO DA VIATURA (NÃO ALTERÁVEIS)           -->
             <!-- ========================================================================= -->
-            <div style="background: var(--card-bg, #ffffff); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 4px;">
+            <div style="background: var(--card-bg, #ffffff); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 2px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 1.2rem;">📸</span>
-                        <strong style="font-size: 0.96rem; color: var(--primary);">Setor 1: Fotos Fixas de Inspeção da Viatura</strong>
+                        <strong style="font-size: 0.96rem; color: var(--primary);">Fotos Fixas de Inspeção da Viatura</strong>
                         <span class="badge badge-info" style="font-size: 0.68rem; font-weight: 700;">🔒 Fixo / Referência</span>
                     </div>
                     <span id="inspectBaselineAdminHint" style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">Fotos Fixas de Referência</span>
@@ -4199,27 +4256,19 @@
             </div>
 
             <!-- ========================================================================= -->
-            <!-- 🚨 SETOR 2: FOTOS DE AVARIAS CONSTATADAS NESTA VIATURA                     -->
+            <!-- 🚨 SETOR 2: FOTOS DE AVARIAS CONSTATADAS (EXCLUSIVO PARA O ADMINISTRADOR)  -->
             <!-- ========================================================================= -->
-            <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 10px; padding: 12px; margin-top: 10px;">
+            <div id="inspectModalAvariasSection" style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 10px; padding: 12px; margin-top: 10px; display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 1.2rem;">🚨</span>
-                        <strong style="font-size: 0.96rem; color: #b91c1c;">Setor 2: Fotos de Avarias Constatadas</strong>
+                        <strong style="font-size: 0.96rem; color: #b91c1c;">Histórico de Avarias Constatadas (ADM)</strong>
                     </div>
                     <span id="inspectModalAvariasBadge" class="badge badge-danger" style="font-size: 0.72rem; font-weight: 700;">0 avarias</span>
                 </div>
                 <p style="font-size: 0.78rem; color: #9f1239; margin: 0 0 10px 0; line-height: 1.35;">
-                    Fotos anexadas aos relatos de avarias constatadas. Cada foto de avaria é independente e <strong>não altera</strong> as fotos fixas do Setor 1. Disponíveis para visualização com zoom em tela cheia pelo Administrador.
+                    Relatos de avarias e fotos enviadas pelos policiais militares. Visualização restrita ao Administrador.
                 </p>
-
-                <!-- Botão Direto para Tirar Foto de Avaria -->
-                <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-                    <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromInspection()" style="min-height: 48px; width: 100%; font-size: 1rem; font-weight: 800; gap: 8px; justify-content: center; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35); white-space: normal; text-align: center;">
-                        <span style="font-size: 1.2rem;">🚨</span>
-                        <span>Tirar Foto de Avaria</span>
-                    </button>
-                </div>
 
                 <!-- Lista de Avarias Constatadas com Fotos -->
                 <div id="inspectModalAvariasList" style="display: flex; flex-direction: column; gap: 10px;"></div>
@@ -9814,7 +9863,12 @@
         if (adminControls) adminControls.style.display = isAdminAuthenticated ? 'inline-flex' : 'none';
 
         if (modal) {
-            modal.style.display = 'flex';
+            modal.style.setProperty('display', 'flex', 'important');
+            if (window.visualViewport && window.innerWidth <= 768) {
+                modal.style.height = `${window.visualViewport.height}px`;
+            } else {
+                modal.style.height = '100%';
+            }
         }
     }
 
@@ -10098,9 +10152,13 @@
 
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
-            const modal = document.getElementById('avariaPhotoSelectModal');
-            if (modal && modal.style.display !== 'none' && window.innerWidth <= 768) {
-                modal.style.height = `${window.visualViewport.height}px`;
+            const modalAvaria = document.getElementById('avariaPhotoSelectModal');
+            if (modalAvaria && modalAvaria.style.display !== 'none' && window.innerWidth <= 768) {
+                modalAvaria.style.height = `${window.visualViewport.height}px`;
+            }
+            const modalInspect = document.getElementById('vehicleInspectionModal');
+            if (modalInspect && modalInspect.style.display !== 'none' && window.innerWidth <= 768) {
+                modalInspect.style.height = `${window.visualViewport.height}px`;
             }
         });
     }
@@ -10941,8 +10999,13 @@ function toggleAdminBaselineEditMode() {
         grid.innerHTML = htmlSlots;
 
         // =========================================================================
-        // 🚨 RENDERIZAÇÃO DO SETOR 2: FOTOS DE AVARIAS CONSTATADAS NESTA VIATURA
+        // 🚨 RENDERIZAÇÃO DO SETOR 2: FOTOS DE AVARIAS (EXCLUSIVO PARA ADM)
         // =========================================================================
+        const avariasSectionEl = document.getElementById('inspectModalAvariasSection');
+        if (avariasSectionEl) {
+            avariasSectionEl.style.display = isAdminAuthenticated ? 'block' : 'none';
+        }
+
         if (avariasListEl) {
             const rawAvarias = vehicleAvarias[currentInspectVehicle] || [];
             const vAvarias = Array.isArray(rawAvarias) ? rawAvarias : (typeof rawAvarias === 'object' && rawAvarias !== null ? [rawAvarias] : []);
@@ -10950,7 +11013,9 @@ function toggleAdminBaselineEditMode() {
                 avariasBadge.textContent = `${vAvarias.length} avaria(s)`;
             }
 
-            if (vAvarias.length === 0) {
+            if (!isAdminAuthenticated) {
+                avariasListEl.innerHTML = '';
+            } else if (vAvarias.length === 0) {
                 avariasListEl.innerHTML = `
                     <div style="text-align: center; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; font-size: 0.84rem; font-weight: 700;">
                         ✅ Nenhuma avaria observada registrada para esta viatura.
