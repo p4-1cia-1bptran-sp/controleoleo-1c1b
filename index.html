@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.22.v4";
+            const APP_VERSION = "2026.10.22.v5";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -2300,11 +2300,7 @@
                 flex-shrink: 0 !important;
                 gap: 8px !important;
             }
-            #vehicleInspectionModal .modal-fixed-subbar .btn-subbar-avaria {
-                width: 100% !important;
-                min-height: 46px !important;
-                font-size: 0.95rem !important;
-            }
+
             #vehicleInspectionModal .modal-inspection-body {
                 padding: 8px 10px 20px 10px !important;
                 flex: 1 1 0 !important;
@@ -4224,19 +4220,11 @@
         </div>
 
         <!-- BARRA FIXA SUB-HEADER: INFORMAÇÕES E BOTÃO FIXO TIRAR FOTO DE AVARIA -->
-        <div class="modal-fixed-subbar" id="inspectModalSubbar">
-            <div style="display: flex; flex-direction: column; min-width: 0;">
-                <div id="inspectModalVehicleMeta" style="font-size: 0.92rem; font-weight: 800; color: var(--text-main); line-height: 1.2;">--</div>
-                <div id="inspectModalVehicleKm" style="font-size: 0.76rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;">KM Atual: --</div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <span id="inspectModalPhotoCountBadge" class="badge badge-info" style="font-size: 0.78rem; font-weight: 700;">
-                    0 de 8 fotos fixas
-                </span>
-                <button type="button" class="btn btn-danger-solid btn-3d btn-subbar-avaria" onclick="openAvariaRegistrationFromInspection()" style="min-height: 44px; padding: 8px 16px; font-size: 0.92rem; font-weight: 800; gap: 6px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35); white-space: nowrap;" title="Tirar foto de avaria observada nesta viatura">
-                    <span>🚨</span>
-                    <span>Tirar Foto de Avaria</span>
-                </button>
+        <!-- BARRA FIXA SUB-HEADER: DADOS DA VIATURA (MODELO, PLACA E KM) -->
+        <div class="modal-fixed-subbar" id="inspectModalSubbar" style="padding: 10px 16px; background: var(--bg); border-bottom: 2px solid var(--border);">
+            <div style="display: flex; flex-direction: column; min-width: 0; width: 100%;">
+                <div id="inspectModalVehicleMeta" style="font-size: 0.98rem; font-weight: 800; color: var(--text-main); line-height: 1.25;">--</div>
+                <div id="inspectModalVehicleKm" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;">KM Atual: --</div>
             </div>
         </div>
 
@@ -5452,10 +5440,20 @@
 
         const vehicle = quickKmTargetVehicle;
         const existingIdx = records.findIndex(r => r.vehicle === vehicle);
-        const fixedTargetKm = vehicleTargetMap[vehicle] || (kmVal + 5000);
+        let fixedTargetKm = vehicleTargetMap[vehicle];
+        if (!fixedTargetKm && existingIdx !== -1 && records[existingIdx].targetKm) {
+            fixedTargetKm = records[existingIdx].targetKm;
+            vehicleTargetMap[vehicle] = fixedTargetKm;
+        }
+        if (!fixedTargetKm) {
+            fixedTargetKm = kmVal + 5000;
+            vehicleTargetMap[vehicle] = fixedTargetKm;
+        }
+        localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
 
         if (existingIdx !== -1) {
             records[existingIdx].currentKm = kmVal;
+            records[existingIdx].targetKm = fixedTargetKm;
             records[existingIdx].date = todayStr;
         } else {
             records.unshift({
@@ -5487,7 +5485,8 @@
         closeQuickKmModal();
         renderDashboard();
         renderMileageTable();
-        syncAllDataToOnline();
+        // Sincronização ultra-rápida direta para o Firebase Realtime Database (< 100ms)
+        syncDirectToFirebaseFast();
         showToast(`⏱️ KM da viatura <strong>${vehicle}</strong> atualizado para <strong>${kmVal.toLocaleString('pt-BR')} km</strong>!`);
     }
 
@@ -5660,30 +5659,16 @@
 
     function getApiCandidateEndpoints() {
         const list = [];
-        // Prioridade máxima: Firebase Realtime Database (ultrarrápido, ~80ms, sincronia instantânea entre PCs)
-        if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+        // Firebase Realtime Database é a fonte de verdade em nuvem única e prioritária
+        if (UNIVERSAL_CLOUD_URL) {
             list.push(UNIVERSAL_CLOUD_URL);
         }
-
-        if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-            const originEndpoint = window.location.origin + '/api/oleo';
-            if (!list.includes(originEndpoint)) list.push(originEndpoint);
-            if (!list.includes('/api/oleo')) list.push('/api/oleo');
-            if (!list.includes('/api/dados')) list.push('/api/dados');
-            if (!list.includes('/api/database')) list.push('/api/database');
-        }
-
         const customUrl = localStorage.getItem('oleo_vtr_api_url');
         if (customUrl && customUrl.trim()) {
             let u = customUrl.trim();
             if (!u.startsWith('http') && !u.startsWith('/')) u = 'https://' + u;
             if (!list.includes(u)) list.push(u);
         }
-
-        if (lastActiveEndpoint && !list.includes(lastActiveEndpoint)) {
-            list.push(lastActiveEndpoint);
-        }
-
         return list;
     }
 
@@ -5701,9 +5686,9 @@
                 const isFirebase = endpoint.includes('firebaseio.com');
                 const actualMethod = isFirebase ? (method === 'POST' ? 'PUT' : method) : method;
 
-                // Cache-busting para requisições GET em dispositivos móveis (evita cache de fotos antigas no celular)
+                // ATENÇÃO: Firebase RTDB rejeita parâmetros desconhecidos como _nocache com erro HTTP 400!
                 let fetchUrl = endpoint;
-                if (method === 'GET') {
+                if (method === 'GET' && !isFirebase) {
                     const sep = endpoint.includes('?') ? '&' : '?';
                     fetchUrl = `${endpoint}${sep}_nocache=${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
                 }
@@ -5748,14 +5733,12 @@
 
     function generateDataHash(obj) {
         if (!obj) return '';
+        // Não inclui updatedAt no hash para evitar re-renderizações e saltitações de página quando os dados não mudaram
         const clean = {
             records: obj.records || [],
             vehicles: obj.vehicles || [],
             targetMap: obj.targetMap || {},
-            mileageHistory: obj.mileageHistory || [],
-            vehiclePhotos: obj.vehiclePhotos || {},
-            vehicleAvarias: obj.vehicleAvarias || {},
-            updatedAt: obj.updatedAt || '',
+            mileageHistory: (obj.mileageHistory || []).slice(0, 30),
             lastStatusUpdate: obj.lastStatusUpdate || ''
         };
         return JSON.stringify(clean);
@@ -5851,6 +5834,22 @@
                     let incomingData = null;
                     if (parsed.path === '/' || !parsed.path) {
                         incomingData = parsed.data;
+                    } else if (parsed.path.startsWith('/records')) {
+                        if (parsed.path === '/records') {
+                            records = Array.isArray(parsed.data) ? parsed.data : (parsed.data ? Object.values(parsed.data) : []);
+                            localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
+                            renderDashboard();
+                            renderVehicleMiniCards();
+                            return;
+                        }
+                    } else if (parsed.path.startsWith('/targetMap')) {
+                        if (parsed.path === '/targetMap') {
+                            vehicleTargetMap = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
+                            localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
+                            renderDashboard();
+                            renderVehicleMiniCards();
+                            return;
+                        }
                     } else {
                         loadDataFromOnline(true);
                         return;
@@ -5894,20 +5893,42 @@
         if (Array.isArray(data.records)) {
             records = data.records;
             localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
+        } else if (data.records && typeof data.records === 'object') {
+            records = Object.values(data.records);
+            localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
         }
         if (Array.isArray(data.mileageHistory)) {
             mileageHistory = data.mileageHistory;
+            localStorage.setItem('oleo_vtr_mileage_history', JSON.stringify(mileageHistory));
+        } else if (data.mileageHistory && typeof data.mileageHistory === 'object') {
+            mileageHistory = Object.values(data.mileageHistory);
             localStorage.setItem('oleo_vtr_mileage_history', JSON.stringify(mileageHistory));
         }
         if (Array.isArray(data.vehicles)) {
             customVehicles = data.vehicles;
             if (!customVehicles.includes('26-24')) customVehicles.push('26-24');
             localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
+        } else if (data.vehicles && typeof data.vehicles === 'object') {
+            customVehicles = Object.values(data.vehicles);
+            if (!customVehicles.includes('26-24')) customVehicles.push('26-24');
+            localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
         }
         if (data.targetMap && typeof data.targetMap === 'object') {
-            vehicleTargetMap = data.targetMap;
+            vehicleTargetMap = { ...vehicleTargetMap, ...data.targetMap };
             localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
         }
+        // Alinhamento mútuo obrigatório: targetKm do record e vehicleTargetMap nunca divergem
+        records.forEach(r => {
+            if (r.vehicle) {
+                if (vehicleTargetMap[r.vehicle]) {
+                    r.targetKm = vehicleTargetMap[r.vehicle];
+                } else if (r.targetKm) {
+                    vehicleTargetMap[r.vehicle] = r.targetKm;
+                }
+            }
+        });
+        localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
+        localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
         // Atualização não-destrutiva de fotos e avarias (evita apagar avarias locais se o servidor retornar vazio):
         // Nuvem Online é a FONTE DA VERDADE ÚNICA: sincronização direta e fidedigna
         if (data && data.vehiclePhotos !== undefined) {
@@ -5983,6 +6004,50 @@
     }
 
     let hasInitialCloudLoadCompleted = false;
+
+    async function syncDirectToFirebaseFast() {
+        if (!UNIVERSAL_CLOUD_URL || !UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+            syncAllDataToOnline();
+            return;
+        }
+        const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+        const corePayload = {
+            records: records || [],
+            targetMap: vehicleTargetMap || {},
+            mileageHistory: (mileageHistory || []).slice(0, 50),
+            vehicles: customVehicles || [],
+            lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
+            updatedAt: new Date().toISOString()
+        };
+        lastSyncedHash = generateDataHash(corePayload);
+        setCloudStatusBadge('syncing', '⚡ Enviando Nuvem...');
+
+        try {
+            // Atualiza os registros principais em tempo recorde (~50-80ms) sem travar com fotos pesadas
+            await fetch(`${baseUrl}/records.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(records)
+            });
+            await fetch(`${baseUrl}/targetMap.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(vehicleTargetMap)
+            });
+            await fetch(`${baseUrl}/lastStatusUpdate.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(corePayload.lastStatusUpdate)
+            });
+
+            isCloudConnected = true;
+            setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
+            // Sync complementar em background
+            syncAllDataToOnline();
+        } catch (e) {
+            syncAllDataToOnline();
+        }
+    }
 
     async function syncAllDataToOnline(force = false) {
         if (isRemoteUpdate && !force) return;
@@ -9603,8 +9668,15 @@
 
         let cardsHtml = '';
         customVehicles.forEach(v => {
-            const vRecord = records.find(r => r.vehicle === v);
-            const fixedTarget = vehicleTargetMap[v] || (vRecord ? vRecord.targetKm : null);
+            const vRecords = records.filter(r => r.vehicle === v);
+            let vRecord = null;
+            if (vRecords.length > 0) {
+                vRecord = vRecords.reduce((latest, current) => {
+                    if (!latest) return current;
+                    return (new Date(current.date || 0) >= new Date(latest.date || 0)) ? current : latest;
+                }, null);
+            }
+            const fixedTarget = (vehicleTargetMap && vehicleTargetMap[v]) || (vRecord ? vRecord.targetKm : null);
             const currentKm = (vRecord && vRecord.currentKm !== undefined && vRecord.currentKm !== null && !isNaN(vRecord.currentKm)) ? vRecord.currentKm : null;
             
             // Tom mais escuro e só mostra Em Dia nos que tiverem registro válido
