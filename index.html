@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.22.v5";
+            const APP_VERSION = "2026.10.23.v1";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -1300,8 +1300,7 @@
             padding: 0 !important;
         }
 
-        .modal-card > div:not(.modal-header):not(.modal-footer),
-        .modal-card > form > div:not(.modal-header):not(.modal-footer),
+        
         .modal-body {
             flex: 1 1 auto !important;
             min-height: 0 !important;
@@ -2261,9 +2260,9 @@
                 width: 100% !important;
                 height: 100% !important;
                 height: 100dvh !important;
-                padding: 6px !important;
-                padding-top: max(6px, env(safe-area-inset-top, 6px)) !important;
-                padding-bottom: max(95px, calc(env(safe-area-inset-bottom, 0px) + 85px)) !important;
+                padding: 4px !important;
+                padding-top: max(4px, env(safe-area-inset-top, 4px)) !important;
+                padding-bottom: max(22px, calc(env(safe-area-inset-bottom, 0px) + 12px)) !important;
                 align-items: center !important;
                 justify-content: flex-start !important;
                 overflow: hidden !important;
@@ -2311,15 +2310,16 @@
                 box-sizing: border-box !important;
             }
             #vehicleInspectionModal .modal-footer, #quickKmModal .modal-footer {
-                padding: 10px 12px !important;
-                gap: 8px !important;
+                padding: 6px 10px !important;
+                padding-bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+                gap: 6px !important;
                 flex-shrink: 0 !important;
                 position: sticky !important;
                 bottom: 0 !important;
                 z-index: 50 !important;
                 background: var(--card-bg, #ffffff) !important;
-                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2) !important;
-                border-top: 2.5px solid #cbd5e1 !important;
+                box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.15) !important;
+                border-top: 2px solid #cbd5e1 !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
@@ -2348,8 +2348,11 @@
             }
             #vehicleInspectionModal #adminBaselineControls {
                 width: 100% !important;
-                display: flex !important;
+                display: none !important;
                 gap: 6px !important;
+            }
+            #vehicleInspectionModal #adminBaselineControls.admin-visible {
+                display: flex !important;
             }
             #vehicleInspectionModal #adminBaselineControls button {
                 flex: 1 !important;
@@ -4212,21 +4215,14 @@
 <div id="vehicleInspectionModal" class="modal-overlay" style="z-index: 10040;" onclick="/* Fechamento exclusivo pelos botões Fechar */">
     <div class="modal-card" style="max-width: 760px; width: 95%;" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <div class="modal-title">
-                <span>🔍 Inspeção da Viatura:</span>
+            <div class="modal-title" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span>🔍 Inspeção:</span>
                 <span id="inspectModalVtrTitle" style="color: var(--primary); font-weight: 800;">--</span>
             </div>
             <button type="button" class="modal-close" onclick="cancelVehicleInspectionModal()" title="Fechar Inspeção e Voltar">✖</button>
         </div>
 
-        <!-- BARRA FIXA SUB-HEADER: INFORMAÇÕES E BOTÃO FIXO TIRAR FOTO DE AVARIA -->
-        <!-- BARRA FIXA SUB-HEADER: DADOS DA VIATURA (MODELO, PLACA E KM) -->
-        <div class="modal-fixed-subbar" id="inspectModalSubbar" style="padding: 10px 16px; background: var(--bg); border-bottom: 2px solid var(--border);">
-            <div style="display: flex; flex-direction: column; min-width: 0; width: 100%;">
-                <div id="inspectModalVehicleMeta" style="font-size: 0.98rem; font-weight: 800; color: var(--text-main); line-height: 1.25;">--</div>
-                <div id="inspectModalVehicleKm" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-top: 2px;">KM Atual: --</div>
-            </div>
-        </div>
+<!-- Subcabeçalho removido para que a inspeção comece direto nas Fotos Fixas -->
 
         <div class="modal-inspection-body">
             <!-- ========================================================================= -->
@@ -5240,6 +5236,11 @@
             tag.title = isAdminAuthenticated ? 'Modo Administrador Ativo (Acesso liberado)' : 'Setor disponível apenas para o Administrador';
         });
 
+        const adminInspectionControls = document.getElementById('adminBaselineControls');
+        if (adminInspectionControls) {
+            adminInspectionControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
+            adminInspectionControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
+        }
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
         }
@@ -5941,6 +5942,11 @@
             localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
         }
 
+        const adminInspectionControls = document.getElementById('adminBaselineControls');
+        if (adminInspectionControls) {
+            adminInspectionControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
+            adminInspectionControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
+        }
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
         }
@@ -9923,13 +9929,14 @@
         const metaEl = document.getElementById('inspectModalVehicleMeta');
         const kmEl = document.getElementById('inspectModalVehicleKm');
 
-        if (titleEl) titleEl.textContent = vehicle;
-
         const vRec = records.find(r => r.vehicle === vehicle);
         const vInfo = VEHICLE_FLEET_INFO[vehicle] || {};
-        const modelText = vInfo.model || (vRec && vRec.model) || 'VIATURA';
+        const modelText = vInfo.model || (vRec && vRec.model) || '';
         const placaText = vInfo.placa || (vRec && vRec.placa) || '';
 
+        if (titleEl) {
+            titleEl.textContent = `${vehicle}${modelText ? ' (' + modelText + (placaText ? ' • ' + placaText : '') + ')' : ''}`;
+        }
         if (metaEl) {
             metaEl.textContent = `${modelText}${placaText ? ' • Placa: ' + placaText : ''}`;
         }
@@ -9942,8 +9949,11 @@
 
         const saveBtn = document.getElementById('btnSaveInspectionPhotos');
         const adminControls = document.getElementById('adminBaselineControls');
-        if (saveBtn) saveBtn.style.display = (isAdminAuthenticated && isAdminBaselineEditMode) ? 'inline-flex' : 'none';
-        if (adminControls) adminControls.style.display = isAdminAuthenticated ? 'inline-flex' : 'none';
+        if (saveBtn) saveBtn.style.setProperty('display', (isAdminAuthenticated && isAdminBaselineEditMode) ? 'inline-flex' : 'none', 'important');
+        if (adminControls) {
+            adminControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
+            adminControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
+        }
 
         if (modal) {
             modal.style.setProperty('display', 'flex', 'important');
@@ -10735,6 +10745,11 @@
 
         await syncAllDataToOnline(true);
         renderAdminAvariasList();
+        const adminInspectionControls = document.getElementById('adminBaselineControls');
+        if (adminInspectionControls) {
+            adminInspectionControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
+            adminInspectionControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
+        }
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
         }
@@ -10884,6 +10899,11 @@
         await syncAllDataToOnline(true);
         renderAdminAvariasList();
         updateAdminBadgeUI();
+        const adminInspectionControls = document.getElementById('adminBaselineControls');
+        if (adminInspectionControls) {
+            adminInspectionControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
+            adminInspectionControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
+        }
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
         }
@@ -10992,7 +11012,8 @@ function toggleAdminBaselineEditMode() {
         }
 
         if (adminControls) {
-            adminControls.style.display = isAdminAuthenticated ? 'inline-block' : 'none';
+            adminControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
+            adminControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
         }
         if (btnToggleEdit) {
             btnToggleEdit.textContent = isAdminBaselineEditMode ? '🔒 Travar Fotos Fixas (Modo Padrão)' : '✏️ Cadastrar/Editar Fotos Fixas (ADM)';
