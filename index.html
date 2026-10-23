@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.23.v1";
+            const APP_VERSION = "2026.10.23.v2";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -2251,7 +2251,8 @@
         }
 
         @media (max-width: 768px) {
-            #vehicleInspectionModal, #quickKmModal {
+            /* 🔍 MODAL DE INSPEÇÃO NO MOBILE (FULLSCREEN LIMPO E COM MÁXIMA ALTURA ÚTIL) */
+            #vehicleInspectionModal {
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
@@ -2260,34 +2261,29 @@
                 width: 100% !important;
                 height: 100% !important;
                 height: 100dvh !important;
-                padding: 4px !important;
-                padding-top: max(4px, env(safe-area-inset-top, 4px)) !important;
-                padding-bottom: max(22px, calc(env(safe-area-inset-bottom, 0px) + 12px)) !important;
+                padding: 0 !important;
+                padding-top: env(safe-area-inset-top, 0px) !important;
+                padding-bottom: env(safe-area-inset-bottom, 0px) !important;
                 align-items: center !important;
                 justify-content: flex-start !important;
                 overflow: hidden !important;
                 box-sizing: border-box !important;
             }
-            #vehicleInspectionModal .modal-card, #quickKmModal .modal-card {
+            #vehicleInspectionModal .modal-card {
                 padding: 0 !important;
                 margin: 0 auto !important;
                 height: 100% !important;
                 max-height: 100% !important;
-                width: 98% !important;
+                width: 100% !important;
                 max-width: 580px !important;
-                border-radius: 12px !important;
+                border-radius: 0 !important;
                 display: flex !important;
                 flex-direction: column !important;
                 overflow: hidden !important;
                 position: relative !important;
                 box-sizing: border-box !important;
             }
-            #quickKmModal .modal-card {
-                height: auto !important;
-                max-height: 100% !important;
-                margin: auto auto !important;
-            }
-            #vehicleInspectionModal .modal-header, #quickKmModal .modal-header {
+            #vehicleInspectionModal .modal-header {
                 padding: 10px 14px !important;
                 flex-shrink: 0 !important;
                 position: sticky !important;
@@ -2309,7 +2305,7 @@
                 overscroll-behavior: contain !important;
                 box-sizing: border-box !important;
             }
-            #vehicleInspectionModal .modal-footer, #quickKmModal .modal-footer {
+            #vehicleInspectionModal .modal-footer {
                 padding: 6px 10px !important;
                 padding-bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
                 gap: 6px !important;
@@ -2322,6 +2318,82 @@
                 border-top: 2px solid #cbd5e1 !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+
+            /* ⏱️ MODAL DE ODÔMETRO RÁPIDO (KM) NO MOBILE - DIÁLOGO CENTRALIZADO, CORPO NUNCA ESPREMIDO */
+            #quickKmModal {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                height: 100dvh !important;
+                background: rgba(15, 23, 42, 0.75) !important;
+                backdrop-filter: blur(4px) !important;
+                -webkit-backdrop-filter: blur(4px) !important;
+                display: none;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 12px !important;
+                padding-top: max(12px, env(safe-area-inset-top, 12px)) !important;
+                padding-bottom: max(16px, calc(env(safe-area-inset-bottom, 0px) + 12px)) !important;
+                z-index: 10020 !important;
+                box-sizing: border-box !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            #quickKmModal .modal-card {
+                padding: 0 !important;
+                margin: auto !important;
+                height: auto !important;
+                min-height: fit-content !important;
+                max-height: calc(100dvh - 30px) !important;
+                width: 95% !important;
+                max-width: 420px !important;
+                border-radius: 14px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
+                position: relative !important;
+                box-sizing: border-box !important;
+                box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35) !important;
+                border: 1.5px solid var(--border) !important;
+                flex-shrink: 0 !important;
+            }
+            #quickKmModal .modal-header {
+                padding: 12px 14px !important;
+                flex-shrink: 0 !important;
+                position: static !important;
+                z-index: 10 !important;
+                background: var(--card-bg, #ffffff) !important;
+                border-bottom: 1.5px solid var(--border) !important;
+            }
+            #quickKmModal .modal-body {
+                flex: 0 0 auto !important;
+                min-height: fit-content !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow-y: visible !important;
+                padding: 14px 14px !important;
+                gap: 12px !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            #quickKmModal .modal-footer {
+                padding: 10px 14px !important;
+                gap: 10px !important;
+                flex-shrink: 0 !important;
+                position: static !important;
+                background: var(--card-bg, #ffffff) !important;
+                border-top: 1.5px solid var(--border) !important;
+                box-shadow: none !important;
+                display: flex !important;
+                justify-content: flex-end !important;
             }
             #vehicleInspectionModal .modal-footer {
                 display: flex !important;
@@ -5387,11 +5459,7 @@
             }
             modal.classList.remove('tv-off-overlay');
             modal.style.setProperty('display', 'flex', 'important');
-            if (window.visualViewport && window.innerWidth <= 768) {
-                modal.style.height = `${window.visualViewport.height}px`;
-            } else {
-                modal.style.height = '100%';
-            }
+            modal.style.height = '';
         }
 
         // No celular, não força o teclado a abrir automaticamente para evitar oscilações de tela (piscadas)
@@ -9957,11 +10025,7 @@
 
         if (modal) {
             modal.style.setProperty('display', 'flex', 'important');
-            if (window.visualViewport && window.innerWidth <= 768) {
-                modal.style.height = `${window.visualViewport.height}px`;
-            } else {
-                modal.style.height = '100%';
-            }
+            modal.style.height = '';
         }
     }
 
