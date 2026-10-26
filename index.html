@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.23.v3";
+            const APP_VERSION = "2026.10.26.v1";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -3441,6 +3441,55 @@
             color: #f8fafc;
         }
 
+
+        /* 🔒 BLOQUEIO TOTAL DE INTERAÇÃO DO FUNDO QUANDO QUALQUER JANELA/MODAL ESTÁ ABERTA */
+        body.modal-open-lock {
+            overflow: hidden !important;
+            touch-action: none !important;
+            overscroll-behavior: none !important;
+        }
+        body.modal-open-lock > .dashboard-container {
+            pointer-events: none !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+        }
+        .modal-overlay {
+            pointer-events: auto !important;
+            touch-action: none !important;
+            overscroll-behavior: contain !important;
+        }
+        .modal-overlay .modal-card {
+            pointer-events: auto !important;
+            touch-action: pan-y !important;
+        }
+        #avariaMilitarModal .modal-card,
+        #avariaTextModal .modal-card {
+            height: auto !important;
+            min-height: fit-content !important;
+            max-height: calc(100dvh - 28px) !important;
+            margin: auto !important;
+        }
+        #avariaMilitarModal .modal-card > form {
+            height: auto !important;
+            flex: 0 0 auto !important;
+            overflow: visible !important;
+        }
+        #avariaMilitarModal .modal-body,
+        #avariaTextModal .modal-body {
+            flex: 0 0 auto !important;
+            min-height: fit-content !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow-y: visible !important;
+            padding: 14px !important;
+        }
+        #avariaMilitarModal .modal-footer,
+        #avariaTextModal .modal-footer {
+            flex-shrink: 0 !important;
+            position: static !important;
+            padding: 12px 14px !important;
+        }
+
 </style>
     <!-- Google Identity Services (OAuth 2.0 e Google Drive) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -4480,10 +4529,10 @@
 <!-- ========================================================================= -->
 <!-- 👮 MODAL: NOME QRA DO MILITAR QUE CONSTATOU A AVARIA                       -->
 <!-- ========================================================================= -->
-<div id="avariaMilitarModal" class="modal-overlay" style="z-index: 10099;" onclick="/* exclusivo pelos botões */">
-    <div class="modal-card" style="max-width: 480px; width: 95%; max-height: 85dvh;" onclick="event.stopPropagation()">
+<div id="avariaMilitarModal" class="modal-overlay" style="z-index: 10060;" onclick="event.stopPropagation()">
+    <div class="modal-card" style="max-width: 460px; width: 95%; height: auto !important;" onclick="event.stopPropagation()">
         <div class="modal-header" style="padding: 10px 14px;">
-            <div class="modal-title" style="font-size: 1.08rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+            <div class="modal-title" style="font-size: 1.05rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px;">
                 <span>👮 Militar que Constatou a Avaria</span>
             </div>
             <button type="button" class="modal-close" onclick="closeAvariaMilitarModal()" title="Cancelar e Voltar">✖</button>
@@ -4497,10 +4546,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="avariaQraInput" style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); margin-bottom: 4px;">
-                        Nome / QRA do militar que constatou a avaria: *
+                    <label for="avariaQraInput" style="font-weight: 800; font-size: 0.92rem; color: var(--text-main); margin-bottom: 4px;">
+                        Digite o QRA do policial: *
                     </label>
-                    <input type="text" id="avariaQraInput" placeholder="Digite o QRA do policial (ex: SD PM VAGNER)" required style="font-weight: 800; font-size: 1.05rem !important; padding: 12px 14px; text-transform: uppercase; border: 2px solid var(--primary); border-radius: 8px;" oninput="this.value = this.value.toUpperCase()">
+                    <input type="text" id="avariaQraInput" placeholder="EX.: SD VAGNER" required autocomplete="off" style="font-weight: 800; font-size: 1.05rem !important; padding: 12px 14px; text-transform: uppercase; border: 2px solid var(--primary); border-radius: 8px;" oninput="this.value = this.value.toUpperCase(); document.getElementById('avariaMilitarError').style.display='none';" onkeydown="if(event.key==='Enter'){event.preventDefault(); confirmAvariaMilitarSubmit(event);}">
                 </div>
 
                 <div id="avariaMilitarError" style="display: none; color: #ef4444; font-size: 0.84rem; font-weight: 700;">
@@ -4512,7 +4561,7 @@
                 <button type="button" class="btn btn-outline btn-3d" style="min-height: 48px; font-weight: 700; font-size: 0.95rem; padding: 10px 20px; border-color: #cbd5e1; color: var(--text-muted);" onclick="closeAvariaMilitarModal()">
                     ✖ Cancelar
                 </button>
-                <button type="submit" class="btn btn-success btn-3d" style="flex: 1; font-weight: 800; font-size: 1.05rem; min-height: 48px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; justify-content: center; gap: 8px;">
+                <button type="button" id="btnConfirmAvariaMilitar" class="btn btn-success btn-3d" onclick="confirmAvariaMilitarSubmit(event)" style="flex: 1; font-weight: 800; font-size: 1.05rem; min-height: 48px; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-bottom: 3px solid #166534; justify-content: center; gap: 8px;">
                     <span>💾</span>
                     <span>Finalizar</span>
                 </button>
@@ -4525,7 +4574,7 @@
 <!-- ========================================================================= -->
 <!-- 📢 4. MODAL: "INFORMAÇÕES INSERIDAS, INFORME A RESERVA IMEDIATAMENTE!"    -->
 <!-- ========================================================================= -->
-<div id="avariaAlertModal" class="modal-overlay" style="z-index: 10060;" onclick="/* exclusivo pelo botão OK */">
+<div id="avariaAlertModal" class="modal-overlay" style="z-index: 10085;" onclick="/* exclusivo pelo botão OK */">
     <div class="modal-card modal-alert-card" style="max-width: 480px; border: 2.5px solid #ef4444;" onclick="event.stopPropagation()">
         <div style="font-size: 3.5rem; margin-bottom: 12px;">🚨📢</div>
         <h3 style="font-size: 1.25rem; font-weight: 900; color: #b91c1c; line-height: 1.35; margin-bottom: 14px; text-transform: uppercase;">
@@ -5444,30 +5493,113 @@
         }
     }
 
+
+    // =========================================================================
+    // 🔒 CONTROLE EXCLUSIVO DE JANELAS MODAIS (BLOQUEIO TOTAL DO FUNDO)
+    // =========================================================================
+    const ALL_MODAL_OVERLAY_IDS = [
+        'quickKmModal',
+        'vehicleInspectionModal',
+        'avariaPromptModal',
+        'avariaTextModal',
+        'avariaPhotoSelectModal',
+        'avariaMilitarModal',
+        'avariaAlertModal',
+        'adminAvariaNotificationModal',
+        'adminPasswordModal',
+        'photoSourceModal',
+        'photoViewerModal',
+        'bilaoModal',
+        'congratsModal',
+        'helpModal',
+        'confirmModal'
+    ];
+
+    function syncModalBodyLock() {
+        const overlays = Array.from(document.querySelectorAll('.modal-overlay, .photo-viewer-overlay'));
+        const visibleOverlays = overlays.filter(el => {
+            const disp = window.getComputedStyle(el).display;
+            return disp !== 'none';
+        });
+
+        if (visibleOverlays.length > 0) {
+            document.body.classList.add('modal-open-lock');
+            document.documentElement.classList.add('modal-open-lock');
+
+            // Ordena pelo z-index para deixar SOMENTE a janela do topo interativa
+            visibleOverlays.sort((a, b) => {
+                const zA = parseInt(window.getComputedStyle(a).zIndex || a.style.zIndex || '1000', 10) || 1000;
+                const zB = parseInt(window.getComputedStyle(b).zIndex || b.style.zIndex || '1000', 10) || 1000;
+                return zA - zB;
+            });
+
+            const topModal = visibleOverlays[visibleOverlays.length - 1];
+            visibleOverlays.forEach(el => {
+                if (el === topModal) {
+                    el.style.setProperty('pointer-events', 'auto', 'important');
+                    el.removeAttribute('inert');
+                    el.setAttribute('aria-hidden', 'false');
+                } else {
+                    el.style.setProperty('pointer-events', 'none', 'important');
+                    el.setAttribute('aria-hidden', 'true');
+                }
+            });
+        } else {
+            document.body.classList.remove('modal-open-lock');
+            document.documentElement.classList.remove('modal-open-lock');
+            overlays.forEach(el => {
+                el.style.removeProperty('pointer-events');
+                el.removeAttribute('inert');
+            });
+        }
+    }
+
+    function showModalExclusive(modalId, zIndexVal = null, closeOthers = []) {
+        closeOthers.forEach(otherId => {
+            const otherEl = document.getElementById(otherId);
+            if (otherEl) {
+                otherEl.style.setProperty('display', 'none', 'important');
+            }
+        });
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            if (zIndexVal) {
+                modal.style.setProperty('z-index', String(zIndexVal), 'important');
+            }
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.style.removeProperty('height');
+        }
+        syncModalBodyLock();
+    }
+
+    function hideModalSafe(modalId) {
+        const modal = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
+        if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
+        }
+        syncModalBodyLock();
+    }
+
     // =========================================================================
     // 💀 MODAL "NÃO É BILÃO O SUFICIENTE"
     // =========================================================================
     function openBilaoModal() {
-        const modal = document.getElementById('bilaoModal');
-        if (modal) modal.style.display = 'flex';
+        showModalExclusive('bilaoModal', 10095);
     }
 
     function closeBilaoModal() {
-        const modal = document.getElementById('bilaoModal');
-        if (modal) modal.style.display = 'none';
+        hideModalSafe('bilaoModal');
     }
 
     // =========================================================================
     // 🎉 POPUP DE PARABÉNS PELO REGISTRO
     // =========================================================================
     function openCongratsModal() {
-        const modal = document.getElementById('congratsModal');
-        if (modal) modal.style.display = 'flex';
+        showModalExclusive('congratsModal', 10090);
     }
 
     function closeCongratsModal() {
-        const modal = document.getElementById('congratsModal');
-        if (modal) modal.style.display = 'none';
+        hideModalSafe('congratsModal');
     }
 
     // =========================================================================
@@ -5507,8 +5639,9 @@
             }
             modal.classList.remove('tv-off-overlay');
             modal.style.setProperty('display', 'flex', 'important');
-            modal.style.height = '';
+            modal.style.removeProperty('height');
         }
+        syncModalBodyLock();
 
         // No celular, não força o teclado a abrir automaticamente para evitar oscilações de tela (piscadas)
         if (window.innerWidth > 768 && valInput) {
@@ -5524,8 +5657,9 @@
         const card = modal.querySelector('.modal-card');
 
         if (skipAnimation || !card) {
-            modal.style.display = 'none';
+            modal.style.setProperty('display', 'none', 'important');
             quickKmTargetVehicle = null;
+            syncModalBodyLock();
             return;
         }
 
@@ -5535,11 +5669,12 @@
 
         if (quickKmCloseTimer) clearTimeout(quickKmCloseTimer);
         quickKmCloseTimer = setTimeout(() => {
-            modal.style.display = 'none';
+            modal.style.setProperty('display', 'none', 'important');
             card.classList.remove('tv-off-active');
             modal.classList.remove('tv-off-overlay');
             quickKmTargetVehicle = null;
             quickKmCloseTimer = null;
+            syncModalBodyLock();
         }, 360);
     }
 
@@ -10111,9 +10246,9 @@
         quickKmTargetVehicle = vehicle;
         currentInspectVehicle = vehicle;
 
-        // Fecha a janela de KM para focar na inspeção
+        // Fecha a janela de KM com !important para focar exclusivamente na inspeção
         const kmModal = document.getElementById('quickKmModal');
-        if (kmModal) kmModal.style.display = 'none';
+        if (kmModal) kmModal.style.setProperty('display', 'none', 'important');
 
         // Atualização fresca de fotos em segundo plano ao abrir inspeção
         if (typeof loadDataFromOnline === 'function') {
@@ -10152,22 +10287,23 @@
 
         if (modal) {
             modal.style.setProperty('display', 'flex', 'important');
-            modal.style.height = '';
+            modal.style.removeProperty('height');
         }
+        syncModalBodyLock();
     }
 
-    
     function openAvariaRegistrationFromInspection() {
         const vtr = currentInspectVehicle || quickKmTargetVehicle;
         if (!vtr) return;
         const inspectModal = document.getElementById('vehicleInspectionModal');
-        if (inspectModal) inspectModal.style.display = 'none';
+        if (inspectModal) inspectModal.style.setProperty('display', 'none', 'important');
         openAvariaTextModal(vtr);
     }
 
     function cancelVehicleInspectionModal() {
         const modal = document.getElementById('vehicleInspectionModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) modal.style.setProperty('display', 'none', 'important');
+        syncModalBodyLock();
         const vtr = currentInspectVehicle || quickKmTargetVehicle;
         if (vtr) {
             openQuickKmModal(vtr);
@@ -10176,7 +10312,8 @@
 
     function closeVehicleInspectionModal() {
         const modal = document.getElementById('vehicleInspectionModal');
-        if (modal) modal.style.display = 'none';
+        if (modal) modal.style.setProperty('display', 'none', 'important');
+        syncModalBodyLock();
 
         // ⚠️ Abre a pergunta: "Encontrou alguma avaria?"
         if (currentInspectVehicle) {
@@ -10189,15 +10326,13 @@
     // =========================================================================
     function openAvariaPromptModal(vehicle) {
         currentAvariaVehicle = vehicle;
-        const modal = document.getElementById('avariaPromptModal');
         const vtrEl = document.getElementById('avariaVtrPrefixPrompt');
         if (vtrEl) vtrEl.textContent = vehicle;
-        if (modal) modal.style.display = 'flex';
+        showModalExclusive('avariaPromptModal', 10050, ['vehicleInspectionModal', 'quickKmModal']);
     }
 
     function onAvariaPromptNo() {
-        const modal = document.getElementById('avariaPromptModal');
-        if (modal) modal.style.display = 'none';
+        hideModalSafe('avariaPromptModal');
         const vtr = currentAvariaVehicle || quickKmTargetVehicle;
         currentAvariaVehicle = null;
         // Volta para a janela de inspecionar viatura e inserir km
@@ -10207,8 +10342,7 @@
     }
 
     function onAvariaPromptYes() {
-        const modal = document.getElementById('avariaPromptModal');
-        if (modal) modal.style.display = 'none';
+        hideModalSafe('avariaPromptModal');
         openAvariaTextModal(currentAvariaVehicle);
     }
 
@@ -10228,9 +10362,8 @@
             descInput.disabled = false;
         }
 
+        showModalExclusive('avariaTextModal', 10052, ['avariaPromptModal', 'vehicleInspectionModal', 'quickKmModal', 'avariaPhotoSelectModal']);
         if (modal) {
-            modal.style.setProperty('display', 'flex', 'important');
-            modal.style.zIndex = '10052';
             const card = modal.querySelector('.modal-card');
             if (card) card.scrollTop = 0;
             const body = modal.querySelector('.modal-body');
@@ -10244,10 +10377,9 @@
     }
 
     function closeAvariaTextModal() {
-        const modal = document.getElementById('avariaTextModal');
-        if (modal) {
-            modal.style.setProperty('display', 'none', 'important');
-        }
+        const descInput = document.getElementById('avariaDescriptionInput');
+        if (descInput) descInput.blur();
+        hideModalSafe('avariaTextModal');
         const vtr = currentAvariaVehicle || quickKmTargetVehicle;
         currentAvariaVehicle = null;
         if (vtr) {
@@ -10265,13 +10397,11 @@
             return;
         }
 
+        if (descInput) descInput.blur();
         currentAvariaDescription = text;
 
         // Fecha a janela de texto e abre a janela para selecionar a foto
-        const modalText = document.getElementById('avariaTextModal');
-        if (modalText) {
-            modalText.style.setProperty('display', 'none', 'important');
-        }
+        hideModalSafe('avariaTextModal');
 
         openAvariaPhotoSelectModal(currentAvariaVehicle);
     }
@@ -10308,12 +10438,14 @@
         if (subEl) {
             subEl.textContent = 'Deseja tirar uma foto agora ou escolher uma imagem da galeria do celular?';
         }
-        if (modal) modal.style.display = 'flex';
+        if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
+        }
+        syncModalBodyLock();
     }
 
     function closePhotoSourceModal() {
-        const modal = document.getElementById('photoSourceModal');
-        if (modal) modal.style.display = 'none';
+        hideModalSafe('photoSourceModal');
     }
 
     function choosePhotoSource(source) {
@@ -10420,36 +10552,15 @@
 
         renderAvariaPhotoSlots();
 
+        showModalExclusive('avariaPhotoSelectModal', 10054, ['avariaTextModal', 'avariaPromptModal', 'vehicleInspectionModal', 'quickKmModal']);
         if (modal) {
-            modal.style.setProperty('display', 'flex', 'important');
-            modal.style.zIndex = '10054';
             const body = modal.querySelector('.modal-body');
             if (body) body.scrollTop = 0;
-            // 📱 Ajuste dinâmico de altura para o Safari iOS (evita que a barra de ferramentas inferior cubra o rodapé)
-            if (window.visualViewport && window.innerWidth <= 768) {
-                modal.style.height = `${window.visualViewport.height}px`;
-            } else {
-                modal.style.height = '100%';
-            }
         }
     }
 
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-            if (window.innerWidth > 768) return;
-            const h = `${window.visualViewport.height}px`;
-            ['avariaPhotoSelectModal', 'vehicleInspectionModal', 'quickKmModal', 'avariaTextModal', 'avariaMilitarModal', 'adminPasswordModal', 'adminAvariaNotificationModal'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el && el.style.display !== 'none') {
-                    el.style.height = h;
-                }
-            });
-        });
-    }
-
     function cancelAvariaPhotoSelectToPrevious() {
-        const photoModal = document.getElementById('avariaPhotoSelectModal');
-        if (photoModal) photoModal.style.display = 'none';
+        hideModalSafe('avariaPhotoSelectModal');
 
         const vtr = currentAvariaVehicle || quickKmTargetVehicle;
         if (vtr) {
@@ -10661,19 +10772,6 @@
     }
 
     function openAvariaMilitarModal() {
-        // Garante que TODAS as outras janelas de fotos e inspeção fiquem 100% fechadas
-        const photoModal = document.getElementById('avariaPhotoSelectModal');
-        if (photoModal) photoModal.style.setProperty('display', 'none', 'important');
-
-        const inspectModal = document.getElementById('vehicleInspectionModal');
-        if (inspectModal) inspectModal.style.setProperty('display', 'none', 'important');
-
-        const textModal = document.getElementById('avariaTextModal');
-        if (textModal) textModal.style.setProperty('display', 'none', 'important');
-
-        const promptModal = document.getElementById('avariaPromptModal');
-        if (promptModal) promptModal.style.setProperty('display', 'none', 'important');
-
         const modal = document.getElementById('avariaMilitarModal');
         const vtrEl = document.getElementById('avariaMilitarVtrTitle');
         const errEl = document.getElementById('avariaMilitarError');
@@ -10687,11 +10785,19 @@
         const savedQra = localStorage.getItem('oleo_vtr_last_qra') || '';
         if (qraInput) {
             qraInput.value = savedQra;
+            qraInput.disabled = false;
         }
 
+        // Fecha TODAS as janelas anteriores com !important e abre somente avariaMilitarModal
+        showModalExclusive('avariaMilitarModal', 10060, [
+            'avariaPhotoSelectModal',
+            'vehicleInspectionModal',
+            'avariaTextModal',
+            'avariaPromptModal',
+            'quickKmModal'
+        ]);
+
         if (modal) {
-            modal.style.setProperty('display', 'flex', 'important');
-            modal.style.zIndex = '10099';
             const card = modal.querySelector('.modal-card');
             if (card) {
                 card.scrollTop = 0;
@@ -10700,20 +10806,18 @@
     }
 
     function closeAvariaMilitarModal() {
-        const modal = document.getElementById('avariaMilitarModal');
-        if (modal) modal.style.setProperty('display', 'none', 'important');
+        const qraInput = document.getElementById('avariaQraInput');
+        if (qraInput) qraInput.blur();
+        hideModalSafe('avariaMilitarModal');
 
         // Retorna para a tela de seleção de fotos da avaria caso queira adicionar mais fotos
-        const photoModal = document.getElementById('avariaPhotoSelectModal');
-        if (photoModal) {
-            photoModal.style.setProperty('display', 'flex', 'important');
-        }
+        showModalExclusive('avariaPhotoSelectModal', 10054, ['avariaMilitarModal']);
     }
 
     function confirmAvariaMilitarSubmit(event) {
         if (event) {
-            event.preventDefault();
-            event.stopPropagation();
+            if (typeof event.preventDefault === 'function') event.preventDefault();
+            if (typeof event.stopPropagation === 'function') event.stopPropagation();
         }
 
         const qraInput = document.getElementById('avariaQraInput');
@@ -10723,70 +10827,92 @@
         if (!qra) {
             if (errEl) {
                 errEl.style.display = 'block';
-                errEl.textContent = '⚠️ Informe o QRA do militar que constatou a avaria.';
+                errEl.textContent = '⚠️ Informe o QRA do militar (EX.: SD VAGNER).';
             }
             if (qraInput) qraInput.focus();
             return;
         }
 
-        localStorage.setItem('oleo_vtr_last_qra', qra);
+        // Fecha o teclado do celular imediatamente para não travar a tela
+        if (qraInput) qraInput.blur();
+
+        try {
+            localStorage.setItem('oleo_vtr_last_qra', qra);
+        } catch (e) {}
 
         const now = new Date();
         const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-        const slotsWithPhotos = Object.keys(currentAvariaPhotos);
+        const slotsWithPhotos = Object.keys(currentAvariaPhotos || {});
         const finalSlots = slotsWithPhotos.length > 0 ? slotsWithPhotos : (selectedAvariaSlots || []);
+
+        const targetVtr = currentAvariaVehicle || currentInspectVehicle || quickKmTargetVehicle || 'VTR';
 
         // SETOR 2: Salva exclusivamente no objeto da avaria (SEM alterar as fotos fixas do Setor 1!)
         const newAvaria = {
             id: Date.now(),
-            vehicle: currentAvariaVehicle,
+            vehicle: targetVtr,
             description: currentAvariaDescription || 'Avaria constatada em inspeção',
             slots: finalSlots,
-            photos: { ...currentAvariaPhotos }, // Novas fotos enviadas pelo policial
+            photos: { ...(currentAvariaPhotos || {}) }, // Novas fotos enviadas pelo policial
             militar: qra,
             qra: qra,
             date: dateStr,
             timestamp: now.toISOString()
         };
 
-        if (!vehicleAvarias[currentAvariaVehicle]) {
-            vehicleAvarias[currentAvariaVehicle] = [];
+        if (!vehicleAvarias[targetVtr] || !Array.isArray(vehicleAvarias[targetVtr])) {
+            vehicleAvarias[targetVtr] = [];
         }
-        vehicleAvarias[currentAvariaVehicle].unshift(newAvaria);
-        localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+        vehicleAvarias[targetVtr].unshift(newAvaria);
+        try {
+            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+        } catch (e) {
+            console.warn('Aviso ao salvar avarias no localStorage:', e);
+        }
 
-        const savedVtr = currentAvariaVehicle;
+        const savedVtr = targetVtr;
         currentAvariaPhotos = {}; // Limpa fotos temporárias de avaria
 
-        const militarModal = document.getElementById('avariaMilitarModal');
-        if (militarModal) militarModal.style.display = 'none';
+        // 🔥 IMPORTANTE: Fecha IMEDIATAMENTE com !important a janela do QRA e todas as anteriores!
+        [
+            'avariaMilitarModal',
+            'avariaPhotoSelectModal',
+            'avariaTextModal',
+            'avariaPromptModal',
+            'vehicleInspectionModal',
+            'quickKmModal'
+        ].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.setProperty('display', 'none', 'important');
+        });
 
-        const photoModal = document.getElementById('avariaPhotoSelectModal');
-        if (photoModal) photoModal.style.display = 'none';
-
-        // Envio direto imediato para o Firebase (garante sincronização mesmo antes do sync completo)
-        if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
-            const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
-            fetch(`${baseUrl}/vehicleAvarias/${encodeURIComponent(savedVtr)}.json`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(vehicleAvarias[savedVtr]),
-                cache: 'no-store'
-            }).catch(err => console.warn('Erro ao sincronizar avaria direta no Firebase:', err));
-        }
-
-        syncAllDataToOnline(true);
-        updateAdminBadgeUI();
-        renderDashboard();
-        renderVehicleMiniCards();
-
-        // Abre a janela final de aviso da reserva:
+        // Abre IMEDIATAMENTE a janela final de aviso da reserva (z-index 10085)
         openAvariaAlertModal(savedVtr, qra);
+
+        // Envio direto imediato para o Firebase em segundo plano (sem travar a UI)
+        try {
+            if (typeof syncAvariasDirectToFirebase === 'function') {
+                syncAvariasDirectToFirebase(savedVtr);
+            } else if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
+                const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+                fetch(`${baseUrl}/vehicleAvarias/${encodeURIComponent(savedVtr)}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vehicleAvarias[savedVtr]),
+                    cache: 'no-store'
+                }).catch(err => console.warn('Erro ao sincronizar avaria direta no Firebase:', err));
+            }
+            if (typeof syncAllDataToOnline === 'function') syncAllDataToOnline(true);
+            if (typeof updateAdminBadgeUI === 'function') updateAdminBadgeUI();
+            if (typeof renderDashboard === 'function') renderDashboard();
+            if (typeof renderVehicleMiniCards === 'function') renderVehicleMiniCards();
+        } catch (syncErr) {
+            console.warn('Erro em pós-processamento de avaria:', syncErr);
+        }
     }
 
     function openAvariaAlertModal(vehicle, militarCompleto = '') {
-        const modal = document.getElementById('avariaAlertModal');
         const vtrEl = document.getElementById('avariaAlertVtr');
         const milEl = document.getElementById('avariaAlertMilitar');
         const milSpan = document.getElementById('avariaAlertMilitarSpan');
@@ -10798,24 +10924,31 @@
         if (milSpan) {
             milSpan.style.display = militarCompleto ? 'inline' : 'none';
         }
-        if (modal) modal.style.display = 'flex';
+        showModalExclusive('avariaAlertModal', 10085, [
+            'avariaMilitarModal',
+            'avariaPhotoSelectModal',
+            'avariaTextModal',
+            'avariaPromptModal',
+            'vehicleInspectionModal',
+            'quickKmModal'
+        ]);
     }
 
     function closeAvariaAlertModal() {
-        const modal = document.getElementById('avariaAlertModal');
-        if (modal) modal.style.display = 'none';
-
-        // Garante fechamento de todos os modais anteriores de inspeção e avaria
-        const kmModal = document.getElementById('quickKmModal');
-        if (kmModal) kmModal.style.display = 'none';
-        const inspectModal = document.getElementById('vehicleInspectionModal');
-        if (inspectModal) inspectModal.style.display = 'none';
-        const photoModal = document.getElementById('avariaPhotoSelectModal');
-        if (photoModal) photoModal.style.display = 'none';
-        const textModal = document.getElementById('avariaTextModal');
-        if (textModal) textModal.style.display = 'none';
-        const militarModal = document.getElementById('avariaMilitarModal');
-        if (militarModal) militarModal.style.display = 'none';
+        // Garante fechamento com !important de todos os modais de inspeção e avaria
+        [
+            'avariaAlertModal',
+            'avariaMilitarModal',
+            'avariaPhotoSelectModal',
+            'avariaTextModal',
+            'avariaPromptModal',
+            'vehicleInspectionModal',
+            'quickKmModal'
+        ].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.setProperty('display', 'none', 'important');
+        });
+        syncModalBodyLock();
 
         currentAvariaVehicle = null;
         currentAvariaDescription = '';
@@ -11055,12 +11188,12 @@
         if (!modal) return;
         switchAvariasViewTab('ativas');
         renderAdminAvariasList();
-        modal.style.display = 'flex';
+        modal.style.setProperty('display', 'flex', 'important');
+        syncModalBodyLock();
     }
 
     function closeAdminAvariaNotificationModal() {
-        const modal = document.getElementById('adminAvariaNotificationModal');
-        if (modal) modal.style.display = 'none';
+        hideModalSafe('adminAvariaNotificationModal');
         const avarias = getAllAvarias();
         localStorage.setItem('oleo_vtr_seen_avarias_count', String(avarias.length));
     }
