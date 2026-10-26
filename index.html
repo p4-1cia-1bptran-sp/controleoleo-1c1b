@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.23.v2";
+            const APP_VERSION = "2026.10.23.v3";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -4554,31 +4554,60 @@
             <button type="button" class="modal-close" onclick="closeAdminAvariaNotificationModal()" title="Fechar">✖</button>
         </div>
 
-        <div class="modal-body">
-            <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px 14px; font-size: 0.88rem; color: #9f1239; line-height: 1.45;">
-                📢 <strong>Atenção Administrador:</strong> Foram enviadas mensagens relatando avarias observadas nas viaturas da frota. Verifique os relatos abaixo:
+        <div class="modal-body" style="padding: 12px 14px; gap: 12px;">
+            <!-- Abas de Navegação: Avarias Ativas vs Lixeira -->
+            <div style="display: flex; gap: 8px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">
+                <button type="button" id="tabAvariasAtivas" class="view-mode-tab-btn active" onclick="switchAvariasViewTab('ativas')" style="flex: 1; justify-content: center; min-height: 42px; font-size: 0.88rem; font-weight: 800; border-radius: 8px;">
+                    <span>🚨 Avarias Ativas</span>
+                    <span id="badgeCountAvariasAtivas" class="badge badge-danger" style="margin-left: 6px; font-size: 0.74rem; font-weight: 800;">0</span>
+                </button>
+                <button type="button" id="tabAvariasLixeira" class="view-mode-tab-btn" onclick="switchAvariasViewTab('lixeira')" style="flex: 1; justify-content: center; min-height: 42px; font-size: 0.88rem; font-weight: 800; border-radius: 8px; background: var(--bg); color: var(--text-muted); border-color: var(--border);">
+                    <span>🗑️ Lixeira (Apagadas)</span>
+                    <span id="badgeCountAvariasLixeira" class="badge" style="margin-left: 6px; font-size: 0.74rem; font-weight: 800; background: #e2e8f0; color: #475569;">0</span>
+                </button>
             </div>
 
-            <!-- Lista de Avarias Relatadas -->
-            <div id="adminAvariasListContainer" style="display: flex; flex-direction: column; gap: 10px; padding: 2px 0;">
-                <!-- Preenchido via renderAdminAvariasList() -->
+            <!-- SETOR 1: AVARIAS ATIVAS -->
+            <div id="adminAvariasAtivasSection" style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 10px 12px; font-size: 0.86rem; color: #9f1239; line-height: 1.45;">
+                    📢 <strong>Atenção Administrador:</strong> Relatos de avarias ativos na frota. Ao excluir um relato, ele é enviado para a <strong>Lixeira</strong> e deixa de constar no painel e nas inspeções.
+                </div>
+                <!-- Lista de Avarias Ativas -->
+                <div id="adminAvariasListContainer" style="display: flex; flex-direction: column; gap: 10px; padding: 2px 0;"></div>
+            </div>
+
+            <!-- SETOR 2: LIXEIRA DE AVARIAS -->
+            <div id="adminAvariasLixeiraSection" style="display: none; flex-direction: column; gap: 10px;">
+                <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #64748b; border-radius: 8px; padding: 10px 12px; font-size: 0.86rem; color: #334155; line-height: 1.45;">
+                    🗑️ <strong>Lixeira de Avarias:</strong> Relatos apagados pelo administrador. Eles NÃO aparecem na frota nem nas inspeções. Você pode <strong>Restaurar</strong> para as ativas ou <strong>Apagar de Vez (Definitivo)</strong> para eliminar as fotos permanentemente.
+                </div>
+                <!-- Lista de Avarias na Lixeira -->
+                <div id="adminAvariasLixeiraContainer" style="display: flex; flex-direction: column; gap: 10px; padding: 2px 0;"></div>
             </div>
         </div>
 
-        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 14px;">
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 14px;">
+            <!-- Ações para Avarias Ativas -->
+            <div id="adminAvariasAtivasFooterActions" style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button type="button" class="btn btn-danger-solid btn-3d" onclick="openAvariaRegistrationFromAdmin()" style="font-weight: 800; gap: 6px;" title="Registrar nova avaria observada em uma viatura">
                     ➕ Inserir Avaria
                 </button>
                 <button type="button" class="btn btn-outline btn-3d" onclick="exportAvariasExcel()" style="font-weight: 700; border-color: #cbd5e1; gap: 6px;" title="Exportar planilha Excel de avarias">
                     📊 Exportar Relatório (.xlsx)
                 </button>
-
-            </div>
-            <div style="display: flex; gap: 8px;">
                 <button type="button" class="btn btn-outline btn-3d" onclick="markAllAvariasAsSeen()" style="font-weight: 700;">
                     👁️ Ciente de Todas
                 </button>
+            </div>
+
+            <!-- Ações para Lixeira -->
+            <div id="adminAvariasLixeiraFooterActions" style="display: none; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-danger-solid btn-3d" onclick="emptyAvariasLixeira()" style="font-weight: 800; gap: 6px;" title="Apagar definitivamente todos os relatos da lixeira de vez">
+                    🧹 Esvaziar Lixeira (Apagar de Vez)
+                </button>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-left: auto;">
                 <button type="button" class="btn btn-primary btn-3d" onclick="closeAdminAvariaNotificationModal()" style="font-weight: 800; min-width: 100px;">
                     OK
                 </button>
@@ -5196,6 +5225,25 @@
             vehicleAvarias = {};
         }
     } catch(e) { vehicleAvarias = {}; }
+
+    // 🗑️ LIXEIRA DE AVARIAS E CONTROLE DE EXCLUSÕES PERMANENTES
+    let vehicleAvariasLixeira = {};
+    try {
+        const rawL = localStorage.getItem('oleo_vtr_avarias_lixeira');
+        vehicleAvariasLixeira = rawL ? JSON.parse(rawL) : {};
+        if (!vehicleAvariasLixeira || typeof vehicleAvariasLixeira !== 'object' || Array.isArray(vehicleAvariasLixeira)) {
+            vehicleAvariasLixeira = {};
+        }
+    } catch(e) { vehicleAvariasLixeira = {}; }
+
+    let deletedAvariaIds = [];
+    try {
+        const rawD = localStorage.getItem('oleo_vtr_deleted_avaria_ids');
+        deletedAvariaIds = rawD ? JSON.parse(rawD) : [];
+        if (!Array.isArray(deletedAvariaIds)) deletedAvariaIds = [];
+    } catch(e) { deletedAvariaIds = []; }
+
+    let currentAvariasViewTab = 'ativas';
 
     // 🛡️ NORMALIZAÇÃO E SANITIZAÇÃO DE AVARIAS PARA PREVENIR ERROS DE FOREACH NO CELULAR
     (function normalizeStoredAvarias() {
@@ -5881,7 +5929,8 @@
                     if (parsed.path && parsed.path.startsWith('/vehicleAvarias')) {
                         const cleanPath = parsed.path.replace(/^\/vehicleAvarias\/?/, '');
                         if (!cleanPath) {
-                            vehicleAvarias = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
+                            const raw = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
+                            vehicleAvarias = sanitizeIncomingAvarias(raw);
                         } else {
                             const parts = cleanPath.split('/').filter(Boolean).map(decodeURIComponent);
                             if (parts.length >= 1) {
@@ -5889,13 +5938,56 @@
                                 if (parsed.data === null) {
                                     delete vehicleAvarias[vtr];
                                 } else {
-                                    vehicleAvarias[vtr] = parsed.data;
+                                    let list = parsed.data;
+                                    if (!Array.isArray(list)) list = (list && typeof list === 'object') ? [list] : [];
+                                    const lixeiraIds = new Set(getAllLixeiraAvarias().map(a => String(a.id)));
+                                    const delIds = new Set((deletedAvariaIds || []).map(String));
+                                    const filtered = list.filter(a => a && a.id && !lixeiraIds.has(String(a.id)) && !delIds.has(String(a.id)));
+                                    if (filtered.length > 0) {
+                                        vehicleAvarias[vtr] = filtered;
+                                    } else {
+                                        delete vehicleAvarias[vtr];
+                                    }
                                 }
                             }
                         }
                         localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+                        updateAdminBadgeUI();
+                        if (typeof renderAdminAvariasList === 'function') renderAdminAvariasList();
                         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
                             renderInspectionSlots();
+                        }
+                        return;
+                    }
+
+                    // 3. Sincronização da Lixeira de Avarias em tempo real (/vehicleAvariasLixeira/...)
+                    if (parsed.path && parsed.path.startsWith('/vehicleAvariasLixeira')) {
+                        const cleanPath = parsed.path.replace(/^\/vehicleAvariasLixeira\/?/, '');
+                        if (!cleanPath) {
+                            vehicleAvariasLixeira = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
+                        } else {
+                            const parts = cleanPath.split('/').filter(Boolean).map(decodeURIComponent);
+                            if (parts.length >= 1) {
+                                const vtr = parts[0];
+                                if (parsed.data === null) {
+                                    delete vehicleAvariasLixeira[vtr];
+                                } else {
+                                    vehicleAvariasLixeira[vtr] = parsed.data;
+                                }
+                            }
+                        }
+                        localStorage.setItem('oleo_vtr_avarias_lixeira', JSON.stringify(vehicleAvariasLixeira));
+                        if (typeof renderAdminAvariasList === 'function') renderAdminAvariasList();
+                        return;
+                    }
+
+                    // 4. Sincronização dos IDs deletados (/deletedAvariaIds/...)
+                    if (parsed.path && parsed.path.startsWith('/deletedAvariaIds')) {
+                        if (Array.isArray(parsed.data)) {
+                            parsed.data.forEach(id => {
+                                if (!deletedAvariaIds.includes(id)) deletedAvariaIds.push(id);
+                            });
+                            localStorage.setItem('oleo_vtr_deleted_avaria_ids', JSON.stringify(deletedAvariaIds));
                         }
                         return;
                     }
@@ -6005,8 +6097,21 @@
             localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
         }
 
+        if (data && data.deletedAvariaIds && Array.isArray(data.deletedAvariaIds)) {
+            data.deletedAvariaIds.forEach(id => {
+                if (!deletedAvariaIds.includes(id)) deletedAvariaIds.push(id);
+            });
+            localStorage.setItem('oleo_vtr_deleted_avaria_ids', JSON.stringify(deletedAvariaIds));
+        }
+
+        if (data && data.vehicleAvariasLixeira !== undefined) {
+            vehicleAvariasLixeira = (data.vehicleAvariasLixeira && typeof data.vehicleAvariasLixeira === 'object') ? data.vehicleAvariasLixeira : {};
+            localStorage.setItem('oleo_vtr_avarias_lixeira', JSON.stringify(vehicleAvariasLixeira));
+        }
+
         if (data && data.vehicleAvarias !== undefined) {
-            vehicleAvarias = (data.vehicleAvarias && typeof data.vehicleAvarias === 'object') ? data.vehicleAvarias : {};
+            const rawAvarias = (data.vehicleAvarias && typeof data.vehicleAvarias === 'object') ? data.vehicleAvarias : {};
+            vehicleAvarias = sanitizeIncomingAvarias(rawAvarias);
             localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
         }
 
@@ -6135,6 +6240,8 @@
             targetMap: vehicleTargetMap || {},
             vehiclePhotos: vehiclePhotos || {},
             vehicleAvarias: vehicleAvarias || {},
+            vehicleAvariasLixeira: vehicleAvariasLixeira || {},
+            deletedAvariaIds: deletedAvariaIds || [],
             appTitle: appTitle || '🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN',
             lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
             updatedAt: new Date().toISOString()
@@ -7911,6 +8018,9 @@
         records = [];
         mileageHistory = [];
         vehiclePhotos = {};
+        vehicleAvarias = {};
+        vehicleAvariasLixeira = {};
+        deletedAvariaIds = [];
         localStorage.removeItem('oleo_vtr_vehicle_photos');
         customVehicles = [...defaultVehicles];
         vehicleTargetMap = {};
@@ -8171,7 +8281,10 @@
             targetMap: vehicleTargetMap,
             records: records,
             mileageHistory: mileageHistory,
-            vehiclePhotos: vehiclePhotos
+            vehiclePhotos: vehiclePhotos,
+            vehicleAvarias: vehicleAvarias,
+            vehicleAvariasLixeira: vehicleAvariasLixeira,
+            deletedAvariaIds: deletedAvariaIds
         };
 
         const defaultName = `Controle_Oleo_Viaturas_Backup_${new Date().toISOString().slice(0,10)}`;
@@ -8525,6 +8638,18 @@
         if (imported.vehiclePhotos && typeof imported.vehiclePhotos === 'object') {
             vehiclePhotos = imported.vehiclePhotos;
             localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
+        }
+        if (imported.vehicleAvarias && typeof imported.vehicleAvarias === 'object') {
+            vehicleAvarias = imported.vehicleAvarias;
+            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+        }
+        if (imported.vehicleAvariasLixeira && typeof imported.vehicleAvariasLixeira === 'object') {
+            vehicleAvariasLixeira = imported.vehicleAvariasLixeira;
+            localStorage.setItem('oleo_vtr_avarias_lixeira', JSON.stringify(vehicleAvariasLixeira));
+        }
+        if (imported.deletedAvariaIds && Array.isArray(imported.deletedAvariaIds)) {
+            deletedAvariaIds = imported.deletedAvariaIds;
+            localStorage.setItem('oleo_vtr_deleted_avaria_ids', JSON.stringify(deletedAvariaIds));
         }
 
         let newRecords = Array.isArray(imported) ? imported : (imported.records || []);
@@ -9589,6 +9714,8 @@
                 mileageHistory: mileageHistory,
                 vehiclePhotos: vehiclePhotos || {},
                 vehicleAvarias: vehicleAvarias || {},
+                vehicleAvariasLixeira: vehicleAvariasLixeira || {},
+                deletedAvariaIds: deletedAvariaIds || [],
                 updatedAt: new Date().toISOString()
             };
 
@@ -10706,6 +10833,19 @@
     // =========================================================================
     // 🚨 GESTÃO, NOTIFICAÇÃO E EXPORTAÇÃO DE AVARIAS OBSERVADAS
     // =========================================================================
+    // 🚨 GESTÃO, LIXEIRA E EXCLUSÃO DEFINITIVA DE AVARIAS OBSERVADAS (ADM)
+    // =========================================================================
+
+    function saveAvariasState() {
+        try {
+            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+            localStorage.setItem('oleo_vtr_avarias_lixeira', JSON.stringify(vehicleAvariasLixeira));
+            localStorage.setItem('oleo_vtr_deleted_avaria_ids', JSON.stringify(deletedAvariaIds));
+        } catch(e) {
+            console.warn('Erro ao salvar estado de avarias:', e);
+        }
+    }
+
     function getAllAvarias() {
         const list = [];
         if (!vehicleAvarias || typeof vehicleAvarias !== 'object') return list;
@@ -10727,6 +10867,160 @@
         return list;
     }
 
+    function getAllLixeiraAvarias() {
+        const list = [];
+        if (!vehicleAvariasLixeira || typeof vehicleAvariasLixeira !== 'object') return list;
+
+        Object.keys(vehicleAvariasLixeira).forEach(vtr => {
+            const val = vehicleAvariasLixeira[vtr];
+            if (Array.isArray(val)) {
+                val.forEach(item => {
+                    if (item && typeof item === 'object') {
+                        list.push({ ...item, vehicle: item.vehicle || vtr });
+                    }
+                });
+            } else if (val && typeof val === 'object' && val.description) {
+                list.push({ ...val, vehicle: val.vehicle || vtr });
+            }
+        });
+
+        list.sort((a, b) => new Date(b.deletedAt || b.timestamp || b.date) - new Date(a.deletedAt || a.timestamp || a.date));
+        return list;
+    }
+
+    // 🛡️ SANITIZAÇÃO DE AVARIAS RECEBIDAS DA NUVEM: IMPEDE QUE AVARIAS APAGADAS OU NA LIXEIRA RESSURJAM
+    function sanitizeIncomingAvarias(rawAvarias) {
+        if (!rawAvarias || typeof rawAvarias !== 'object') return {};
+        const lixeiraIds = new Set(getAllLixeiraAvarias().map(a => String(a.id)));
+        const delIds = new Set((deletedAvariaIds || []).map(String));
+        const clean = {};
+
+        Object.keys(rawAvarias).forEach(vtr => {
+            let list = rawAvarias[vtr];
+            if (!Array.isArray(list)) {
+                if (list && typeof list === 'object') list = [list];
+                else list = [];
+            }
+            const filtered = list.filter(a => a && a.id && !lixeiraIds.has(String(a.id)) && !delIds.has(String(a.id)));
+            if (filtered.length > 0) {
+                clean[vtr] = filtered;
+            }
+        });
+        return clean;
+    }
+
+    // ⚡ SINCRONIZAÇÃO DIRETA IMEDIATA DE AVARIAS E LIXEIRA NO FIREBASE (~40ms)
+    function syncAvariasDirectToFirebase(vehicle = null) {
+        if (!UNIVERSAL_CLOUD_URL || !UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) return;
+        const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+
+        try {
+            if (vehicle) {
+                // 1. Atualiza vehicleAvarias da viatura no Firebase
+                if (vehicleAvarias[vehicle] && vehicleAvarias[vehicle].length > 0) {
+                    fetch(`${baseUrl}/vehicleAvarias/${encodeURIComponent(vehicle)}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(vehicleAvarias[vehicle]),
+                        cache: 'no-store'
+                    }).catch(() => {});
+                } else {
+                    fetch(`${baseUrl}/vehicleAvarias/${encodeURIComponent(vehicle)}.json`, {
+                        method: 'DELETE',
+                        cache: 'no-store'
+                    }).catch(() => {});
+                }
+
+                // 2. Atualiza vehicleAvariasLixeira da viatura no Firebase
+                if (vehicleAvariasLixeira[vehicle] && vehicleAvariasLixeira[vehicle].length > 0) {
+                    fetch(`${baseUrl}/vehicleAvariasLixeira/${encodeURIComponent(vehicle)}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(vehicleAvariasLixeira[vehicle]),
+                        cache: 'no-store'
+                    }).catch(() => {});
+                } else {
+                    fetch(`${baseUrl}/vehicleAvariasLixeira/${encodeURIComponent(vehicle)}.json`, {
+                        method: 'DELETE',
+                        cache: 'no-store'
+                    }).catch(() => {});
+                }
+            } else {
+                // Sincroniza nó completo de avarias e lixeira
+                fetch(`${baseUrl}/vehicleAvarias.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vehicleAvarias),
+                    cache: 'no-store'
+                }).catch(() => {});
+
+                fetch(`${baseUrl}/vehicleAvariasLixeira.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vehicleAvariasLixeira),
+                    cache: 'no-store'
+                }).catch(() => {});
+            }
+
+            // 3. Atualiza deletedAvariaIds no Firebase
+            fetch(`${baseUrl}/deletedAvariaIds.json`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(deletedAvariaIds),
+                cache: 'no-store'
+            }).catch(() => {});
+        } catch(e) {
+            console.warn('Erro ao sincronizar avarias no Firebase:', e);
+        }
+    }
+
+    // ALTERNÂNCIA DE ABAS NO MODAL DE AVARIAS: ATIVAS X LIXEIRA
+    function switchAvariasViewTab(tab) {
+        currentAvariasViewTab = tab;
+        const tabAtivas = document.getElementById('tabAvariasAtivas');
+        const tabLixeira = document.getElementById('tabAvariasLixeira');
+        const secAtivas = document.getElementById('adminAvariasAtivasSection');
+        const secLixeira = document.getElementById('adminAvariasLixeiraSection');
+        const footAtivas = document.getElementById('adminAvariasAtivasFooterActions');
+        const footLixeira = document.getElementById('adminAvariasLixeiraFooterActions');
+
+        if (tab === 'lixeira') {
+            if (tabAtivas) {
+                tabAtivas.classList.remove('active');
+                tabAtivas.style.background = 'var(--bg)';
+                tabAtivas.style.color = 'var(--text-muted)';
+                tabAtivas.style.borderColor = 'var(--border)';
+            }
+            if (tabLixeira) {
+                tabLixeira.classList.add('active');
+                tabLixeira.style.background = '#475569';
+                tabLixeira.style.color = '#ffffff';
+                tabLixeira.style.borderColor = '#334155';
+            }
+            if (secAtivas) secAtivas.style.display = 'none';
+            if (secLixeira) secLixeira.style.display = 'flex';
+            if (footAtivas) footAtivas.style.display = 'none';
+            if (footLixeira) footLixeira.style.display = 'flex';
+        } else {
+            if (tabAtivas) {
+                tabAtivas.classList.add('active');
+                tabAtivas.style.background = '';
+                tabAtivas.style.color = '';
+                tabAtivas.style.borderColor = '';
+            }
+            if (tabLixeira) {
+                tabLixeira.classList.remove('active');
+                tabLixeira.style.background = 'var(--bg)';
+                tabLixeira.style.color = 'var(--text-muted)';
+                tabLixeira.style.borderColor = 'var(--border)';
+            }
+            if (secAtivas) secAtivas.style.display = 'flex';
+            if (secLixeira) secLixeira.style.display = 'none';
+            if (footAtivas) footAtivas.style.display = 'flex';
+            if (footLixeira) footLixeira.style.display = 'none';
+        }
+    }
+
     function checkAndShowAdminAvariaPopup(force = false) {
         if (!isAdminAuthenticated) return;
         const avarias = getAllAvarias();
@@ -10740,7 +11034,7 @@
         }
     }
 
-        function openAvariaRegistrationFromAdmin() {
+    function openAvariaRegistrationFromAdmin() {
         const defaultVtr = currentInspectVehicle || (document.getElementById('vehicleSelect') ? document.getElementById('vehicleSelect').value : '');
         const vtr = prompt('Informe a viatura para registrar a avaria (ex: T-01100):', defaultVtr);
         if (!vtr || !vtr.trim()) return;
@@ -10759,6 +11053,7 @@
         }
         const modal = document.getElementById('adminAvariaNotificationModal');
         if (!modal) return;
+        switchAvariasViewTab('ativas');
         renderAdminAvariasList();
         modal.style.display = 'flex';
     }
@@ -10777,17 +11072,6 @@
         closeAdminAvariaNotificationModal();
     }
 
-    // Helper universal para download de imagens no navegador
-    
-
-    
-
-    
-
-    
-
-    
-
     async function deleteAvariaPhotoDirect(vehicle, slotId, avariaId) {
         if (!isAdminAuthenticated) {
             const ok = await requestAdminPassword("apagar esta foto de avaria");
@@ -10799,185 +11083,417 @@
             return;
         }
 
+        let changed = false;
+        // Procura nas ativas
         if (vehicleAvarias[vehicle] && Array.isArray(vehicleAvarias[vehicle])) {
             const av = vehicleAvarias[vehicle].find(a => a.id === avariaId);
             if (av && av.photos && av.photos[slotId]) {
                 delete av.photos[slotId];
+                changed = true;
             }
-            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
+        }
+        // Procura na lixeira se estiver lá
+        if (vehicleAvariasLixeira[vehicle] && Array.isArray(vehicleAvariasLixeira[vehicle])) {
+            const avL = vehicleAvariasLixeira[vehicle].find(a => a.id === avariaId);
+            if (avL && avL.photos && avL.photos[slotId]) {
+                delete avL.photos[slotId];
+                changed = true;
+            }
         }
 
-        await syncAllDataToOnline(true);
-        renderAdminAvariasList();
-        const adminInspectionControls = document.getElementById('adminBaselineControls');
-        if (adminInspectionControls) {
-            adminInspectionControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
-            adminInspectionControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
+        if (changed) {
+            saveAvariasState();
+            syncAvariasDirectToFirebase(vehicle);
         }
+
+        renderAdminAvariasList();
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
         }
         showToast(`🗑️ Foto de avaria <strong>${def.label}</strong> removida com sucesso!`);
     }
 
-    function renderAdminAvariasList() {
-        const container = document.getElementById('adminAvariasListContainer');
-        if (!container) return;
-
-        const avarias = getAllAvarias();
-        if (avarias.length === 0) {
-            container.innerHTML = `
-                <div style="text-align: center; color: var(--text-muted); padding: 24px; font-size: 0.9rem;">
-                    ✅ Nenhuma avaria observada registrada no momento.
-                </div>
-            `;
-            return;
-        }
-
-        let html = '';
-        avarias.forEach((av, idx) => {
-            const vInfo = VEHICLE_FLEET_INFO[av.vehicle] || {};
-            const vRec = records.find(r => r.vehicle === av.vehicle);
-            const modelText = vInfo.model || (vRec && vRec.model) || 'VIATURA';
-            const placaText = vInfo.placa || (vRec && vRec.placa) || '';
-
-            const avPhotos = av.photos || {};
-            const slotsWithPhotos = (av.slots || []).map(s => {
-                const def = AVARIA_SLOT_DEFS.find(d => d.id === s) || { id: s, label: (s === 'painel' ? 'Painel' : s), icon: '📍' };
-                // Prioriza foto isolada da avaria (Setor 2)
-                const photo = avPhotos[s] || (vehiclePhotos[av.vehicle] && vehiclePhotos[av.vehicle][s]);
-                return {
-                    id: s,
-                    label: def.label,
-                    icon: def.icon,
-                    photo: photo,
-                    hasPhoto: Boolean(photo && photo.data)
-                };
-            });
-
-            const actualPhotos = slotsWithPhotos.filter(item => item.hasPhoto);
-
-            let photosGalleryHtml = '';
-            if (actualPhotos.length > 0) {
-                photosGalleryHtml = `
-                    <div style="margin-top: 6px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 8px;">
-                        <div style="font-size: 0.74rem; font-weight: 800; color: #991b1b; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>📷 Fotos de Avarias (${actualPhotos.length}):</span>
-                            <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 600;">Toque na miniatura para ampliar com zoom</span>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px;">
-                            ${actualPhotos.map(item => `
-                                <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; text-align: center;">
-                                    <div style="font-size: 0.72rem; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        ${item.icon} ${item.label}
-                                    </div>
-                                    <div style="width: 100%; height: 75px; border-radius: 6px; overflow: hidden; position: relative; cursor: pointer; background: #000;" onclick="openPhotoViewerModal('${item.photo.data}', { allowDownload: true, isAvaria: true, title: 'Avaria ${av.vehicle} - ${item.label}', filename: 'Avaria_${av.vehicle}_${item.label}.jpg' });" title="Toque para ampliar foto em tela cheia com zoom">
-                                        <img src="${item.photo.data}" alt="${item.label}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                                        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.85)); color: #fff; font-size: 0.64rem; padding: 2px; font-weight: 600;">👁️ Ampliar</div>
-                                    </div>
-                                    <div style="display: flex; gap: 4px; margin-top: 2px;">
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteAvariaPhotoDirect('${av.vehicle}', '${item.id}', ${av.id})" style="width: 100%; padding: 4px 6px; font-size: 0.72rem; min-height: 28px; font-weight: 700;" title="Apagar esta foto de avaria">
-                                            🗑️ Remover Foto
-                                        </button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            const slotBadges = (av.slots && av.slots.length > 0)
-                ? av.slots.map(s => {
-                    const def = AVARIA_SLOT_DEFS.find(d => d.id === s);
-                    const label = def ? def.label : (s === 'painel' ? 'Painel' : s);
-                    const hasP = Boolean((avPhotos[s] && avPhotos[s].data) || (vehiclePhotos[av.vehicle] && vehiclePhotos[av.vehicle][s] && vehiclePhotos[av.vehicle][s].data));
-                    return `<span style="background: ${hasP ? '#dcfce7' : '#fee2e2'}; color: ${hasP ? '#15803d' : '#991b1b'}; border: 1px solid ${hasP ? '#86efac' : '#fca5a5'}; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">📍 ${label} ${hasP ? '📷' : ''}</span>`;
-                }).join(' ')
-                : '<span style="color: var(--text-muted); font-size: 0.74rem;">(Sem fotos apontadas)</span>';
-
-            html += `
-                <div style="background: var(--card-bg, #ffffff); border: 1.5px solid #fca5a5; border-left: 5px solid #dc2626; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 1rem; font-weight: 900; color: #b91c1c;">🚓 ${av.vehicle}</span>
-                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">${modelText} ${placaText ? '• ' + placaText : ''}</span>
-                        </div>
-                        <span style="font-size: 0.74rem; font-weight: 700; color: #64748b;">🕒 ${av.date || '-'}</span>
-                    </div>
-
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 10px;">
-                        <span style="font-size: 0.76rem; font-weight: 700; color: #1e40af;">👮 Militar que Verificou:</span>
-                        <strong style="font-size: 0.86rem; color: #1e3a8a;">${av.militar || 'Não informado'}</strong>
-                    </div>
-
-                    <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 0.88rem; color: var(--text-main); font-weight: 600; line-height: 1.4;">
-                        💬 "${av.description}"
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">Posições apontadas:</span>
-                        ${slotBadges}
-                    </div>
-
-                    ${photosGalleryHtml}
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 8px;">
-                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-
-                            <button type="button" class="btn btn-outline btn-sm" onclick="closeAdminAvariaNotificationModal(); openVehicleInspectionModal('${av.vehicle}');" style="padding: 4px 10px; font-size: 0.76rem; font-weight: 700; border-color: #3b82f6; color: #1d4ed8; background: #eff6ff;" title="Abrir fotos de inspeção desta viatura">
-                                🔍 Inspecionar VTR
-                            </button>
-                        </div>
-                        <div style="display: flex; gap: 6px;">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteAvariaRecord('${av.vehicle}', ${av.id})" style="padding: 4px 10px; font-size: 0.74rem; font-weight: 700;" title="Excluir relato de avaria">
-                                🗑️ Excluir Relato
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
-        container.innerHTML = html;
-    }
-
+    // 🗑️ 1. MOVER AVARIA ATIVA PARA A LIXEIRA (NUNCA MAIS VOLTA SOZINHA)
     async function deleteAvariaRecord(vehicle, avariaId) {
         if (!isAdminAuthenticated) {
-            const ok = await requestAdminPassword("excluir este registro de avaria");
+            const ok = await requestAdminPassword("mover este relato de avaria para a lixeira");
             if (!ok) return;
         }
 
-        if (!confirm(`Deseja remover este relato de avaria da viatura ${vehicle}?`)) {
+        if (!confirm(`Deseja mover este relato de avaria da viatura ${vehicle} para a Lixeira?`)) {
             return;
         }
 
+        let movedItem = null;
         if (vehicleAvarias[vehicle] && Array.isArray(vehicleAvarias[vehicle])) {
-            vehicleAvarias[vehicle] = vehicleAvarias[vehicle].filter(a => a.id !== avariaId);
+            const idx = vehicleAvarias[vehicle].findIndex(a => a.id === avariaId);
+            if (idx !== -1) {
+                movedItem = vehicleAvarias[vehicle][idx];
+                vehicleAvarias[vehicle].splice(idx, 1);
+            }
             if (vehicleAvarias[vehicle].length === 0) {
                 delete vehicleAvarias[vehicle];
             }
-            localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
         }
 
-        await syncAllDataToOnline(true);
+        if (movedItem) {
+            const now = new Date();
+            movedItem.deletedAt = now.toISOString();
+            movedItem.deletedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            if (!vehicleAvariasLixeira[vehicle]) {
+                vehicleAvariasLixeira[vehicle] = [];
+            }
+            vehicleAvariasLixeira[vehicle].unshift(movedItem);
+
+            if (!deletedAvariaIds.includes(avariaId)) {
+                deletedAvariaIds.push(avariaId);
+            }
+        }
+
+        saveAvariasState();
+
+        // 🚀 Sincronização direta instantânea no Firebase (remove de vehicleAvarias e adiciona em vehicleAvariasLixeira)
+        syncAvariasDirectToFirebase(vehicle);
+
         renderAdminAvariasList();
         updateAdminBadgeUI();
-        const adminInspectionControls = document.getElementById('adminBaselineControls');
-        if (adminInspectionControls) {
-            adminInspectionControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
-            adminInspectionControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
-        }
         if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
             renderInspectionSlots();
         }
-        showToast(`🗑️ Relato de avaria da viatura <strong>${vehicle}</strong> removido com sucesso!`);
+        showToast(`🗑️ Relato de avaria da viatura <strong>${vehicle}</strong> movido para a <strong>Lixeira</strong>!`);
+    }
+
+    // ♻️ 2. RESTAURAR AVARIA DA LIXEIRA DE VOLTA PARA AS ATIVAS
+    async function restoreAvariaFromLixeira(vehicle, avariaId) {
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("restaurar este relato de avaria");
+            if (!ok) return;
+        }
+
+        let itemToRestore = null;
+        if (vehicleAvariasLixeira[vehicle] && Array.isArray(vehicleAvariasLixeira[vehicle])) {
+            const idx = vehicleAvariasLixeira[vehicle].findIndex(a => a.id === avariaId);
+            if (idx !== -1) {
+                itemToRestore = vehicleAvariasLixeira[vehicle][idx];
+                vehicleAvariasLixeira[vehicle].splice(idx, 1);
+            }
+            if (vehicleAvariasLixeira[vehicle].length === 0) {
+                delete vehicleAvariasLixeira[vehicle];
+            }
+        }
+
+        if (itemToRestore) {
+            delete itemToRestore.deletedAt;
+            delete itemToRestore.deletedDate;
+
+            if (!vehicleAvarias[vehicle]) {
+                vehicleAvarias[vehicle] = [];
+            }
+            vehicleAvarias[vehicle].unshift(itemToRestore);
+
+            // Remove da lista de exclusões para permitir que sincronize como ativa
+            deletedAvariaIds = deletedAvariaIds.filter(id => id !== avariaId);
+        }
+
+        saveAvariasState();
+
+        // Sincroniza ambos os nós no Firebase
+        syncAvariasDirectToFirebase(vehicle);
+
+        renderAdminAvariasList();
+        updateAdminBadgeUI();
+        if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+            renderInspectionSlots();
+        }
+        showToast(`♻️ Relato de avaria da viatura <strong>${vehicle}</strong> restaurado para as ativas com sucesso!`);
+    }
+
+    // 🔥 3. EXCLUIR DEFINITIVAMENTE DA LIXEIRA (APAGAR DE VEZ)
+    async function purgeAvariaPermanently(vehicle, avariaId) {
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("excluir definitivamente este relato de avaria");
+            if (!ok) return;
+        }
+
+        if (!confirm(`🚨 ATENÇÃO: Deseja realmente APAGAR DE VEZ este relato de avaria da viatura ${vehicle}?\n\nEsta ação apagará permanentemente as fotos e informações e não poderá ser desfeita.`)) {
+            return;
+        }
+
+        if (vehicleAvariasLixeira[vehicle] && Array.isArray(vehicleAvariasLixeira[vehicle])) {
+            vehicleAvariasLixeira[vehicle] = vehicleAvariasLixeira[vehicle].filter(a => a.id !== avariaId);
+            if (vehicleAvariasLixeira[vehicle].length === 0) {
+                delete vehicleAvariasLixeira[vehicle];
+            }
+        }
+
+        // Mantém na lista de IDs excluídos para NUNCA ressurgir
+        if (!deletedAvariaIds.includes(avariaId)) {
+            deletedAvariaIds.push(avariaId);
+        }
+
+        saveAvariasState();
+        syncAvariasDirectToFirebase(vehicle);
+
+        renderAdminAvariasList();
+        showToast(`🔥 Relato de avaria da viatura <strong>${vehicle}</strong> apagado definitivamente de vez!`);
+    }
+
+    // 🧹 4. ESVAZIAR LIXEIRA INTEIRA (APAGAR TUDO DE VEZ)
+    async function emptyAvariasLixeira() {
+        if (!isAdminAuthenticated) {
+            const ok = await requestAdminPassword("esvaziar a lixeira de avarias");
+            if (!ok) return;
+        }
+
+        const totalCount = getAllLixeiraAvarias().length;
+        if (totalCount === 0) {
+            alert('A lixeira já está vazia.');
+            return;
+        }
+
+        if (!confirm(`🚨 ATENÇÃO: Deseja realmente APAGAR DE VEZ todos os ${totalCount} relatos que estão na lixeira?\n\nTodos os registros e fotos serão eliminados permanentemente do sistema e do Firebase.`)) {
+            return;
+        }
+
+        getAllLixeiraAvarias().forEach(a => {
+            if (!deletedAvariaIds.includes(a.id)) {
+                deletedAvariaIds.push(a.id);
+            }
+        });
+
+        vehicleAvariasLixeira = {};
+        saveAvariasState();
+        syncAvariasDirectToFirebase(null);
+
+        renderAdminAvariasList();
+        showToast(`🧹 <strong>Lixeira esvaziada!</strong> ${totalCount} relatos foram eliminados de vez.`);
+    }
+
+    // 📋 RENDERIZAÇÃO COMPLETA: AVARIAS ATIVAS E LIXEIRA COM FOTOS E AÇÕES
+    function renderAdminAvariasList() {
+        const ativasContainer = document.getElementById('adminAvariasListContainer');
+        const lixeiraContainer = document.getElementById('adminAvariasLixeiraContainer');
+        const badgeAtivas = document.getElementById('badgeCountAvariasAtivas');
+        const badgeLixeira = document.getElementById('badgeCountAvariasLixeira');
+
+        const avariasAtivas = getAllAvarias();
+        const avariasLixeira = getAllLixeiraAvarias();
+
+        if (badgeAtivas) badgeAtivas.textContent = avariasAtivas.length;
+        if (badgeLixeira) badgeLixeira.textContent = avariasLixeira.length;
+
+        // 1. RENDERIZAÇÃO DAS ATIVAS
+        if (ativasContainer) {
+            if (avariasAtivas.length === 0) {
+                ativasContainer.innerHTML = `
+                    <div style="text-align: center; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 24px; font-size: 0.92rem; font-weight: 700;">
+                        ✅ Nenhuma avaria ativa registrada na frota no momento.
+                    </div>
+                `;
+            } else {
+                let htmlAtivas = '';
+                avariasAtivas.forEach((av, idx) => {
+                    const vInfo = VEHICLE_FLEET_INFO[av.vehicle] || {};
+                    const vRec = records.find(r => r.vehicle === av.vehicle);
+                    const modelText = vInfo.model || (vRec && vRec.model) || 'VIATURA';
+                    const placaText = vInfo.placa || (vRec && vRec.placa) || '';
+
+                    const avPhotos = av.photos || {};
+                    const slotsWithPhotos = (av.slots || []).map(s => {
+                        const def = AVARIA_SLOT_DEFS.find(d => d.id === s) || { id: s, label: (s === 'painel' ? 'Painel' : s), icon: '📍' };
+                        const photo = avPhotos[s] || (vehiclePhotos[av.vehicle] && vehiclePhotos[av.vehicle][s]);
+                        return {
+                            id: s,
+                            label: def.label,
+                            icon: def.icon,
+                            photo: photo,
+                            hasPhoto: Boolean(photo && photo.data)
+                        };
+                    });
+
+                    const actualPhotos = slotsWithPhotos.filter(item => item.hasPhoto);
+
+                    let photosGalleryHtml = '';
+                    if (actualPhotos.length > 0) {
+                        photosGalleryHtml = `
+                            <div style="margin-top: 6px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 8px;">
+                                <div style="font-size: 0.74rem; font-weight: 800; color: #991b1b; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                                    <span>📷 Fotos de Avarias (${actualPhotos.length}):</span>
+                                    <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 600;">Toque na foto para ampliar com zoom</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px;">
+                                    ${actualPhotos.map(item => `
+                                        <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; text-align: center;">
+                                            <div style="font-size: 0.72rem; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                ${item.icon} ${item.label}
+                                            </div>
+                                            <div style="width: 100%; height: 75px; border-radius: 6px; overflow: hidden; position: relative; cursor: pointer; background: #000;" onclick="openPhotoViewerModal('${item.photo.data}', { allowDownload: true, isAvaria: true, title: 'Avaria ${av.vehicle} - ${item.label}', filename: 'Avaria_${av.vehicle}_${item.label}.jpg' });" title="Toque para ampliar foto em tela cheia com zoom">
+                                                <img src="${item.photo.data}" alt="${item.label}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.85)); color: #fff; font-size: 0.64rem; padding: 2px; font-weight: 600;">👁️ Ampliar</div>
+                                            </div>
+                                            <div style="display: flex; gap: 4px; margin-top: 2px;">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteAvariaPhotoDirect('${av.vehicle}', '${item.id}', ${av.id})" style="width: 100%; padding: 4px 6px; font-size: 0.72rem; min-height: 28px; font-weight: 700;" title="Apagar esta foto de avaria">
+                                                    🗑️ Remover Foto
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    const slotBadges = (av.slots && av.slots.length > 0)
+                        ? av.slots.map(s => {
+                            const def = AVARIA_SLOT_DEFS.find(d => d.id === s);
+                            const label = def ? def.label : (s === 'painel' ? 'Painel' : s);
+                            const hasP = Boolean((avPhotos[s] && avPhotos[s].data) || (vehiclePhotos[av.vehicle] && vehiclePhotos[av.vehicle][s] && vehiclePhotos[av.vehicle][s].data));
+                            return `<span style="background: ${hasP ? '#dcfce7' : '#fee2e2'}; color: ${hasP ? '#15803d' : '#991b1b'}; border: 1px solid ${hasP ? '#86efac' : '#fca5a5'}; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">📍 ${label} ${hasP ? '📷' : ''}</span>`;
+                        }).join(' ')
+                        : '<span style="color: var(--text-muted); font-size: 0.74rem;">(Sem fotos apontadas)</span>';
+
+                    htmlAtivas += `
+                        <div style="background: var(--card-bg, #ffffff); border: 1.5px solid #fca5a5; border-left: 5px solid #dc2626; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 1rem; font-weight: 900; color: #b91c1c;">🚓 ${av.vehicle}</span>
+                                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">${modelText} ${placaText ? '• ' + placaText : ''}</span>
+                                </div>
+                                <span style="font-size: 0.74rem; font-weight: 700; color: #64748b;">🕒 ${av.date || '-'}</span>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 10px;">
+                                <span style="font-size: 0.76rem; font-weight: 700; color: #1e40af;">👮 Militar que Verificou:</span>
+                                <strong style="font-size: 0.86rem; color: #1e3a8a;">${av.militar || 'Não informado'}</strong>
+                            </div>
+
+                            <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 0.88rem; color: var(--text-main); font-weight: 600; line-height: 1.4;">
+                                💬 "${av.description}"
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">Posições apontadas:</span>
+                                ${slotBadges}
+                            </div>
+
+                            ${photosGalleryHtml}
+
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 8px;">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="closeAdminAvariaNotificationModal(); openVehicleInspectionModal('${av.vehicle}');" style="padding: 4px 10px; font-size: 0.76rem; font-weight: 700; border-color: #3b82f6; color: #1d4ed8; background: #eff6ff;" title="Abrir fotos de inspeção desta viatura">
+                                    🔍 Inspecionar VTR
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteAvariaRecord('${av.vehicle}', ${av.id})" style="padding: 4px 12px; font-size: 0.76rem; font-weight: 800; min-height: 32px;" title="Mover este relato para a lixeira">
+                                    🗑️ Excluir Relato
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                ativasContainer.innerHTML = htmlAtivas;
+            }
+        }
+
+        // 2. RENDERIZAÇÃO DA LIXEIRA
+        if (lixeiraContainer) {
+            if (avariasLixeira.length === 0) {
+                lixeiraContainer.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 24px; font-size: 0.92rem;">
+                        <span style="font-size: 1.8rem; display: block; margin-bottom: 6px;">🗑️</span>
+                        A lixeira está vazia. Nenhuma avaria apagada no momento.
+                    </div>
+                `;
+            } else {
+                let htmlLixeira = '';
+                avariasLixeira.forEach((av, idx) => {
+                    const vInfo = VEHICLE_FLEET_INFO[av.vehicle] || {};
+                    const vRec = records.find(r => r.vehicle === av.vehicle);
+                    const modelText = vInfo.model || (vRec && vRec.model) || 'VIATURA';
+                    const placaText = vInfo.placa || (vRec && vRec.placa) || '';
+
+                    const avPhotos = av.photos || {};
+                    const slotsWithPhotos = (av.slots || []).map(s => {
+                        const def = AVARIA_SLOT_DEFS.find(d => d.id === s) || { id: s, label: s, icon: '📍' };
+                        const photo = avPhotos[s];
+                        return {
+                            id: s,
+                            label: def.label,
+                            icon: def.icon,
+                            photo: photo,
+                            hasPhoto: Boolean(photo && photo.data)
+                        };
+                    });
+
+                    const actualPhotos = slotsWithPhotos.filter(item => item.hasPhoto);
+
+                    let photosGalleryHtml = '';
+                    if (actualPhotos.length > 0) {
+                        photosGalleryHtml = `
+                            <div style="margin-top: 6px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 8px;">
+                                <div style="font-size: 0.74rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px;">
+                                    📷 Fotos Armazenadas na Lixeira (${actualPhotos.length}):
+                                </div>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px;">
+                                    ${actualPhotos.map(item => `
+                                        <div style="background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; text-align: center;">
+                                            <div style="font-size: 0.72rem; font-weight: 700; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                ${item.icon} ${item.label}
+                                            </div>
+                                            <div style="width: 100%; height: 75px; border-radius: 6px; overflow: hidden; position: relative; cursor: pointer; background: #000;" onclick="openPhotoViewerModal('${item.photo.data}', { allowDownload: true, isAvaria: true, title: 'Lixeira ${av.vehicle} - ${item.label}', filename: 'Lixeira_${av.vehicle}_${item.label}.jpg' });" title="Toque para ver a foto com zoom">
+                                                <img src="${item.photo.data}" alt="${item.label}" style="width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.85;">
+                                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 0.64rem; padding: 2px;">👁️ Ver</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    htmlLixeira += `
+                        <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-left: 5px solid #64748b; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 1rem; font-weight: 800; color: #334155;">🚓 ${av.vehicle}</span>
+                                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">${modelText} ${placaText ? '• ' + placaText : ''}</span>
+                                </div>
+                                <div style="display: flex; flex-direction: column; align-items: flex-end; font-size: 0.72rem; color: #64748b;">
+                                    <span>🕒 Relato: ${av.date || '-'}</span>
+                                    <span style="color: #b91c1c; font-weight: 700;">🗑️ Apagado: ${av.deletedDate || 'Recentemente'}</span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; background: #e2e8f0; border-radius: 6px; padding: 6px 10px; font-size: 0.76rem;">
+                                <span style="font-weight: 700; color: #475569;">👮 Militar que Verificou:</span>
+                                <strong style="color: #0f172a;">${av.militar || 'Não informado'}</strong>
+                            </div>
+
+                            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 0.88rem; color: var(--text-main); font-weight: 600; line-height: 1.4;">
+                                💬 "${av.description}"
+                            </div>
+
+                            ${photosGalleryHtml}
+
+                            <div style="display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 4px; border-top: 1px dashed var(--border); padding-top: 8px;">
+                                <button type="button" class="btn btn-outline btn-3d btn-sm" onclick="restoreAvariaFromLixeira('${av.vehicle}', ${av.id})" style="padding: 6px 14px; font-size: 0.82rem; font-weight: 800; border-color: #16a34a; color: #15803d; background: #f0fdf4;" title="Restaurar este relato para as avarias ativas">
+                                    ♻️ Restaurar Avaria
+                                </button>
+                                <button type="button" class="btn btn-danger-solid btn-3d btn-sm" onclick="purgeAvariaPermanently('${av.vehicle}', ${av.id})" style="padding: 6px 14px; font-size: 0.82rem; font-weight: 800;" title="Excluir definitivamente este relato de vez">
+                                    🔥 Apagar de Vez
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                lixeiraContainer.innerHTML = htmlLixeira;
+            }
+        }
     }
 
     function exportAvariasExcel() {
         const avarias = getAllAvarias();
         if (avarias.length === 0) {
-            alert("Nenhuma avaria observada encontrada para exportar.");
+            alert("Nenhuma avaria ativa encontrada para exportar.");
             return;
         }
 
@@ -11011,7 +11527,7 @@
                     "Data / Hora do Relato": av.date || '-',
                     "Descrição da Avaria Observada": av.description || '-',
                     "Posições / Fotos com Alteração": slotNames,
-                    "Situação": av.status || 'Ativa / Informada à Reserva de Material e P4'
+                    "Situação": 'Ativa / Informada à Reserva de Material e P4'
                 };
             });
 
@@ -11038,7 +11554,7 @@
         }
     }
 
-function toggleAdminBaselineEditMode() {
+    function toggleAdminBaselineEditMode() {
         if (!isAdminAuthenticated) {
             requestAdminPassword("cadastrar ou editar fotos fixas de referência da viatura").then(ok => {
                 if (ok) {
