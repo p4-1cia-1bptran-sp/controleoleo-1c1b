@@ -19,7 +19,7 @@
     <script>
         // 🛡️ ANTI-CACHE IMEDIATO: EXECUTA ANTES DE QUALQUER ELEMENTO DA PÁGINA
         (function() {
-            const APP_VERSION = "2026.10.26.v1";
+            const APP_VERSION = "2026.10.26.v2";
 
             // 1. Desregistra Service Workers antigos que retêm arquivos em cache no celular
             if ('serviceWorker' in navigator) {
@@ -46,6 +46,7 @@
                     localStorage.setItem('oleo_vtr_app_version', APP_VERSION);
                     sessionStorage.clear();
                     localStorage.removeItem('oleo_vtr_active_endpoint');
+                    localStorage.removeItem('oleo_vtr_api_url');
                 }
             } catch(e) {}
 
@@ -5684,29 +5685,31 @@
 
     function saveQuickKmUpdate() {
         if (!quickKmTargetVehicle) return;
-        const kmVal = parseFloat(document.getElementById('quickKmValue').value);
+        const valInput = document.getElementById('quickKmValue');
+        const kmVal = parseFloat(valInput ? valInput.value : '');
         if (isNaN(kmVal) || kmVal < 0) {
             alert('Informe uma quilometragem válida.');
             return;
         }
+        if (valInput) valInput.blur();
 
-        const vehicle = quickKmTargetVehicle;
+        const vehicle = normalizeVehiclePrefix(quickKmTargetVehicle);
+        const mutMs = markLocalMutation(vehicle);
+
+        normalizeAndDeduplicateRecords();
         const existingIdx = records.findIndex(r => r.vehicle === vehicle);
-        let fixedTargetKm = vehicleTargetMap[vehicle];
-        if (!fixedTargetKm && existingIdx !== -1 && records[existingIdx].targetKm) {
-            fixedTargetKm = records[existingIdx].targetKm;
-            vehicleTargetMap[vehicle] = fixedTargetKm;
-        }
-        if (!fixedTargetKm) {
+        let fixedTargetKm = (existingIdx !== -1 && records[existingIdx].targetKm) ? Number(records[existingIdx].targetKm) : Number(vehicleTargetMap[vehicle] || 0);
+        if (!fixedTargetKm || isNaN(fixedTargetKm) || fixedTargetKm <= 0) {
             fixedTargetKm = kmVal + 5000;
-            vehicleTargetMap[vehicle] = fixedTargetKm;
         }
+        vehicleTargetMap[vehicle] = fixedTargetKm;
         localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
 
         if (existingIdx !== -1) {
             records[existingIdx].currentKm = kmVal;
             records[existingIdx].targetKm = fixedTargetKm;
             records[existingIdx].date = todayStr;
+            records[existingIdx].updatedAtMs = mutMs;
         } else {
             records.unshift({
                 id: vehicle,
@@ -5717,27 +5720,28 @@
                 oilBrand: '',
                 filtroOleo: true,
                 filtroAr: true,
-                filtroCombustivel: false
+                filtroCombustivel: false,
+                updatedAtMs: mutMs
             });
         }
 
         mileageHistory.unshift({
-            id: Date.now(),
+            id: mutMs,
             vehicle: vehicle,
             date: todayStr,
             currentKm: kmVal,
             targetKm: fixedTargetKm,
             isOilChange: false,
             oilBrand: '',
-            timestamp: new Date().toISOString()
+            timestamp: new Date(mutMs).toISOString(),
+            updatedAtMs: mutMs
         });
 
         saveRecords();
         updateStatusTimestamp();
-        closeQuickKmModal();
-        renderDashboard();
-        renderMileageTable();
-        // Sincronização ultra-rápida direta para o Firebase Realtime Database (< 100ms)
+        closeQuickKmModal(true);
+        refreshAllVehicleUI(vehicle);
+        // Sincronização atômica ultra-rápida para o Firebase Realtime Database (< 80ms)
         syncDirectToFirebaseFast();
         showToast(`⏱️ KM da viatura <strong>${vehicle}</strong> atualizado para <strong>${kmVal.toLocaleString('pt-BR')} km</strong>!`);
     }
@@ -5897,7 +5901,7 @@
     }
 
     // =========================================================================
-    // ☁️ SINCRONIZAÇÃO EM NUVEM AUTOMÁTICA MULTI-DISPOSITIVOS
+    // ☁️ SINCRONIZAÇÃO EM NUVEM ATÔMICA E ANTI-CONFLITO (FIREBASE REALTIME DB)
     // =========================================================================
     let isCloudConnected = false;
     let isRemoteUpdate = false;
@@ -5909,22 +5913,186 @@
     let UNIVERSAL_CLOUD_URL = localStorage.getItem('oleo_vtr_firebase_url') || DEFAULT_FIREBASE_URL;
     let firebaseEventSource = null;
 
+    // 🔒 Controle monotônico de mutações locais (impede que um GET atrasado sobrescreva lançamentos recentes)
+    let lastLocalMutationMs = parseInt(localStorage.getItem('oleo_vtr_last_mutation_ms') || '0', 10) || 0;
+    let localMutationSeq = 0;
+    let activeSaveCount = 0;
+    let currentGetAbortController = null;
+    let isGetInFlight = false;
+    let lastKnownCloudUpdatedAtMs = 0;
+    let lastKnownCloudStatusToken = '';
+    let hasInitialCloudLoadCompleted = false;
+    let hasLoadedPhotosOnce = false;
+    let deletedRecordVehicles = [];
+    try {
+        deletedRecordVehicles = JSON.parse(localStorage.getItem('oleo_vtr_deleted_record_vtrs') || '[]');
+        if (!Array.isArray(deletedRecordVehicles)) deletedRecordVehicles = [];
+    } catch (e) { deletedRecordVehicles = []; }
+
+    function markLocalMutation(vehicle = null, isDeleteRecord = false) {
+        const nowMs = Date.now();
+        lastLocalMutationMs = Math.max(nowMs, lastLocalMutationMs + 1);
+        localMutationSeq++;
+        try {
+            localStorage.setItem('oleo_vtr_last_mutation_ms', String(lastLocalMutationMs));
+            if (vehicle) {
+                const cleanV = normalizeVehiclePrefix(vehicle);
+                if (isDeleteRecord) {
+                    if (!deletedRecordVehicles.includes(cleanV)) deletedRecordVehicles.push(cleanV);
+                } else {
+                    deletedRecordVehicles = deletedRecordVehicles.filter(v => v !== cleanV);
+                }
+                localStorage.setItem('oleo_vtr_deleted_record_vtrs', JSON.stringify(deletedRecordVehicles));
+            }
+        } catch (e) {}
+
+        // Cancela imediatamente qualquer GET em andamento que tenha começado antes deste lançamento!
+        if (currentGetAbortController) {
+            try { currentGetAbortController.abort(); } catch (e) {}
+            currentGetAbortController = null;
+        }
+        return lastLocalMutationMs;
+    }
+
+    // 🔄 Deduplicação estrita e alinhamento de KM Alvo (garante 1 único registro por viatura em toda a página)
+    function normalizeAndDeduplicateRecords() {
+        if (!Array.isArray(records)) records = [];
+        const byVtr = {};
+        const order = [];
+
+        records.forEach(r => {
+            if (!r || typeof r !== 'object') return;
+            const rawV = r.vehicle || r.id;
+            if (!rawV) return;
+            const v = normalizeVehiclePrefix(rawV);
+            r.vehicle = v;
+            r.id = v;
+            r.currentKm = parseFloat(r.currentKm || 0);
+            if (isNaN(r.currentKm)) r.currentKm = 0;
+
+            let tKm = parseFloat(r.targetKm || vehicleTargetMap[v] || 0);
+            if (!tKm || isNaN(tKm) || tKm <= 0) {
+                tKm = r.currentKm + 5000;
+            }
+            r.targetKm = tKm;
+
+            if (!byVtr[v]) {
+                byVtr[v] = r;
+                order.push(v);
+            } else {
+                const existing = byVtr[v];
+                const exMs = Number(existing.updatedAtMs || 0);
+                const newMs = Number(r.updatedAtMs || 0);
+                if (newMs > exMs) {
+                    byVtr[v] = r;
+                } else if (newMs === exMs) {
+                    const exDate = existing.date || '';
+                    const newDate = r.date || '';
+                    if (newDate > exDate || (newDate === exDate && r.currentKm > existing.currentKm)) {
+                        byVtr[v] = r;
+                    }
+                }
+            }
+        });
+
+        records = order.map(v => {
+            const winner = byVtr[v];
+            vehicleTargetMap[v] = winner.targetKm;
+            return winner;
+        });
+    }
+
+    // 🔄 Atualização unificada de TODOS os painéis visuais da página
+    function refreshAllVehicleUI(selectedPrefix = null) {
+        normalizeAndDeduplicateRecords();
+        const vehicleSelect = document.getElementById('vehicleSelect');
+        const targetSelection = selectedPrefix ? normalizeVehiclePrefix(selectedPrefix) : (vehicleSelect ? vehicleSelect.value : '');
+
+        const active = document.activeElement;
+        const isUserTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+
+        if (!isUserTyping) {
+            populateMonthSelect();
+            populateVehicleSelects();
+            if (targetSelection && vehicleSelect && customVehicles.includes(targetSelection)) {
+                vehicleSelect.value = targetSelection;
+            }
+            onVehicleSelectChange();
+        } else {
+            // Mesmo se houver foco residual, atualiza os textos informativos do painel superior
+            const sel = targetSelection || (vehicleSelect ? vehicleSelect.value : '');
+            if (sel) {
+                const vRecord = records.find(r => r.vehicle === sel);
+                const lastKmVal = document.getElementById('lastKmVal');
+                const lastTargetVal = document.getElementById('lastTargetVal');
+                const lastRemainingVal = document.getElementById('lastRemainingVal');
+                const lastStatusVal = document.getElementById('lastStatusVal');
+                if (vRecord && lastKmVal && lastTargetVal && lastRemainingVal && lastStatusVal) {
+                    const activeTargetKm = vRecord.targetKm || vehicleTargetMap[sel];
+                    const diff = activeTargetKm ? (activeTargetKm - vRecord.currentKm) : null;
+                    lastKmVal.textContent = vRecord.currentKm.toLocaleString('pt-BR') + ' km';
+                    lastTargetVal.textContent = activeTargetKm ? (activeTargetKm.toLocaleString('pt-BR') + ' km (Fixo)') : '--';
+                    if (diff !== null) {
+                        if (diff > 500) {
+                            lastRemainingVal.innerHTML = `<span style="color: var(--success); font-weight:700;">+${diff.toLocaleString('pt-BR')} km</span>`;
+                            lastStatusVal.innerHTML = `<span class="badge badge-ok">Em Dia</span>`;
+                        } else if (diff >= 0) {
+                            lastRemainingVal.innerHTML = `<span style="color: var(--warning); font-weight:700;">+${diff.toLocaleString('pt-BR')} km</span>`;
+                            lastStatusVal.innerHTML = `<span class="badge badge-warning">Atenção</span>`;
+                        } else {
+                            lastRemainingVal.innerHTML = `<span style="color: var(--danger); font-weight:700;">-${Math.abs(diff).toLocaleString('pt-BR')} km</span>`;
+                            lastStatusVal.innerHTML = `<span class="badge badge-danger">Vencido</span>`;
+                        }
+                    }
+                }
+            }
+        }
+
+        renderVehicleMiniCards();
+        renderDashboard();
+        renderMileageTable();
+        if (typeof updateAdminBadgeUI === 'function') {
+            // Atualiza badges sem recursão
+            const badge = document.getElementById('adminSessionBadge');
+            const avariaBadge = document.getElementById('adminAvariaBadge');
+            const avariaBadgeText = document.getElementById('adminAvariaBadgeText');
+            const banner = document.getElementById('avariaAlertBanner');
+            const bannerBadge = document.getElementById('bannerAvariaCountBadge');
+            const bannerDetails = document.getElementById('bannerAvariaDetails');
+            if (badge) badge.style.display = isAdminAuthenticated ? 'inline-flex' : 'none';
+            const avariasList = typeof getAllAvarias === 'function' ? getAllAvarias() : [];
+            if (avariaBadge) {
+                if (isAdminAuthenticated && avariasList.length > 0) {
+                    avariaBadge.style.display = 'inline-flex';
+                    if (avariaBadgeText) avariaBadgeText.textContent = `🚨 Avarias (${avariasList.length})`;
+                } else {
+                    avariaBadge.style.display = 'none';
+                }
+            }
+            if (banner) {
+                if (isAdminAuthenticated && avariasList.length > 0) {
+                    banner.style.display = 'flex';
+                    if (bannerBadge) bannerBadge.textContent = `${avariasList.length} avaria(s)`;
+                    if (bannerDetails) {
+                        const vtrsWithAvarias = [...new Set(avariasList.map(a => a.vehicle))].join(', ');
+                        bannerDetails.textContent = `Viaturas com avaria relatada: ${vtrsWithAvarias}. Verifique as fotos e informe à Reserva/P4.`;
+                    }
+                } else {
+                    banner.style.display = 'none';
+                }
+            }
+        }
+    }
+
     function getApiCandidateEndpoints() {
         const list = [];
-        // Firebase Realtime Database é a fonte de verdade em nuvem única e prioritária
         if (UNIVERSAL_CLOUD_URL) {
             list.push(UNIVERSAL_CLOUD_URL);
-        }
-        const customUrl = localStorage.getItem('oleo_vtr_api_url');
-        if (customUrl && customUrl.trim()) {
-            let u = customUrl.trim();
-            if (!u.startsWith('http') && !u.startsWith('/')) u = 'https://' + u;
-            if (!list.includes(u)) list.push(u);
         }
         return list;
     }
 
-    async function executeApiRequest(method, payload = null) {
+    async function executeApiRequest(method, payload = null, customSignal = null) {
         const endpoints = getApiCandidateEndpoints();
         let lastError = null;
         let lastStatusCode = null;
@@ -5932,17 +6100,22 @@
         for (const endpoint of endpoints) {
             try {
                 const controller = new AbortController();
-                // Timeout estendido para 15s para garantir upload de fotos em redes móveis
                 const timeoutId = setTimeout(() => controller.abort(), 15000);
+                if (customSignal) {
+                    customSignal.addEventListener('abort', () => controller.abort(), { once: true });
+                }
 
                 const isFirebase = endpoint.includes('firebaseio.com');
-                const actualMethod = isFirebase ? (method === 'POST' ? 'PUT' : method) : method;
+                // Usa PATCH por padrão no Firebase para atualizações atômicas sem sobrescrever nós de fotos pesadas!
+                let actualMethod = method;
+                if (isFirebase && method === 'POST') {
+                    actualMethod = 'PATCH';
+                }
 
-                // ATENÇÃO: Firebase RTDB rejeita parâmetros desconhecidos como _nocache com erro HTTP 400!
                 let fetchUrl = endpoint;
                 if (method === 'GET' && !isFirebase) {
                     const sep = endpoint.includes('?') ? '&' : '?';
-                    fetchUrl = `${endpoint}${sep}_nocache=${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+                    fetchUrl = `${endpoint}${sep}_nocache=${Date.now()}`;
                 }
 
                 const reqOpts = {
@@ -5958,7 +6131,7 @@
                     signal: controller.signal
                 };
 
-                if (payload && (method === 'POST' || method === 'PUT')) {
+                if (payload && (actualMethod === 'POST' || actualMethod === 'PUT' || actualMethod === 'PATCH')) {
                     reqOpts.body = JSON.stringify(payload);
                 }
 
@@ -5976,7 +6149,7 @@
                     lastError = errData.error || `HTTP ${response.status}`;
                 }
             } catch (err) {
-                lastError = err.name === 'AbortError' ? 'Tempo limite esgotado' : err.message;
+                lastError = err.name === 'AbortError' ? 'Operação cancelada ou tempo esgotado' : err.message;
             }
         }
 
@@ -5985,13 +6158,21 @@
 
     function generateDataHash(obj) {
         if (!obj) return '';
-        // Não inclui updatedAt no hash para evitar re-renderizações e saltitações de página quando os dados não mudaram
+        const cleanRecords = (Array.isArray(obj.records) ? obj.records : Object.values(obj.records || {})).map(r => ({
+            v: r && r.vehicle,
+            c: r && r.currentKm,
+            t: r && r.targetKm,
+            d: r && r.date,
+            o: r && r.oilBrand
+        }));
+        const avKeys = Object.keys(obj.vehicleAvarias || {}).sort().map(k => `${k}:${(obj.vehicleAvarias[k] || []).length}`);
+        const lixKeys = Object.keys(obj.vehicleAvariasLixeira || {}).sort().map(k => `${k}:${(obj.vehicleAvariasLixeira[k] || []).length}`);
         const clean = {
-            records: obj.records || [],
-            vehicles: obj.vehicles || [],
-            targetMap: obj.targetMap || {},
-            mileageHistory: (obj.mileageHistory || []).slice(0, 30),
-            lastStatusUpdate: obj.lastStatusUpdate || ''
+            r: cleanRecords,
+            v: obj.vehicles || [],
+            t: obj.targetMap || {},
+            a: avKeys,
+            l: lixKeys
         };
         return JSON.stringify(clean);
     }
@@ -6003,11 +6184,15 @@
         if (txt) txt.textContent = text;
     }
 
-    
     // ⚡ STREAM EM TEMPO REAL BIDIRECIONAL CONTÍNUO (FIREBASE SSE / EVENTSOURCE)
-    function initFirebaseRealtimeStream() {
+    function initFirebaseRealtimeStream(forceReconnect = false) {
         if (!window.EventSource) return;
         if (!UNIVERSAL_CLOUD_URL || !UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) return;
+
+        // Não fecha nem recria a conexão se ela já estiver aberta (evita re-download completo ao focar a janela!)
+        if (!forceReconnect && firebaseEventSource && firebaseEventSource.readyState !== EventSource.CLOSED) {
+            return;
+        }
 
         if (firebaseEventSource) {
             try { firebaseEventSource.close(); } catch(e) {}
@@ -6017,12 +6202,16 @@
         try {
             firebaseEventSource = new EventSource(UNIVERSAL_CLOUD_URL);
 
-            firebaseEventSource.addEventListener('put', function(e) {
+            const handleRealtimeEvent = function(e) {
                 try {
+                    // Ignora ecos da própria gravação local durante janela de proteção de 5 segundos
+                    if (activeSaveCount > 0 || (Date.now() - lastLocalMutationMs < 5000)) {
+                        return;
+                    }
                     const parsed = JSON.parse(e.data);
                     if (!parsed) return;
 
-                    // 1. Sincronização e exclusão instantânea de fotos em tempo real (/vehiclePhotos/...)
+                    // 1. Sincronização de fotos fixas (/vehiclePhotos/...)
                     if (parsed.path && parsed.path.startsWith('/vehiclePhotos')) {
                         const cleanPath = parsed.path.replace(/^\/vehiclePhotos\/?/, '');
                         if (!cleanPath) {
@@ -6033,12 +6222,9 @@
                                 const vtr = parts[0];
                                 const slot = parts[1];
                                 if (parsed.data === null) {
-                                    // Foto apagada no PC ou celular: remove imediatamente no outro aparelho!
                                     if (vehiclePhotos[vtr]) {
                                         delete vehiclePhotos[vtr][slot];
-                                        if (Object.keys(vehiclePhotos[vtr]).length === 0) {
-                                            delete vehiclePhotos[vtr];
-                                        }
+                                        if (Object.keys(vehiclePhotos[vtr]).length === 0) delete vehiclePhotos[vtr];
                                     }
                                 } else {
                                     if (!vehiclePhotos[vtr]) vehiclePhotos[vtr] = {};
@@ -6046,11 +6232,8 @@
                                 }
                             } else if (parts.length === 1) {
                                 const vtr = parts[0];
-                                if (parsed.data === null) {
-                                    delete vehiclePhotos[vtr];
-                                } else {
-                                    vehiclePhotos[vtr] = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
-                                }
+                                if (parsed.data === null) delete vehiclePhotos[vtr];
+                                else vehiclePhotos[vtr] = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
                             }
                         }
                         localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
@@ -6060,204 +6243,230 @@
                         return;
                     }
 
-                    // 2. Sincronização e exclusão instantânea de avarias em tempo real (/vehicleAvarias/...)
-                    if (parsed.path && parsed.path.startsWith('/vehicleAvarias')) {
-                        const cleanPath = parsed.path.replace(/^\/vehicleAvarias\/?/, '');
-                        if (!cleanPath) {
-                            const raw = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
-                            vehicleAvarias = sanitizeIncomingAvarias(raw);
-                        } else {
-                            const parts = cleanPath.split('/').filter(Boolean).map(decodeURIComponent);
-                            if (parts.length >= 1) {
-                                const vtr = parts[0];
-                                if (parsed.data === null) {
-                                    delete vehicleAvarias[vtr];
-                                } else {
-                                    let list = parsed.data;
-                                    if (!Array.isArray(list)) list = (list && typeof list === 'object') ? [list] : [];
-                                    const lixeiraIds = new Set(getAllLixeiraAvarias().map(a => String(a.id)));
-                                    const delIds = new Set((deletedAvariaIds || []).map(String));
-                                    const filtered = list.filter(a => a && a.id && !lixeiraIds.has(String(a.id)) && !delIds.has(String(a.id)));
-                                    if (filtered.length > 0) {
-                                        vehicleAvarias[vtr] = filtered;
-                                    } else {
-                                        delete vehicleAvarias[vtr];
-                                    }
-                                }
-                            }
-                        }
-                        localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
-                        updateAdminBadgeUI();
-                        if (typeof renderAdminAvariasList === 'function') renderAdminAvariasList();
-                        if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
-                            renderInspectionSlots();
-                        }
+                    // 2. Evento na raiz ('/') via PUT inicial ou PATCH atômico
+                    if ((parsed.path === '/' || !parsed.path) && parsed.data && typeof parsed.data === 'object') {
+                        applyOnlineData(parsed.data, true);
                         return;
                     }
 
-                    // 3. Sincronização da Lixeira de Avarias em tempo real (/vehicleAvariasLixeira/...)
-                    if (parsed.path && parsed.path.startsWith('/vehicleAvariasLixeira')) {
-                        const cleanPath = parsed.path.replace(/^\/vehicleAvariasLixeira\/?/, '');
-                        if (!cleanPath) {
-                            vehicleAvariasLixeira = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
-                        } else {
-                            const parts = cleanPath.split('/').filter(Boolean).map(decodeURIComponent);
-                            if (parts.length >= 1) {
-                                const vtr = parts[0];
-                                if (parsed.data === null) {
-                                    delete vehicleAvariasLixeira[vtr];
-                                } else {
-                                    vehicleAvariasLixeira[vtr] = parsed.data;
-                                }
-                            }
-                        }
-                        localStorage.setItem('oleo_vtr_avarias_lixeira', JSON.stringify(vehicleAvariasLixeira));
-                        if (typeof renderAdminAvariasList === 'function') renderAdminAvariasList();
+                    // 3. Eventos parciais de dados: busca atualização leve se não for eco de timestamp
+                    if (parsed.path === '/updatedAt' || parsed.path === '/updatedAtMs' || parsed.path === '/lastStatusUpdate') {
                         return;
                     }
-
-                    // 4. Sincronização dos IDs deletados (/deletedAvariaIds/...)
-                    if (parsed.path && parsed.path.startsWith('/deletedAvariaIds')) {
-                        if (Array.isArray(parsed.data)) {
-                            parsed.data.forEach(id => {
-                                if (!deletedAvariaIds.includes(id)) deletedAvariaIds.push(id);
-                            });
-                            localStorage.setItem('oleo_vtr_deleted_avaria_ids', JSON.stringify(deletedAvariaIds));
-                        }
-                        return;
-                    }
-
-                    let incomingData = null;
-                    if (parsed.path === '/' || !parsed.path) {
-                        incomingData = parsed.data;
-                    } else if (parsed.path.startsWith('/records')) {
-                        if (parsed.path === '/records') {
-                            records = Array.isArray(parsed.data) ? parsed.data : (parsed.data ? Object.values(parsed.data) : []);
-                            localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
-                            renderDashboard();
-                            renderVehicleMiniCards();
-                            return;
-                        }
-                    } else if (parsed.path.startsWith('/targetMap')) {
-                        if (parsed.path === '/targetMap') {
-                            vehicleTargetMap = (parsed.data && typeof parsed.data === 'object') ? parsed.data : {};
-                            localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
-                            renderDashboard();
-                            renderVehicleMiniCards();
-                            return;
-                        }
-                    } else {
-                        loadDataFromOnline(true);
-                        return;
-                    }
-
-                    if (incomingData && typeof incomingData === 'object') {
-                        applyOnlineData(incomingData, true);
-                    }
+                    loadDataFromOnline(true);
                 } catch(err) {
                     console.warn('Erro ao processar evento de tempo real:', err);
                 }
-            });
+            };
 
-            firebaseEventSource.addEventListener('patch', function() {
-                loadDataFromOnline(true);
-            });
+            firebaseEventSource.addEventListener('put', handleRealtimeEvent);
+            firebaseEventSource.addEventListener('patch', handleRealtimeEvent);
 
             firebaseEventSource.onerror = function() {
-                // Reconexão automática gerenciada pelo navegador
+                // Reconexão automática nativa do EventSource
             };
         } catch(err) {
             console.warn('Não foi possível iniciar o stream SSE:', err);
         }
     }
 
-    function applyOnlineData(data, isBackground = false) {
-        if (!data || typeof data !== 'object') return;
-        const currentHash = generateDataHash(data);
-        if (currentHash && currentHash === lastSyncedHash) {
-            setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
-            isCloudConnected = true;
-            return;
+    // 🛡️ RECONCILIAÇÃO INTELIGENTE POR VIATURA E TIMESTAMP (NUNCA REVERTE ALTERAÇÃO RECÉM-LANÇADA)
+    function reconcileCloudAndLocalState(data) {
+        if (!data || typeof data !== 'object') return false;
+
+        const remoteUpdatedAtMs = Number(data.updatedAtMs || 0);
+        // Se este dispositivo tem uma alteração mais recente que o snapshot recebido da nuvem, preserva o estado local!
+        if (lastLocalMutationMs > 0 && remoteUpdatedAtMs > 0 && remoteUpdatedAtMs < lastLocalMutationMs) {
+            return false;
+        }
+        if (remoteUpdatedAtMs > 0) {
+            lastKnownCloudUpdatedAtMs = Math.max(lastKnownCloudUpdatedAtMs, remoteUpdatedAtMs);
+        }
+        if (data.lastStatusUpdate) {
+            lastKnownCloudStatusToken = String(data.lastStatusUpdate);
         }
 
-        const active = document.activeElement;
-        const isUserTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
-
-        lastSyncedHash = currentHash;
-        isRemoteUpdate = true;
-
-        if (Array.isArray(data.records)) {
-            records = data.records;
-            localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
-        } else if (data.records && typeof data.records === 'object') {
-            records = Object.values(data.records);
-            localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
-        }
-        if (Array.isArray(data.mileageHistory)) {
-            mileageHistory = data.mileageHistory;
-            localStorage.setItem('oleo_vtr_mileage_history', JSON.stringify(mileageHistory));
-        } else if (data.mileageHistory && typeof data.mileageHistory === 'object') {
-            mileageHistory = Object.values(data.mileageHistory);
-            localStorage.setItem('oleo_vtr_mileage_history', JSON.stringify(mileageHistory));
-        }
-        if (Array.isArray(data.vehicles)) {
-            customVehicles = data.vehicles;
-            if (!customVehicles.includes('26-24')) customVehicles.push('26-24');
-            localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
-        } else if (data.vehicles && typeof data.vehicles === 'object') {
-            customVehicles = Object.values(data.vehicles);
-            if (!customVehicles.includes('26-24')) customVehicles.push('26-24');
-            localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
-        }
-        if (data.targetMap && typeof data.targetMap === 'object') {
-            vehicleTargetMap = { ...vehicleTargetMap, ...data.targetMap };
-            localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
-        }
-        // Alinhamento mútuo obrigatório: targetKm do record e vehicleTargetMap nunca divergem
-        records.forEach(r => {
-            if (r.vehicle) {
-                if (vehicleTargetMap[r.vehicle]) {
-                    r.targetKm = vehicleTargetMap[r.vehicle];
-                } else if (r.targetKm) {
-                    vehicleTargetMap[r.vehicle] = r.targetKm;
-                }
+        // 1. Reconciliação de Viaturas Cadastradas (vehicles)
+        if (data.vehicles !== undefined) {
+            const cloudVehicles = Array.isArray(data.vehicles) ? data.vehicles : (data.vehicles && typeof data.vehicles === 'object' ? Object.values(data.vehicles) : []);
+            if (cloudVehicles.length > 0) {
+                customVehicles = cloudVehicles.map(normalizeVehiclePrefix);
+                if (!customVehicles.includes('26-24')) customVehicles.push('26-24');
+                customVehicles = [...new Set(customVehicles)];
+                localStorage.setItem('oleo_vtr_vehicles', JSON.stringify(customVehicles));
             }
-        });
-        localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
-        localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
-        // Atualização não-destrutiva de fotos e avarias (evita apagar avarias locais se o servidor retornar vazio):
-        // Nuvem Online é a FONTE DA VERDADE ÚNICA: sincronização direta e fidedigna
-        if (data && data.vehiclePhotos !== undefined) {
+        }
+
+        // 2. Reconciliação de Records e TargetMap (por viatura, respeitando updatedAtMs mais recente)
+        const incomingTargetMap = (data.targetMap && typeof data.targetMap === 'object') ? data.targetMap : null;
+        if (data.records !== undefined || incomingTargetMap) {
+            const rawCloudRecords = data.records !== undefined
+                ? (Array.isArray(data.records) ? data.records : (data.records && typeof data.records === 'object' ? Object.values(data.records) : []))
+                : null;
+
+            if (rawCloudRecords !== null) {
+                const localByVtr = {};
+                (records || []).forEach(r => {
+                    if (r && (r.vehicle || r.id)) {
+                        const v = normalizeVehiclePrefix(r.vehicle || r.id);
+                        localByVtr[v] = r;
+                    }
+                });
+
+                const cloudByVtr = {};
+                const cloudOrder = [];
+                rawCloudRecords.forEach(r => {
+                    if (!r || typeof r !== 'object') return;
+                    const v = normalizeVehiclePrefix(r.vehicle || r.id);
+                    if (!v) return;
+                    r.vehicle = v;
+                    r.id = v;
+                    if (!cloudByVtr[v]) {
+                        cloudByVtr[v] = r;
+                        cloudOrder.push(v);
+                    } else {
+                        const ex = cloudByVtr[v];
+                        if (Number(r.updatedAtMs || 0) >= Number(ex.updatedAtMs || 0)) {
+                            cloudByVtr[v] = r;
+                        }
+                    }
+                });
+
+                const allVtrs = new Set([...cloudOrder, ...Object.keys(localByVtr)]);
+                const mergedRecords = [];
+                const nowMs = Date.now();
+
+                allVtrs.forEach(v => {
+                    const cRec = cloudByVtr[v];
+                    const lRec = localByVtr[v];
+
+                    // Se foi excluído localmente mais recentemente que o snapshot da nuvem, mantém excluído
+                    if (deletedRecordVehicles.includes(v) && lastLocalMutationMs > remoteUpdatedAtMs) {
+                        return;
+                    }
+
+                    let winner = null;
+                    if (cRec && lRec) {
+                        const lMs = Number(lRec.updatedAtMs || 0);
+                        const cMs = Number(cRec.updatedAtMs || 0);
+                        if (lMs > cMs) {
+                            winner = lRec;
+                        } else if (lMs > 0 && cMs === 0 && (nowMs - lMs < 600000)) {
+                            // Registro local lançado nos últimos 10 min contra registro legado sem timestamp
+                            winner = lRec;
+                        } else {
+                            winner = cRec;
+                        }
+                    } else if (cRec) {
+                        winner = cRec;
+                    } else if (lRec) {
+                        const lMs = Number(lRec.updatedAtMs || 0);
+                        if (lMs > remoteUpdatedAtMs || (lMs > 0 && (nowMs - lMs < 600000))) {
+                            winner = lRec;
+                        }
+                    }
+
+                    if (winner) {
+                        winner.vehicle = v;
+                        winner.id = v;
+                        winner.currentKm = parseFloat(winner.currentKm || 0);
+                        if (isNaN(winner.currentKm)) winner.currentKm = 0;
+
+                        // O targetKm do registro vencedor é a fonte única da verdade para a viatura
+                        const mapTarget = incomingTargetMap && incomingTargetMap[v] ? parseFloat(incomingTargetMap[v]) : (vehicleTargetMap[v] ? parseFloat(vehicleTargetMap[v]) : 0);
+                        let finalTarget = parseFloat(winner.targetKm || 0);
+                        if (!finalTarget || isNaN(finalTarget) || finalTarget <= 0) {
+                            finalTarget = mapTarget > 0 ? mapTarget : (winner.currentKm + 5000);
+                        }
+                        winner.targetKm = finalTarget;
+                        vehicleTargetMap[v] = finalTarget;
+                        mergedRecords.push(winner);
+                    }
+                });
+
+                records = mergedRecords;
+                normalizeAndDeduplicateRecords();
+                localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
+                localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
+            } else if (incomingTargetMap) {
+                Object.keys(incomingTargetMap).forEach(k => {
+                    const v = normalizeVehiclePrefix(k);
+                    const val = parseFloat(incomingTargetMap[k]);
+                    if (!isNaN(val) && val > 0) {
+                        vehicleTargetMap[v] = val;
+                    }
+                });
+                normalizeAndDeduplicateRecords();
+                localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
+                localStorage.setItem('oleo_vtr_records', JSON.stringify(records));
+            }
+        }
+
+        // 3. Reconciliação de Histórico Mensal de Rodagem (preserva lançamentos locais recentes)
+        if (data.mileageHistory !== undefined) {
+            const cloudHist = Array.isArray(data.mileageHistory)
+                ? data.mileageHistory
+                : (data.mileageHistory && typeof data.mileageHistory === 'object' ? Object.values(data.mileageHistory) : []);
+            const cloudIds = new Set(cloudHist.map(h => h && String(h.id)));
+            const nowMs = Date.now();
+            const recentLocal = (mileageHistory || []).filter(h => {
+                if (!h || !h.id || cloudIds.has(String(h.id))) return false;
+                const hMs = Number(h.updatedAtMs || h.id || 0);
+                return hMs > remoteUpdatedAtMs || (hMs > 0 && (nowMs - hMs < 600000));
+            });
+            mileageHistory = [...recentLocal, ...cloudHist];
+            localStorage.setItem('oleo_vtr_mileage_history', JSON.stringify(mileageHistory));
+        }
+
+        // 4. Reconciliação de Fotos Fixas (quando presentes no payload)
+        if (data.vehiclePhotos !== undefined) {
             vehiclePhotos = (data.vehiclePhotos && typeof data.vehiclePhotos === 'object') ? data.vehiclePhotos : {};
+            hasLoadedPhotosOnce = true;
             localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
         }
 
-        if (data && data.deletedAvariaIds && Array.isArray(data.deletedAvariaIds)) {
+        // 5. Reconciliação de IDs de Avarias Excluídas, Lixeira e Avarias Ativas
+        if (data.deletedAvariaIds && Array.isArray(data.deletedAvariaIds)) {
             data.deletedAvariaIds.forEach(id => {
                 if (!deletedAvariaIds.includes(id)) deletedAvariaIds.push(id);
             });
             localStorage.setItem('oleo_vtr_deleted_avaria_ids', JSON.stringify(deletedAvariaIds));
         }
 
-        if (data && data.vehicleAvariasLixeira !== undefined) {
-            vehicleAvariasLixeira = (data.vehicleAvariasLixeira && typeof data.vehicleAvariasLixeira === 'object') ? data.vehicleAvariasLixeira : {};
+        if (data.vehicleAvariasLixeira !== undefined) {
+            const cloudLix = (data.vehicleAvariasLixeira && typeof data.vehicleAvariasLixeira === 'object') ? data.vehicleAvariasLixeira : {};
+            vehicleAvariasLixeira = cloudLix;
             localStorage.setItem('oleo_vtr_avarias_lixeira', JSON.stringify(vehicleAvariasLixeira));
         }
 
-        if (data && data.vehicleAvarias !== undefined) {
+        if (data.vehicleAvarias !== undefined) {
             const rawAvarias = (data.vehicleAvarias && typeof data.vehicleAvarias === 'object') ? data.vehicleAvarias : {};
-            vehicleAvarias = sanitizeIncomingAvarias(rawAvarias);
+            const sanitizedCloud = sanitizeIncomingAvarias(rawAvarias);
+            const lixeiraIds = new Set(getAllLixeiraAvarias().map(a => String(a.id)));
+            const delIds = new Set((deletedAvariaIds || []).map(String));
+            const nowMs = Date.now();
+
+            // Preserva qualquer avaria recém-registrada localmente que ainda esteja subindo para a nuvem
+            Object.keys(vehicleAvarias || {}).forEach(vtr => {
+                const localList = Array.isArray(vehicleAvarias[vtr]) ? vehicleAvarias[vtr] : [];
+                localList.forEach(localAv => {
+                    if (!localAv || !localAv.id) return;
+                    const idStr = String(localAv.id);
+                    if (lixeiraIds.has(idStr) || delIds.has(idStr)) return;
+                    const avMs = Number(localAv.id || 0);
+                    if (avMs > remoteUpdatedAtMs || (avMs > 0 && (nowMs - avMs < 300000))) {
+                        if (!sanitizedCloud[vtr]) sanitizedCloud[vtr] = [];
+                        if (!sanitizedCloud[vtr].some(a => String(a.id) === idStr)) {
+                            sanitizedCloud[vtr].unshift(localAv);
+                        }
+                    }
+                });
+            });
+
+            vehicleAvarias = sanitizedCloud;
             localStorage.setItem('oleo_vtr_avarias', JSON.stringify(vehicleAvarias));
         }
 
-        const adminInspectionControls = document.getElementById('adminBaselineControls');
-        if (adminInspectionControls) {
-            adminInspectionControls.classList.toggle('admin-visible', Boolean(isAdminAuthenticated));
-            adminInspectionControls.style.setProperty('display', isAdminAuthenticated ? 'flex' : 'none', 'important');
-        }
-        if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
-            renderInspectionSlots();
-        }
         if (data.appTitle) {
             appTitle = data.appTitle;
             localStorage.setItem('oleo_vtr_app_title', appTitle);
@@ -6269,15 +6478,48 @@
             localStorage.setItem('oleo_vtr_last_status_update', data.lastStatusUpdate);
         }
 
-        if (!isUserTyping) {
-            populateMonthSelect();
-            populateVehicleSelects();
-        }
-        renderDashboard();
-        renderMileageTable();
-        renderVehicleMiniCards();
+        return true;
+    }
 
+    function applyOnlineData(data, isBackground = false) {
+        if (!data || typeof data !== 'object') return;
+
+        // Bloqueia sobrescrita em background se uma gravação local estiver em curso ou recém-concluída
+        if (isBackground && (activeSaveCount > 0 || (Date.now() - lastLocalMutationMs < 5000))) {
+            return;
+        }
+
+        isRemoteUpdate = true;
+        const applied = reconcileCloudAndLocalState(data);
         isRemoteUpdate = false;
+
+        if (!applied) {
+            // Nosso estado local é mais novo que o da nuvem: envia nosso estado atualizado para o Firebase
+            setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
+            isCloudConnected = true;
+            syncDirectToFirebaseFast();
+            return;
+        }
+
+        const newHash = generateDataHash({
+            records: records,
+            vehicles: customVehicles,
+            targetMap: vehicleTargetMap,
+            vehicleAvarias: vehicleAvarias,
+            vehicleAvariasLixeira: vehicleAvariasLixeira
+        });
+
+        const hasChanged = newHash !== lastSyncedHash;
+        lastSyncedHash = newHash;
+
+        if (hasChanged || !isBackground) {
+            refreshAllVehicleUI();
+            if (typeof renderAdminAvariasList === 'function') renderAdminAvariasList();
+            if (typeof renderInspectionSlots === 'function' && currentInspectVehicle) {
+                renderInspectionSlots();
+            }
+        }
+
         isCloudConnected = true;
         setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
         if (!isBackground) {
@@ -6286,9 +6528,65 @@
     }
 
     async function loadDataFromOnline(isBackground = false) {
+        // Em background, não concorre com gravações locais nem interrompe janelas modais abertas
+        if (isBackground) {
+            if (activeSaveCount > 0 || isGetInFlight || (Date.now() - lastLocalMutationMs < 5000)) {
+                return;
+            }
+            if (document.body.classList.contains('modal-open-lock')) {
+                return;
+            }
+        }
+
+        const seqAtStart = localMutationSeq;
+        isGetInFlight = true;
         if (!isBackground) setCloudStatusBadge('syncing', 'Conectando Online...');
+
         try {
-            const res = await executeApiRequest('GET');
+            const isFirebase = UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com');
+            const baseUrl = isFirebase ? UNIVERSAL_CLOUD_URL.replace('.json', '') : '';
+
+            // 🚀 Em background (após a carga inicial), faz checagem ultraleve de 25 bytes (/updatedAtMs.json)
+            if (isBackground && isFirebase && hasInitialCloudLoadCompleted && hasLoadedPhotosOnce) {
+                const tokenCtrl = new AbortController();
+                currentGetAbortController = tokenCtrl;
+                const tokenTimeout = setTimeout(() => tokenCtrl.abort(), 6000);
+                const tokenRes = await fetch(`${baseUrl}/updatedAtMs.json`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache' },
+                    cache: 'no-store',
+                    signal: tokenCtrl.signal
+                });
+                clearTimeout(tokenTimeout);
+
+                if (seqAtStart !== localMutationSeq || activeSaveCount > 0 || (Date.now() - lastLocalMutationMs < 5000)) {
+                    isGetInFlight = false;
+                    return;
+                }
+
+                if (tokenRes.ok) {
+                    const remoteMs = await tokenRes.json().catch(() => null);
+                    const remoteNum = Number(remoteMs || 0);
+                    if (remoteNum > 0 && (remoteNum === lastKnownCloudUpdatedAtMs || remoteNum <= lastLocalMutationMs)) {
+                        // Nada mudou no Firebase! Zero download pesado e zero re-renderização!
+                        isCloudConnected = true;
+                        setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
+                        isGetInFlight = false;
+                        return;
+                    }
+                }
+            }
+
+            const getCtrl = new AbortController();
+            currentGetAbortController = getCtrl;
+            const res = await executeApiRequest('GET', null, getCtrl.signal);
+            currentGetAbortController = null;
+
+            // Se o usuário lançou alguma alteração enquanto o GET estava baixando, descarta o GET antigo!
+            if (seqAtStart !== localMutationSeq || activeSaveCount > 0 || (isBackground && (Date.now() - lastLocalMutationMs < 5000))) {
+                isGetInFlight = false;
+                return;
+            }
 
             if (!res.success) {
                 hasInitialCloudLoadCompleted = true;
@@ -6296,13 +6594,20 @@
                 if (!isBackground) {
                     showToast(`⚠️ <strong>Servidor Offline:</strong> ${res.error || 'Não foi possível carregar os dados online.'}`);
                 }
+                isGetInFlight = false;
                 return;
             }
 
             const data = res.data;
+            const wasFirstLoad = !hasInitialCloudLoadCompleted;
             hasInitialCloudLoadCompleted = true;
-            if (data && typeof data === 'object' && Object.keys(data).length > 0 && (Array.isArray(data.records) || data.vehicles || data.appTitle)) {
+
+            if (data && typeof data === 'object' && Object.keys(data).length > 0 && (data.records !== undefined || data.vehicles !== undefined || data.appTitle !== undefined || data.targetMap !== undefined)) {
                 applyOnlineData(data, isBackground);
+                // Se na primeira carga havia alterações locais mais recentes que o servidor, garante envio imediato
+                if (wasFirstLoad && lastLocalMutationMs > Number(data.updatedAtMs || 0)) {
+                    syncDirectToFirebaseFast();
+                }
             } else {
                 if (records && records.length > 0) {
                     syncAllDataToOnline(true);
@@ -6313,94 +6618,108 @@
             }
         } catch (err) {
             hasInitialCloudLoadCompleted = true;
-            setCloudStatusBadge('disconnected', 'Modo Local (Offline)');
+            if (err && err.name !== 'AbortError') {
+                setCloudStatusBadge('disconnected', 'Modo Local (Offline)');
+            }
+        } finally {
+            isGetInFlight = false;
+            currentGetAbortController = null;
         }
     }
 
-    let hasInitialCloudLoadCompleted = false;
-
+    // ⚡ ENVIO ATÔMICO ULTRARRÁPIDO (~50ms) VIA PATCH (NÃO REENVIA FOTOS PESADAS NEM CAUSA CONFLITO)
     async function syncDirectToFirebaseFast() {
-        if (!UNIVERSAL_CLOUD_URL || !UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
-            syncAllDataToOnline();
-            return;
-        }
-        const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+        normalizeAndDeduplicateRecords();
+        const mutMs = lastLocalMutationMs || markLocalMutation();
+        lastKnownCloudUpdatedAtMs = Math.max(lastKnownCloudUpdatedAtMs, mutMs);
+
         const corePayload = {
             records: records || [],
             targetMap: vehicleTargetMap || {},
-            mileageHistory: (mileageHistory || []).slice(0, 50),
+            mileageHistory: mileageHistory || [],
             vehicles: customVehicles || [],
+            deletedRecordVehicles: deletedRecordVehicles || [],
+            appTitle: appTitle || '🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN',
             lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date(mutMs).toISOString(),
+            updatedAtMs: mutMs
         };
-        lastSyncedHash = generateDataHash(corePayload);
-        setCloudStatusBadge('syncing', '⚡ Enviando Nuvem...');
+
+        lastSyncedHash = generateDataHash({
+            records: records,
+            vehicles: customVehicles,
+            targetMap: vehicleTargetMap,
+            vehicleAvarias: vehicleAvarias,
+            vehicleAvariasLixeira: vehicleAvariasLixeira
+        });
+
+        activeSaveCount++;
+        setCloudStatusBadge('syncing', '⚡ Salvando Nuvem...');
 
         try {
-            // Atualiza os registros principais em tempo recorde (~50-80ms) sem travar com fotos pesadas
-            await fetch(`${baseUrl}/records.json`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(records)
-            });
-            await fetch(`${baseUrl}/targetMap.json`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(vehicleTargetMap)
-            });
-            await fetch(`${baseUrl}/lastStatusUpdate.json`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(corePayload.lastStatusUpdate)
-            });
-
-            isCloudConnected = true;
-            setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
-            // Sync complementar em background
-            syncAllDataToOnline();
+            const res = await executeApiRequest('PATCH', corePayload);
+            if (res.success) {
+                isCloudConnected = true;
+                setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
+            } else {
+                setCloudStatusBadge('disconnected', 'Salvo Localmente');
+            }
         } catch (e) {
-            syncAllDataToOnline();
+            setCloudStatusBadge('disconnected', 'Salvo Localmente');
+        } finally {
+            activeSaveCount = Math.max(0, activeSaveCount - 1);
         }
     }
 
-    async function syncAllDataToOnline(force = false) {
-        if (isRemoteUpdate && !force) return;
-        // 🛡️ Proteção anti-sobrescrita: não empurra dados locais antigos até que a nuvem seja consultada
-        if (!hasInitialCloudLoadCompleted && !force) return;
+    async function syncAllDataToOnline(forceFullPut = false) {
+        if (isRemoteUpdate && !forceFullPut) return;
+
+        // Para atualizações normais do dia a dia, usa SEMPRE o PATCH atômico rápido (sem reenviar fotos fixas de 10MB!)
+        if (!forceFullPut) {
+            return syncDirectToFirebaseFast();
+        }
+
+        normalizeAndDeduplicateRecords();
+        const mutMs = markLocalMutation();
+        lastKnownCloudUpdatedAtMs = Math.max(lastKnownCloudUpdatedAtMs, mutMs);
 
         const payload = {
             records: records || [],
             mileageHistory: mileageHistory || [],
             vehicles: customVehicles || [],
             targetMap: vehicleTargetMap || {},
+            deletedRecordVehicles: deletedRecordVehicles || [],
             vehiclePhotos: vehiclePhotos || {},
             vehicleAvarias: vehicleAvarias || {},
             vehicleAvariasLixeira: vehicleAvariasLixeira || {},
             deletedAvariaIds: deletedAvariaIds || [],
             appTitle: appTitle || '🚓 CONTROLE DE ÓLEO E AVARIAS - FROTA 1ª CIA DO 1º BPTRAN',
             lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date(mutMs).toISOString(),
+            updatedAtMs: mutMs
         };
 
         lastSyncedHash = generateDataHash(payload);
+        activeSaveCount++;
         setCloudStatusBadge('syncing', '🔄 Sincronizando Online...');
 
         try {
-            const res = await executeApiRequest('POST', payload);
+            const res = await executeApiRequest('PATCH', payload);
             if (res.success) {
                 isCloudConnected = true;
-                setCloudStatusBadge('connected', '🟢 Online');
+                setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
             } else {
                 setCloudStatusBadge('disconnected', 'Salvo apenas Localmente');
             }
         } catch (err) {
             setCloudStatusBadge('disconnected', 'Salvo apenas Localmente');
+        } finally {
+            activeSaveCount = Math.max(0, activeSaveCount - 1);
         }
     }
 
     function startAutoSync() {
-        // Conexão direta por Stream contínuo em Tempo Real (~80ms entre computadores)
-        initFirebaseRealtimeStream();
+        initFirebaseRealtimeStream(false);
 
         if (autoSyncInterval) clearInterval(autoSyncInterval);
         autoSyncInterval = setInterval(() => {
@@ -6410,26 +6729,42 @@
             if (!isUserTyping) {
                 loadDataFromOnline(true);
             }
-        }, 2500);
+        }, 3500);
 
         window.addEventListener('focus', () => { 
-            initFirebaseRealtimeStream();
+            initFirebaseRealtimeStream(false);
             loadDataFromOnline(true); 
         });
         window.addEventListener('online', () => { 
-            initFirebaseRealtimeStream();
+            initFirebaseRealtimeStream(true);
             loadDataFromOnline(true); 
         });
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
-                initFirebaseRealtimeStream();
+                initFirebaseRealtimeStream(false);
                 loadDataFromOnline(true);
             }
         });
-        // 📱 Mobile bfcache (retorno de outra aba ou desbloqueio de tela do celular)
         window.addEventListener('pageshow', () => {
-            initFirebaseRealtimeStream();
+            initFirebaseRealtimeStream(false);
             loadDataFromOnline(true);
+        });
+        // Sincronia instantânea entre abas abertas no mesmo navegador/celular
+        window.addEventListener('storage', (e) => {
+            if (!e.key || !e.key.startsWith('oleo_vtr_')) return;
+            try {
+                if (e.key === 'oleo_vtr_records' && e.newValue) {
+                    records = JSON.parse(e.newValue);
+                    refreshAllVehicleUI();
+                } else if (e.key === 'oleo_vtr_target_map' && e.newValue) {
+                    vehicleTargetMap = JSON.parse(e.newValue);
+                    refreshAllVehicleUI();
+                } else if (e.key === 'oleo_vtr_avarias' && e.newValue) {
+                    vehicleAvarias = JSON.parse(e.newValue);
+                    refreshAllVehicleUI();
+                    if (typeof renderAdminAvariasList === 'function') renderAdminAvariasList();
+                }
+            } catch (err) {}
         });
     }
 
@@ -7456,10 +7791,16 @@
             fluidoFreio = document.getElementById('checkFluidoFreio') ? document.getElementById('checkFluidoFreio').checked : false;
         }
 
-        const existingIdx = records.findIndex(r => r.vehicle === vehicle);
+        const cleanVehicle = normalizeVehiclePrefix(vehicle);
+        const mutMs = markLocalMutation(cleanVehicle);
+        vehicleTargetMap[cleanVehicle] = targetKm;
+        localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
+
+        normalizeAndDeduplicateRecords();
+        const existingIdx = records.findIndex(r => r.vehicle === cleanVehicle);
         const updatedRecord = {
-            id: vehicle,
-            vehicle: vehicle,
+            id: cleanVehicle,
+            vehicle: cleanVehicle,
             date: date,
             currentKm: currentKm,
             targetKm: targetKm,
@@ -7468,7 +7809,8 @@
             filtroOleo: filtroOleo,
             filtroAr: filtroAr,
             filtroCombustivel: filtroCombustivel,
-            fluidoFreio: fluidoFreio
+            fluidoFreio: fluidoFreio,
+            updatedAtMs: mutMs
         };
 
         if (existingIdx !== -1) {
@@ -7478,8 +7820,8 @@
         }
 
         mileageHistory.unshift({
-            id: Date.now(),
-            vehicle: vehicle,
+            id: mutMs,
+            vehicle: cleanVehicle,
             date: date,
             currentKm: currentKm,
             targetKm: targetKm,
@@ -7490,18 +7832,18 @@
             filtroAr: filtroAr,
             filtroCombustivel: filtroCombustivel,
             fluidoFreio: fluidoFreio,
-            timestamp: new Date().toISOString()
+            timestamp: new Date(mutMs).toISOString(),
+            updatedAtMs: mutMs
         });
+
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+        }
 
         saveRecords();
         updateStatusTimestamp();
-        populateMonthSelect();
-        populateVehicleSelects();
-        document.getElementById('vehicleSelect').value = vehicle;
-        onVehicleSelectChange();
-        renderDashboard();
-        renderMileageTable();
-        syncAllDataToOnline();
+        refreshAllVehicleUI(cleanVehicle);
+        syncDirectToFirebaseFast();
 
         openCongratsModal();
     });
@@ -8003,6 +8345,10 @@
             localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
         }
 
+        const mutMs = markLocalMutation(vehicle);
+        vehicleTargetMap[vehicle] = targetKm;
+        localStorage.setItem('oleo_vtr_target_map', JSON.stringify(vehicleTargetMap));
+
         v.date = date;
         v.currentKm = currentKm;
         v.targetKm = targetKm;
@@ -8012,9 +8358,10 @@
         v.filtroAr = filtroAr;
         v.filtroCombustivel = filtroCombustivel;
         v.fluidoFreio = fluidoFreio;
+        v.updatedAtMs = mutMs;
 
         mileageHistory.unshift({
-            id: Date.now(),
+            id: mutMs,
             vehicle: vehicle,
             date: date,
             currentKm: currentKm,
@@ -8026,17 +8373,15 @@
             filtroAr: filtroAr,
             filtroCombustivel: filtroCombustivel,
             fluidoFreio: fluidoFreio,
-            timestamp: new Date().toISOString()
+            timestamp: new Date(mutMs).toISOString(),
+            updatedAtMs: mutMs
         });
 
         saveRecords();
         updateStatusTimestamp();
-        populateMonthSelect();
-        populateVehicleSelects();
-        renderDashboard();
-        renderMileageTable();
         closeEditModal();
-        syncAllDataToOnline();
+        refreshAllVehicleUI(vehicle);
+        syncDirectToFirebaseFast();
 
         showToast(`💾 Viatura <strong>${vehicle}</strong> atualizada com sucesso!`);
     }
@@ -8046,13 +8391,12 @@
         if (!ok) return;
 
         if (confirm(`Deseja excluir o registro da viatura ${vehicleId} da tabela?`)) {
+            markLocalMutation(vehicleId, true);
             records = records.filter(r => r.vehicle !== vehicleId);
             saveRecords();
             updateStatusTimestamp();
-            populateMonthSelect();
-            populateVehicleSelects();
-            renderDashboard();
-            syncAllDataToOnline();
+            refreshAllVehicleUI();
+            syncDirectToFirebaseFast();
             showToast(`🗑️ Registro da viatura ${vehicleId} excluído.`);
         }
     }
@@ -8929,27 +9273,27 @@
             projectionBox.style.display = 'none';
         }
 
-        let filteredRecords = [...baseRecords];
+        let filteredRecords = [...vehicleList];
 
         if (filterVal === 'FILTER_VENCIDOS') {
-            filteredRecords = baseRecords.filter(r => {
-                const target = vehicleTargetMap[r.vehicle] || r.targetKm;
+            filteredRecords = vehicleList.filter(r => {
+                const target = r.targetKm || vehicleTargetMap[r.vehicle];
                 return target ? (target - r.currentKm) < 0 : false;
             });
         } else if (filterVal === 'FILTER_ATENCAO') {
-            filteredRecords = baseRecords.filter(r => {
-                const target = vehicleTargetMap[r.vehicle] || r.targetKm;
+            filteredRecords = vehicleList.filter(r => {
+                const target = r.targetKm || vehicleTargetMap[r.vehicle];
                 if (!target) return false;
                 const diff = target - r.currentKm;
                 return diff >= 0 && diff <= 500;
             });
         } else if (filterVal === 'FILTER_EM_DIA') {
-            filteredRecords = baseRecords.filter(r => {
-                const target = vehicleTargetMap[r.vehicle] || r.targetKm;
+            filteredRecords = vehicleList.filter(r => {
+                const target = r.targetKm || vehicleTargetMap[r.vehicle];
                 return target ? (target - r.currentKm) > 500 : false;
             });
         } else if (filterVal !== 'ALL') {
-            filteredRecords = baseRecords.filter(r => r.vehicle === filterVal);
+            filteredRecords = vehicleList.filter(r => r.vehicle === filterVal);
         }
 
         // Ordena registros respeitando a sequência personalizada definida em customVehicles
@@ -10250,8 +10594,8 @@
         const kmModal = document.getElementById('quickKmModal');
         if (kmModal) kmModal.style.setProperty('display', 'none', 'important');
 
-        // Atualização fresca de fotos em segundo plano ao abrir inspeção
-        if (typeof loadDataFromOnline === 'function') {
+        // Carrega fotos iniciais apenas se ainda não tiverem sido carregadas na sessão
+        if (!hasLoadedPhotosOnce && typeof loadDataFromOnline === 'function') {
             loadDataFromOnline(true);
         }
         const modal = document.getElementById('vehicleInspectionModal');
@@ -10890,23 +11234,11 @@
         // Abre IMEDIATAMENTE a janela final de aviso da reserva (z-index 10085)
         openAvariaAlertModal(savedVtr, qra);
 
-        // Envio direto imediato para o Firebase em segundo plano (sem travar a UI)
+        // Envio atômico imediato da avaria para o Firebase (sem reenviar fotos fixas nem causar conflito)
         try {
-            if (typeof syncAvariasDirectToFirebase === 'function') {
-                syncAvariasDirectToFirebase(savedVtr);
-            } else if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
-                const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
-                fetch(`${baseUrl}/vehicleAvarias/${encodeURIComponent(savedVtr)}.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(vehicleAvarias[savedVtr]),
-                    cache: 'no-store'
-                }).catch(err => console.warn('Erro ao sincronizar avaria direta no Firebase:', err));
-            }
-            if (typeof syncAllDataToOnline === 'function') syncAllDataToOnline(true);
-            if (typeof updateAdminBadgeUI === 'function') updateAdminBadgeUI();
-            if (typeof renderDashboard === 'function') renderDashboard();
-            if (typeof renderVehicleMiniCards === 'function') renderVehicleMiniCards();
+            updateStatusTimestamp();
+            syncAvariasDirectToFirebase(savedVtr);
+            refreshAllVehicleUI(savedVtr);
         } catch (syncErr) {
             console.warn('Erro em pós-processamento de avaria:', syncErr);
         }
@@ -11042,68 +11374,38 @@
         return clean;
     }
 
-    // ⚡ SINCRONIZAÇÃO DIRETA IMEDIATA DE AVARIAS E LIXEIRA NO FIREBASE (~40ms)
-    function syncAvariasDirectToFirebase(vehicle = null) {
+    // ⚡ SINCRONIZAÇÃO ATÔMICA IMEDIATA DE AVARIAS E LIXEIRA NO FIREBASE (~50ms)
+    async function syncAvariasDirectToFirebase(vehicle = null) {
         if (!UNIVERSAL_CLOUD_URL || !UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) return;
-        const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+        const mutMs = markLocalMutation();
+        lastKnownCloudUpdatedAtMs = Math.max(lastKnownCloudUpdatedAtMs, mutMs);
 
+        lastSyncedHash = generateDataHash({
+            records: records,
+            vehicles: customVehicles,
+            targetMap: vehicleTargetMap,
+            vehicleAvarias: vehicleAvarias,
+            vehicleAvariasLixeira: vehicleAvariasLixeira
+        });
+
+        const avariaPayload = {
+            vehicleAvarias: vehicleAvarias || {},
+            vehicleAvariasLixeira: vehicleAvariasLixeira || {},
+            deletedAvariaIds: deletedAvariaIds || [],
+            lastStatusUpdate: localStorage.getItem('oleo_vtr_last_status_update') || '',
+            updatedAt: new Date(mutMs).toISOString(),
+            updatedAtMs: mutMs
+        };
+
+        activeSaveCount++;
         try {
-            if (vehicle) {
-                // 1. Atualiza vehicleAvarias da viatura no Firebase
-                if (vehicleAvarias[vehicle] && vehicleAvarias[vehicle].length > 0) {
-                    fetch(`${baseUrl}/vehicleAvarias/${encodeURIComponent(vehicle)}.json`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(vehicleAvarias[vehicle]),
-                        cache: 'no-store'
-                    }).catch(() => {});
-                } else {
-                    fetch(`${baseUrl}/vehicleAvarias/${encodeURIComponent(vehicle)}.json`, {
-                        method: 'DELETE',
-                        cache: 'no-store'
-                    }).catch(() => {});
-                }
-
-                // 2. Atualiza vehicleAvariasLixeira da viatura no Firebase
-                if (vehicleAvariasLixeira[vehicle] && vehicleAvariasLixeira[vehicle].length > 0) {
-                    fetch(`${baseUrl}/vehicleAvariasLixeira/${encodeURIComponent(vehicle)}.json`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(vehicleAvariasLixeira[vehicle]),
-                        cache: 'no-store'
-                    }).catch(() => {});
-                } else {
-                    fetch(`${baseUrl}/vehicleAvariasLixeira/${encodeURIComponent(vehicle)}.json`, {
-                        method: 'DELETE',
-                        cache: 'no-store'
-                    }).catch(() => {});
-                }
-            } else {
-                // Sincroniza nó completo de avarias e lixeira
-                fetch(`${baseUrl}/vehicleAvarias.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(vehicleAvarias),
-                    cache: 'no-store'
-                }).catch(() => {});
-
-                fetch(`${baseUrl}/vehicleAvariasLixeira.json`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(vehicleAvariasLixeira),
-                    cache: 'no-store'
-                }).catch(() => {});
-            }
-
-            // 3. Atualiza deletedAvariaIds no Firebase
-            fetch(`${baseUrl}/deletedAvariaIds.json`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(deletedAvariaIds),
-                cache: 'no-store'
-            }).catch(() => {});
+            await executeApiRequest('PATCH', avariaPayload);
+            isCloudConnected = true;
+            setCloudStatusBadge('connected', '🟢 Online (Tempo Real)');
         } catch(e) {
             console.warn('Erro ao sincronizar avarias no Firebase:', e);
+        } finally {
+            activeSaveCount = Math.max(0, activeSaveCount - 1);
         }
     }
 
@@ -11975,17 +12277,27 @@
                     saveVehiclePhotos();
                     renderInspectionSlots();
 
+                    const mutMs = markLocalMutation();
+                    lastKnownCloudUpdatedAtMs = Math.max(lastKnownCloudUpdatedAtMs, mutMs);
                     if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
                         const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+                        activeSaveCount++;
                         fetch(`${baseUrl}/vehiclePhotos/${encodeURIComponent(currentInspectVehicle)}/${encodeURIComponent(currentUploadSlotId)}.json`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(photoObj),
                             cache: 'no-store'
-                        }).catch(err => console.warn('Erro ao enviar foto direta:', err));
+                        }).then(() => {
+                            return fetch(`${baseUrl}/updatedAtMs.json`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(mutMs),
+                                cache: 'no-store'
+                            });
+                        }).catch(err => console.warn('Erro ao enviar foto direta:', err)).finally(() => {
+                            activeSaveCount = Math.max(0, activeSaveCount - 1);
+                        });
                     }
-
-                    syncAllDataToOnline(true);
                     showToast(`📷 Foto fixa <strong>${slotInfo.label}</strong> salva com sucesso!`);
                 } catch (err) {
                     alert('Erro ao processar imagem: ' + err.message);
@@ -12017,17 +12329,26 @@
             saveVehiclePhotos();
             renderInspectionSlots();
 
+            const mutMs = markLocalMutation();
+            lastKnownCloudUpdatedAtMs = Math.max(lastKnownCloudUpdatedAtMs, mutMs);
             if (UNIVERSAL_CLOUD_URL && UNIVERSAL_CLOUD_URL.includes('firebaseio.com')) {
                 const baseUrl = UNIVERSAL_CLOUD_URL.replace('.json', '');
+                activeSaveCount++;
                 try {
                     await fetch(`${baseUrl}/vehiclePhotos/${encodeURIComponent(vtr)}/${encodeURIComponent(slotId)}.json`, {
                         method: 'DELETE',
                         cache: 'no-store'
                     });
-                } catch (err) {}
+                    await fetch(`${baseUrl}/updatedAtMs.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(mutMs),
+                        cache: 'no-store'
+                    });
+                } catch (err) {} finally {
+                    activeSaveCount = Math.max(0, activeSaveCount - 1);
+                }
             }
-
-            await syncAllDataToOnline(true);
             showToast(`🗑️ Foto fixa "${slotInfo.label}" removida com sucesso!`);
         }
     }
@@ -12036,13 +12357,24 @@
         localStorage.setItem('oleo_vtr_vehicle_photos', JSON.stringify(vehiclePhotos));
     }
 
-    function saveAndSyncInspectionPhotos() {
+    async function saveAndSyncInspectionPhotos() {
+        const mutMs = markLocalMutation();
+        lastKnownCloudUpdatedAtMs = Math.max(lastKnownCloudUpdatedAtMs, mutMs);
         saveVehiclePhotos();
-        syncAllDataToOnline(true);
         isAdminBaselineEditMode = false;
         renderInspectionSlots();
         showToast('💾 <strong>Fotos fixas da viatura salvas e sincronizadas!</strong>');
         closeVehicleInspectionModal();
+        activeSaveCount++;
+        try {
+            await executeApiRequest('PATCH', {
+                vehiclePhotos: vehiclePhotos || {},
+                updatedAt: new Date(mutMs).toISOString(),
+                updatedAtMs: mutMs
+            });
+        } finally {
+            activeSaveCount = Math.max(0, activeSaveCount - 1);
+        }
     }
 
 // =========================================================================
@@ -12373,7 +12705,8 @@
         }, { passive: false });
     }
     
-    // Inicialização Completa
+    // Inicialização Completa (com deduplicação imediata de registros locais)
+    normalizeAndDeduplicateRecords();
     applyTheme(currentTheme);
     updateAdminBadgeUI();
     initGoogleDriveAuth();
